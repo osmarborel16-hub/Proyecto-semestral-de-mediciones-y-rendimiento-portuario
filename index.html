@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard KPI · Un patio que se llena</title>
+  <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+  <div class="aviso-simulado">⚠ DATOS SIMULADOS (mockup) generados con <code>data/generar_datos.py</code> · No son datos reales de una terminal</div>
+
+  <header class="encabezado">
+    <h1>Un patio que se llena · Dashboard de KPI del patio de contenedores</h1>
+    <p>Proyecto Semestral UMIP · Medición y Rendimiento de Terminales Portuarias · Idea 3</p>
+  </header>
+
+  <!-- Filtros globales: afectan a todos los módulos -->
+  <section class="filtros" aria-label="Filtros">
+    <label>Día de análisis: <span class="fecha-sel" id="fechaSel">—</span>
+      <input type="range" id="fDia" min="0" max="59" step="1" value="59">
+    </label>
+    <label>Periodo para flujos (dwell, remanejos, servicio)
+      <select id="fPeriodo">
+        <option value="7">Últimos 7 días</option>
+        <option value="14" selected>Últimos 14 días</option>
+        <option value="30">Últimos 30 días</option>
+        <option value="60">Todo el periodo</option>
+      </select>
+    </label>
+    <label>Categoría
+      <select id="fCategoria">
+        <option value="">Todas</option>
+      </select>
+    </label>
+  </section>
+
+  <main>
+    <!-- 8 KPI con meta y semáforo -->
+    <section class="kpis" id="kpis" aria-label="Indicadores clave"></section>
+
+    <nav class="pestanas" id="pestanas">
+      <button data-mod="m1" class="activa">1 · Mapa del patio</button>
+      <button data-mod="m2">2 · Dwell time</button>
+      <button data-mod="m3">3 · Remanejos</button>
+      <button data-mod="m4">4 · Simulador</button>
+      <button data-mod="m5">5 · Mejora (A3)</button>
+      <button data-mod="m6">6 · Verificación</button>
+    </nav>
+
+    <!-- MÓDULO 1 -->
+    <section class="modulo activo" id="m1">
+      <div class="panel">
+        <h2>Mapa del patio: densidad por bloque</h2>
+        <p class="nota">Yard Density = Inventario ÷ Capacidad operativa × 100, al cierre del día seleccionado. Verde &lt; <span class="uAm"></span> %, amarillo desde <span class="uAm"></span> %, rojo desde <span class="uRo"></span> %.</p>
+        <div class="mapa" id="mapa"></div>
+        <div class="muelle">⚓ Muelle</div>
+        <div class="leyenda-mapa">
+          <span><i style="background: var(--verde)"></i>Normal</span>
+          <span><i style="background: var(--amarillo)"></i>Alerta amarilla</span>
+          <span><i style="background: var(--rojo)"></i>Alerta roja</span>
+        </div>
+      </div>
+      <div class="dos-columnas">
+        <div class="panel">
+          <h3>Evolución de la densidad (60 días)</h3>
+          <p class="nota">Total del patio y por grupo de bloques. Las líneas punteadas son los umbrales.</p>
+          <div class="grafico"><canvas id="gDensidad"></canvas></div>
+        </div>
+        <div class="panel">
+          <h3>Bloques en alerta</h3>
+          <div class="tabla-wrap"><table id="tAlertas"><thead><tr><th>Bloque</th><th>Categoría</th><th>Inventario (TEU)</th><th>Capacidad (TEU)</th><th>Densidad</th><th>Estado</th></tr></thead><tbody></tbody></table></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MÓDULO 2 -->
+    <section class="modulo" id="m2">
+      <div class="dos-columnas">
+        <div class="panel">
+          <h2>Dwell time por categoría vs meta</h2>
+          <p class="nota">Σ días en patio ÷ contenedores que salieron en el periodo.</p>
+          <div class="grafico"><canvas id="gDwell"></canvas></div>
+        </div>
+        <div class="panel">
+          <h2>Antigüedad del inventario (aging)</h2>
+          <p class="nota">Contenedores en patio al cierre del día, por edad y categoría.</p>
+          <div class="grafico"><canvas id="gAging"></canvas></div>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>¿Qué categoría presiona más el patio?</h3>
+        <p class="nota">TEU de más = llegadas diarias (TEU/día) × (dwell real − dwell meta). Es el espacio que se liberaría si la categoría cumpliera su meta (Ley de Little: Inventario = λ × W).</p>
+        <div class="tabla-wrap"><table id="tDwell"><thead><tr><th>Categoría</th><th>Contenedores salidos</th><th>Dwell real (días)</th><th>Meta (días)</th><th>Llegadas (TEU/día)</th><th>TEU en patio</th><th>TEU de más</th><th>Estado</th></tr></thead><tbody></tbody></table></div>
+        <p class="nota" id="notaDwellGlobal"></p>
+      </div>
+    </section>
+
+    <!-- MÓDULO 3 -->
+    <section class="modulo" id="m3">
+      <div class="panel">
+        <label class="nota">Bloque:
+          <select id="fBloque"><option value="">Todos los bloques</option></select>
+        </label>
+      </div>
+      <div class="dos-columnas">
+        <div class="panel">
+          <h2>Rehandle ratio por día</h2>
+          <p class="nota">Movimientos improductivos ÷ movimientos productivos × 100.</p>
+          <div class="grafico"><canvas id="gRemDia"></canvas></div>
+        </div>
+        <div class="panel">
+          <h2>Rehandle ratio por bloque (periodo)</h2>
+          <p class="nota">Compara los bloques en el periodo seleccionado.</p>
+          <div class="grafico"><canvas id="gRemBloque"></canvas></div>
+        </div>
+      </div>
+      <div class="panel">
+        <h2>Relación entre densidad y remanejos</h2>
+        <p class="nota" id="notaRegresion">Cada punto es un bloque en un día (densidad al inicio del día vs rehandle ratio de ese día).</p>
+        <div class="grafico alto"><canvas id="gRemDens"></canvas></div>
+      </div>
+    </section>
+
+    <!-- MÓDULO 4 -->
+    <section class="modulo" id="m4">
+      <div class="panel">
+        <h2>Simulador de escenarios: densidad de los próximos <span class="horizonte"></span> días</h2>
+        <p class="nota">Parte del inventario real (promedio de los 7 días hasta el día de análisis, para quitar el efecto del día de buque). Por categoría: Inventario(t+1) = Inventario(t) + Llegadas − Inventario(t) ÷ Dwell − Evacuación (Ley de Little). La línea base usa el dwell real y el crecimiento de llegadas medido (<b id="crecMedido">—</b> % por día).</p>
+        <div class="botones">
+          <button data-esc="tiempoLibre">Reducir tiempo libre de importación (−2 días)</button>
+          <button data-esc="citas">Citas de retiro de importación (−1 día)</button>
+          <button data-esc="vacios">Evacuar vacíos (60 TEU/día)</button>
+          <button data-esc="combinado">Propuesta combinada</button>
+          <button data-esc="reset" class="secundario">Volver a la situación actual</button>
+        </div>
+        <div class="controles" id="controles"></div>
+      </div>
+      <div class="dos-columnas">
+        <div class="panel">
+          <h3>Densidad proyectada: sin cambios vs escenario</h3>
+          <div class="grafico"><canvas id="gProy"></canvas></div>
+        </div>
+        <div class="panel">
+          <h3>Resultado al día <span class="horizonte"></span></h3>
+          <div class="resultados" id="resultados"></div>
+          <p class="nota" style="margin-top:12px">Remanejos y tiempo de servicio esperados = valor real del periodo + pendiente de la recta del módulo 3 × (densidad proyectada − densidad promedio del periodo). Es una estimación: la recta se ajustó con los datos simulados por bloque y día.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- MÓDULO 5 -->
+    <section class="modulo" id="m5">
+      <div class="panel">
+        <h2>Resumen A3 (Lean): situación actual vs propuesta</h2>
+        <p class="nota">Los números se actualizan solos con los filtros y con el escenario del simulador. Los cuadros de texto son para el análisis del grupo (se guardan en este navegador).</p>
+        <div class="a3">
+          <div class="caja"><h3>1. Problema</h3><ul id="a3Problema"></ul></div>
+          <div class="caja"><h3>2. Situación actual (KPI vs meta)</h3><div class="tabla-wrap"><table id="a3Actual"><thead><tr><th>KPI</th><th>Actual</th><th>Meta</th><th>Estado</th></tr></thead><tbody></tbody></table></div></div>
+          <div class="caja"><h3>3. Causa raíz</h3><ul id="a3Causa"></ul><textarea id="txtCausa" placeholder="5 porqués del grupo: ¿por qué esta categoría se queda tantos días en el patio? ..."></textarea></div>
+          <div class="caja"><h3>4. Desperdicio (Lean)</h3><ul id="a3Desperdicio"></ul></div>
+          <div class="caja"><h3>5. Propuesta</h3><ul id="a3Propuesta"></ul><textarea id="txtPropuesta" placeholder="Describan la propuesta: responsables, costo, cómo se implementa..."></textarea></div>
+          <div class="caja"><h3>6. KPI meta y resultado esperado</h3><div class="tabla-wrap"><table id="a3Resultado"><thead><tr><th>KPI</th><th>Actual</th><th>Con propuesta</th><th>Meta</th></tr></thead><tbody></tbody></table></div></div>
+          <div class="caja"><h3>7. Plan y seguimiento</h3><textarea id="txtPlan" placeholder="Qué KPI se revisan, cada cuánto y quién..."></textarea></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MÓDULO 6 -->
+    <section class="modulo" id="m6">
+      <div class="panel">
+        <h2>Verificación de cálculos</h2>
+        <p class="nota">Paso a paso de 3 KPI con los filtros actuales, para comparar con el cálculo a mano en Excel (data/contenedores.csv y data/movimientos_bloque.csv). Ver docs/verificacion_manual.md.</p>
+        <div id="verificacion"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>Proyecto Semestral UMIP · Datos simulados · Gráficos con Chart.js (js/lib)</footer>
+
+  <!-- Orden de carga: librería, datos, configuración, cálculos, interfaz -->
+  <script src="js/lib/chart.umd.min.js"></script>
+  <script src="data/datos.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/kpi.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

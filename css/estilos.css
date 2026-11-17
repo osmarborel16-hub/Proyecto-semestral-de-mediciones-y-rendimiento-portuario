@@ -1,0 +1,132 @@
+/* Estilos del dashboard - Idea 3 "Un patio que se llena" */
+:root {
+  --fondo: #f4f6f8;
+  --panel: #ffffff;
+  --borde: #dde3ea;
+  --texto: #1d2733;
+  --texto-suave: #5d6b7a;
+  --azul: #1f5f8b;
+  --azul-claro: #e7f0f7;
+  --verde: #2e8b57;
+  --amarillo: #d4a017;
+  --rojo: #c0392b;
+  --radio: 10px;
+  font-family: "Segoe UI", Roboto, Arial, sans-serif;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--fondo); color: var(--texto); }
+
+.aviso-simulado {
+  background: #fff4d6; color: #7a5a00; text-align: center; padding: 6px 12px;
+  font-size: 13px; border-bottom: 1px solid #f0d98a;
+}
+header.encabezado { background: var(--azul); color: #fff; padding: 16px 24px; }
+header.encabezado h1 { margin: 0; font-size: 22px; }
+header.encabezado p { margin: 4px 0 0; opacity: 0.85; font-size: 14px; }
+
+.filtros {
+  display: flex; flex-wrap: wrap; gap: 16px 24px; align-items: end;
+  background: var(--panel); border-bottom: 1px solid var(--borde); padding: 12px 24px;
+  position: sticky; top: 0; z-index: 5;
+}
+.filtros label { display: flex; flex-direction: column; font-size: 12px; color: var(--texto-suave); gap: 4px; }
+.filtros select, .filtros input[type="range"] { font-size: 14px; }
+.filtros input[type="range"] { width: 260px; }
+.filtros .fecha-sel { font-weight: 600; color: var(--texto); font-size: 14px; }
+
+main { padding: 16px 24px 40px; max-width: 1400px; margin: 0 auto; }
+
+/* Tarjetas de KPI */
+.kpis { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-bottom: 16px; }
+.kpi {
+  background: var(--panel); border: 1px solid var(--borde); border-left: 6px solid var(--verde);
+  border-radius: var(--radio); padding: 12px 14px;
+}
+.kpi.amarillo { border-left-color: var(--amarillo); }
+.kpi.rojo { border-left-color: var(--rojo); }
+.kpi .nombre { font-size: 12px; color: var(--texto-suave); text-transform: uppercase; letter-spacing: 0.03em; }
+.kpi .valor { font-size: 26px; font-weight: 700; margin: 4px 0; font-variant-numeric: tabular-nums; }
+.kpi .valor small { font-size: 14px; font-weight: 400; color: var(--texto-suave); }
+.kpi .meta { font-size: 12px; color: var(--texto-suave); }
+.kpi .estado { font-size: 12px; font-weight: 600; }
+.kpi .estado.verde { color: var(--verde); }
+.kpi .estado.amarillo { color: var(--amarillo); }
+.kpi .estado.rojo { color: var(--rojo); }
+
+/* Pestañas */
+.pestanas { display: flex; flex-wrap: wrap; gap: 4px; border-bottom: 2px solid var(--borde); margin-bottom: 16px; }
+.pestanas button {
+  border: none; background: none; padding: 10px 16px; font-size: 14px; cursor: pointer;
+  color: var(--texto-suave); border-bottom: 3px solid transparent; margin-bottom: -2px;
+}
+.pestanas button.activa { color: var(--azul); border-bottom-color: var(--azul); font-weight: 600; }
+.modulo { display: none; }
+.modulo.activo { display: block; }
+
+.panel { background: var(--panel); border: 1px solid var(--borde); border-radius: var(--radio); padding: 16px; margin-bottom: 16px; }
+.panel h2 { font-size: 17px; margin: 0 0 4px; }
+.panel h3 { font-size: 15px; margin: 0 0 8px; }
+.panel .nota { font-size: 13px; color: var(--texto-suave); margin: 0 0 12px; }
+.dos-columnas { display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 16px; }
+.grafico { position: relative; height: 300px; }
+.grafico.alto { height: 360px; }
+
+/* Mapa del patio */
+.mapa { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.bloque {
+  border-radius: 8px; padding: 12px; color: #fff; min-height: 110px;
+  display: flex; flex-direction: column; justify-content: space-between; transition: opacity 0.2s;
+}
+.bloque .id { font-size: 18px; font-weight: 700; }
+.bloque .cat { font-size: 12px; opacity: 0.9; }
+.bloque .dens { font-size: 24px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.bloque .teu { font-size: 12px; opacity: 0.9; }
+.bloque.atenuado { opacity: 0.25; }
+.leyenda-mapa { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12px; color: var(--texto-suave); margin-top: 10px; }
+.leyenda-mapa i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 4px; vertical-align: middle; }
+.muelle { text-align: center; font-size: 12px; color: var(--texto-suave); background: var(--azul-claro); border-radius: 6px; padding: 4px; margin-top: 10px; }
+
+/* Tablas */
+.tabla-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { padding: 7px 10px; border-bottom: 1px solid var(--borde); text-align: left; }
+th { background: #f0f3f6; font-size: 12px; color: var(--texto-suave); text-transform: uppercase; }
+td.num { text-align: right; font-variant-numeric: tabular-nums; }
+.etiqueta { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 12px; font-weight: 600; color: #fff; }
+.etiqueta.verde { background: var(--verde); }
+.etiqueta.amarillo { background: var(--amarillo); }
+.etiqueta.rojo { background: var(--rojo); }
+
+/* Simulador */
+.controles { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px 24px; margin-bottom: 12px; }
+.control label { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px; }
+.control input[type="range"] { width: 100%; }
+.control .actual { font-size: 11px; color: var(--texto-suave); }
+.botones { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.botones button {
+  border: 1px solid var(--azul); background: var(--azul-claro); color: var(--azul);
+  border-radius: 6px; padding: 6px 12px; font-size: 13px; cursor: pointer;
+}
+.botones button.secundario { border-color: var(--borde); background: #fff; color: var(--texto-suave); }
+.resultados { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; }
+.resultado { background: var(--azul-claro); border-radius: 8px; padding: 10px 12px; }
+.resultado .nombre { font-size: 12px; color: var(--texto-suave); }
+.resultado .valor { font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+/* A3 */
+.a3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 12px; }
+.a3 .caja { border: 1px solid var(--borde); border-radius: 8px; padding: 12px; background: #fff; }
+.a3 .caja h3 { color: var(--azul); }
+.a3 textarea { width: 100%; min-height: 90px; font: inherit; font-size: 13px; padding: 8px; border: 1px solid var(--borde); border-radius: 6px; }
+.a3 ul { margin: 0; padding-left: 18px; font-size: 14px; }
+
+.formula { font-family: Consolas, monospace; background: #f0f3f6; padding: 2px 6px; border-radius: 4px; font-size: 13px; }
+.paso { margin: 6px 0; font-size: 14px; }
+footer { text-align: center; font-size: 12px; color: var(--texto-suave); padding: 16px; }
+
+@media (max-width: 700px) {
+  .mapa { grid-template-columns: repeat(2, 1fr); }
+  .dos-columnas, .a3 { grid-template-columns: 1fr; }
+  .filtros input[type="range"] { width: 180px; }
+  main, .filtros { padding-left: 12px; padding-right: 12px; }
+}
