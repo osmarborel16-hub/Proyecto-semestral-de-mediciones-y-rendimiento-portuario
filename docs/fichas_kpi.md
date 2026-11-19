@@ -46,7 +46,8 @@ Cálculo: [6 × 30 × (5 × 6 − 4)] − 80 = 4 680 − 80 = **4 600 TEU**
 | Meta | Importación ≤ 5 · Exportación ≤ 4 · Transbordo ≤ 4 · Vacíos ≤ 7 |
 | Fuente del dato | `contenedores` simulados que ya salieron (fecha de entrada y de salida) |
 | Decisión que apoya | Identificar la categoría crítica; ajustar el tiempo libre de almacenaje |
-| Justificación de la meta | _por completar_ |
+| Justificación de la meta | Importación ≤ 5 días: en el tercer trimestre de 2025 el dwell de importación estuvo entre 3 y 9 días en la mayoría de los puertos analizados por S&P Global [F5 en `data/supuestos.md`]; el grupo elige la mitad baja del rango para una terminal eficiente. Exportación y transbordo ≤ 4 días: la carga de exportación espera a su buque (en la simulación llega de 1 a 7 días antes) y con 3.5 buques por semana el siguiente sale en 2 días o menos. Vacíos ≤ 7 días: una semana de margen para que la naviera los reposicione; más tiempo convierte al vacío en un ocupante de espacio sin carga |
+| Cálculo en el dashboard | Módulo 2 · función `dwellTime()`: solo contenedores que **salieron** en el rango de días (estancia completa, columna `dias_en_patio`) |
 
 ## 4. Dwell time global
 
@@ -59,7 +60,8 @@ Cálculo: [6 × 30 × (5 × 6 − 4)] − 80 = 4 680 − 80 = **4 600 TEU**
 | Meta | ≤ 5 días |
 | Fuente del dato | `contenedores` simulados que ya salieron |
 | Decisión que apoya | Seguimiento general de la rotación del patio |
-| Justificación de la meta | _por completar_ |
+| Justificación de la meta | Con la mezcla de la terminal (unos 32 % importación, 29 % exportación, 28 % transbordo y 11 % vacíos), cumplir las metas de cada categoría da un global ponderado de unos 4.7 días: (6 356 × 5 + 5 806 × 4 + 5 593 × 4 + 2 242 × 7) ÷ 19 997 = 4.65. El grupo redondea a 5 |
+| Por qué ponderado | El promedio simple de las 4 categorías (7.36 días) exagera el peso de los vacíos, que son pocos contenedores con dwell alto. El ponderado (6.35 días) refleja lo que vive el patio. El Módulo 2 muestra los dos para que se vea la diferencia |
 
 ## 5. Remanejos (rehandle ratio)
 
@@ -98,7 +100,8 @@ Cálculo: [6 × 30 × (5 × 6 − 4)] − 80 = 4 680 − 80 = **4 600 TEU**
 | Meta | ≤ 5 % del inventario en contenedores |
 | Fuente del dato | `contenedores` simulados que siguen en patio el día seleccionado |
 | Decisión que apoya | Lista de retiro prioritario; cobro de almacenaje; evacuación de vacíos |
-| Justificación de la meta | _por completar_ |
+| Justificación de la meta | X = 10 días es el doble de la meta de dwell de importación: un contenedor que lleva más de 10 días ya es una excepción (retenido, abandonado o vacío olvidado). Que esas excepciones sean como máximo el 5 % del inventario deja el patio para la carga que rota |
+| Cálculo en el dashboard | Módulo 2 · función `antiguedad()`: contenedores presentes al cierre del día de corte con (día de corte − entrada) > X. X se cambia en vivo en el Módulo 2 |
 
 ## 8. Días hasta alerta roja
 

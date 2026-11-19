@@ -82,6 +82,34 @@
   .tabla-datos .scroll { max-height: 240px; overflow: auto; }
   .tabla-datos table { border-collapse: collapse; margin-top: 6px; }
   .tabla-datos th, .tabla-datos td { border: 1px solid var(--borde); padding: 3px 8px; text-align: right; }
+  /* ----- Módulo 2 · Dwell time ----- */
+  .m2-controles { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 18px; margin: 10px 0 14px; }
+  .m2-controles label { font-size: .8rem; color: var(--suave); display: flex; flex-direction: column; gap: 4px; }
+  .m2-controles input { width: 80px; padding: 5px 8px; border: 1px solid var(--borde); border-radius: 6px; }
+  .m2-respuesta { border: 1px solid var(--borde); border-left: 6px solid var(--primario); border-radius: 8px; background: #f4f8fc; padding: 10px 14px; margin-bottom: 16px; }
+  .m2-respuesta .pregunta { font-size: .78rem; color: var(--suave); text-transform: uppercase; letter-spacing: .4px; }
+  .m2-respuesta .respuesta { font-size: 1.05rem; margin-top: 4px; }
+  .m2-cuerpo { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 22px; }
+  .m2-cuerpo h3 { margin: 0 0 8px; font-size: 1rem; }
+  .barra-dwell { display: grid; grid-template-columns: 110px 1fr 120px; align-items: center; gap: 10px; margin: 10px 0; font-size: .85rem; }
+  .barra-dwell.atenuada { opacity: .35; }
+  .barra-dwell .pista { position: relative; height: 22px; background: #eef1f4; border-radius: 4px; }
+  .barra-dwell .relleno { height: 100%; border-radius: 0 4px 4px 0; }
+  .barra-dwell .meta { position: absolute; top: -4px; width: 2px; height: 30px; background: #1d2733; }
+  .barra-dwell .meta span { position: absolute; top: -16px; left: -18px; font-size: .68rem; color: var(--suave); white-space: nowrap; }
+  .barra-dwell .valor { font-weight: 700; }
+  .barra-dwell .valor small { display: block; font-weight: 400; color: var(--suave); }
+  .m2-global { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+  .m2-global > div { border: 1px solid var(--borde); border-radius: 8px; padding: 8px 12px; background: #fff; }
+  .m2-global .num { font-size: 1.4rem; font-weight: 700; }
+  .m2-global .lbl { font-size: .75rem; color: var(--suave); }
+  .m2-global .incorrecto .num { color: var(--suave); text-decoration: line-through; text-decoration-thickness: 1px; }
+  .tabla-m2 { border-collapse: collapse; width: 100%; font-size: .82rem; margin-top: 8px; }
+  .tabla-m2 th, .tabla-m2 td { border: 1px solid var(--borde); padding: 5px 8px; text-align: right; }
+  .tabla-m2 th:first-child, .tabla-m2 td:first-child { text-align: left; }
+  .tabla-m2 tr.total td { font-weight: 700; background: #f4f6f8; }
+  .tabla-m2 tr.simple td { color: var(--suave); font-style: italic; }
+  @media (max-width: 900px) { .m2-cuerpo { grid-template-columns: 1fr; } }
   @media (max-width: 900px) { .m1-cuerpo { grid-template-columns: 1fr; } .bloques { grid-template-columns: repeat(2, 1fr); } }
   footer { text-align: center; font-size: .8rem; color: var(--suave); padding: 12px; }
 </style>
@@ -188,7 +216,36 @@
 <!-- ===== MÓDULO 2 · DWELL TIME ===== Responsable: Leslie West -->
 <section class="modulo" id="m2">
   <h2>2 · Dwell time</h2>
-  <p class="pendiente">Pendiente: dwell por categoría vs meta, dwell global ponderado vs simple y gráfico de antigüedad (aging).</p>
+  <p class="nota">Dwell time por categoría = Σ días en patio ÷ contenedores de la categoría · se cuentan los contenedores que <strong>salieron</strong> en el rango de días filtrado ·
+     Antigüedad = contenedores con más de X días en patio al cierre del día de corte · el filtro de turno no aplica a este módulo</p>
+
+  <div class="m2-controles">
+    <label>X días para la antigüedad (aging)
+      <input type="number" id="m2-x" min="1" max="60" step="1" value="10">
+    </label>
+  </div>
+
+  <div class="m2-respuesta">
+    <div class="pregunta">¿Qué categoría presiona más el patio y cuántos TEU ocupa de más?</div>
+    <div class="respuesta" id="m2-respuesta"></div>
+  </div>
+
+  <div class="m2-cuerpo">
+    <div>
+      <h3 id="m2-titulo-dwell">Dwell time por categoría vs meta</h3>
+      <div id="m2-barras"></div>
+      <div class="m2-global" id="m2-global"></div>
+    </div>
+    <div>
+      <h3 id="m2-titulo-aging">Antigüedad del inventario</h3>
+      <div class="lienzo"><canvas id="m2-grafico" aria-label="Antigüedad del inventario por categoría"></canvas></div>
+      <p class="nota" id="m2-aging-txt"></p>
+    </div>
+  </div>
+
+  <h3 style="margin-top:18px">Detalle del cálculo</h3>
+  <div id="m2-tabla"></div>
+  <p class="nota">TEU de más = llegadas diarias (TEU/día) × (dwell actual − dwell meta), por la Ley de Little (inventario = llegadas × tiempo de permanencia), la misma de la ficha de ejemplo del curso. Es el inventario que se liberaría si la categoría cumpliera su meta de dwell.</p>
 </section>
 
 <!-- ===== MÓDULO 3 · REMANEJOS ===== Responsable: Adriana Garibaldi -->
@@ -234,6 +291,14 @@ const PATIO = {
 const UMBRALES = { amarillo: 70, rojo: 85 }; // % de densidad (editables por el grupo)
 
 const CATEGORIAS = { IMP: 'Importación', EXP: 'Exportación', TRB: 'Transbordo', VAC: 'Vacíos' };
+
+// Metas del grupo (ver docs/fichas_kpi.md)
+const METAS = {
+  dwell: { IMP: 5, EXP: 4, TRB: 4, VAC: 7 },  // días, por categoría
+  dwellGlobal: 5,                             // días
+  agingX: 10,                                 // X días para la antigüedad del inventario (editable en el Módulo 2)
+  agingPct: 5                                 // % máximo del inventario con más de X días
+};
 
 /* =====================================================================
    2. GENERADOR PSEUDOALEATORIO CON SEMILLA FIJA (reproducible)
@@ -558,7 +623,19 @@ function renderResumenDatos() {
    4b. CONSULTAS COMUNES (las pueden usar todos los módulos)
    ===================================================================== */
 let INV = {};                                        // INV[dia][bloque][categoria] = TEU al cierre del día
+let CONT = [];                                       // contenedores con tiempos numéricos (t en días; día d = [d−1, d))
+function tiempoDe(dia, fechaHoraTxt) {
+  const [hh, mm] = fechaHoraTxt.slice(11, 16).split(':').map(Number);
+  return (dia - 1) + hh / 24 + mm / 1440;
+}
 function indexarDatos() {
+  CONT = DATOS.contenedores.map(c => ({
+    cat: c.categoria, teu: c.teu, bloque: c.bloque,
+    tE: tiempoDe(c.dia_entrada, c.entrada),
+    tS: c.salida ? tiempoDe(c.dia_salida, c.salida) : Infinity,
+    diaE: c.dia_entrada, diaS: c.dia_salida === '' ? null : c.dia_salida,
+    dias: c.dias_en_patio === '' ? null : c.dias_en_patio
+  }));
   INV = {};
   for (const r of DATOS.inventarioDiario) {
     INV[r.dia] = INV[r.dia] || {};
@@ -595,6 +672,49 @@ function estadoDensidad(d) { return d > UMBRALES.rojo ? 'rojo' : (d > UMBRALES.a
 const ESTADO = { verde: '✔ Verde', amarillo: '⚠ Amarilla', rojo: '⛔ Roja' };
 const fmt = (x, dec = 1) => x.toLocaleString('es-PA', { minimumFractionDigits: dec, maximumFractionDigits: dec });
 
+// KPI 3 y 4 · Dwell time de los contenedores que SALIERON entre los días desde y hasta
+// Devuelve, por categoría: contenedores, Σ días, dwell (Σ días ÷ contenedores); y el global ponderado
+function dwellTime(desde, hasta, bloque = 'todos') {
+  const r = {}; Object.keys(CATEGORIAS).forEach(c => r[c] = { n: 0, sumaDias: 0, dwell: null });
+  for (const c of CONT) {
+    if (c.diaS === null || c.diaS < desde || c.diaS > hasta) continue;
+    if (bloque !== 'todos' && c.bloque !== bloque) continue;
+    r[c.cat].n++; r[c.cat].sumaDias += c.dias;
+  }
+  let n = 0, suma = 0, sumaDwells = 0, cats = 0;
+  for (const k in r) {
+    if (r[k].n) { r[k].dwell = r[k].sumaDias / r[k].n; sumaDwells += r[k].dwell; cats++; }
+    n += r[k].n; suma += r[k].sumaDias;
+  }
+  return { porCategoria: r, n, sumaDias: suma,
+    global: n ? suma / n : null,                     // promedio ponderado por contenedores (fórmula del curso)
+    simple: cats ? sumaDwells / cats : null };       // promedio simple de las categorías (solo para comparar)
+}
+// KPI 7 · Antigüedad: contenedores en patio al cierre del día con más de X días
+function antiguedad(dia, x, bloque = 'todos', categoria = 'todas') {
+  let enPatio = 0, mayores = 0; const edades = [];
+  for (const c of CONT) {
+    if (!(c.tE < dia && c.tS >= dia)) continue;      // presente al cierre del día
+    if (bloque !== 'todos' && c.bloque !== bloque) continue;
+    if (categoria !== 'todas' && c.cat !== categoria) continue;
+    const edad = dia - c.tE;
+    enPatio++; if (edad > x) mayores++;
+    edades.push({ cat: c.cat, edad });
+  }
+  return { enPatio, mayores, pct: enPatio ? mayores / enPatio * 100 : 0, edades };
+}
+// TEU que entraron por día en el rango (llegadas λ, para la Ley de Little)
+function llegadasTEUdia(desde, hasta, bloque = 'todos') {
+  const r = {}; Object.keys(CATEGORIAS).forEach(c => r[c] = 0);
+  for (const c of CONT) {
+    if (c.diaE < desde || c.diaE > hasta) continue;
+    if (bloque !== 'todos' && c.bloque !== bloque) continue;
+    r[c.cat] += c.teu;
+  }
+  const dias = hasta - desde + 1; for (const k in r) r[k] /= dias;
+  return r;
+}
+
 /* =====================================================================
    5. TARJETAS DE KPI (meta + señal visual)
    ===================================================================== */
@@ -616,10 +736,19 @@ function renderKPIs() {
       const donde = f.bloque === 'todos' ? 'patio' : 'bloque ' + f.bloque;
       return tarjeta('Yard Density', fmt(d) + ' %', `Meta ≤ ${UMBRALES.amarillo} % · ${donde} · día ${f.hasta}`, estadoDensidad(d));
     })(),
-    tarjeta('Dwell time global', '—', 'Meta ≤ 5 días', ''),
+    (() => {
+      const f = filtros(), dw = dwellTime(f.desde, f.hasta, f.bloque);
+      if (dw.global === null) return tarjeta('Dwell time global', '—', `Meta ≤ ${METAS.dwellGlobal} días`, '');
+      return tarjeta('Dwell time global', fmt(dw.global, 2) + ' días', `Meta ≤ ${METAS.dwellGlobal} días · ponderado · días ${f.desde}–${f.hasta}`,
+        dw.global <= METAS.dwellGlobal ? 'verde' : 'rojo');
+    })(),
     tarjeta('Remanejos', '—', 'Meta ≤ 30 %', ''),
     tarjeta('Servicio en patio', '—', 'Meta ≤ 25 min', ''),
-    tarjeta('Aging (> X días)', '—', 'Meta ≤ 5 % del inventario', ''),
+    (() => {
+      const f = filtros(), ag = antiguedad(f.hasta, METAS.agingX, f.bloque);
+      return tarjeta(`Aging (> ${METAS.agingX} días)`, ag.mayores.toLocaleString('es-PA') + ' cont.',
+        `${fmt(ag.pct)} % del inventario · meta ≤ ${METAS.agingPct} % · día ${f.hasta}`, ag.pct <= METAS.agingPct ? 'verde' : 'rojo');
+    })(),
     tarjeta('Días a alerta roja', '—', 'Meta ≥ 30 días', '')
   ].join('');
 }
@@ -806,7 +935,140 @@ document.getElementById('m1-reproducir').addEventListener('click', (e) => {
     if (+slider.value >= SIM.dias) { clearInterval(reproduccionM1); reproduccionM1 = null; e.target.textContent = '▶ Reproducir los 60 días'; }
   }, 250);
 });
-function renderModulo2() { /* Leslie West */ }
+/* ---------- MÓDULO 2 · DWELL TIME (Leslie West) ---------- */
+const COLOR_CAT = { IMP: '#2a78d6', EXP: '#eb6834', TRB: '#1baf7a', VAC: '#eda100' };   // paleta categórica validada, orden fijo
+let graficoM2 = null;
+
+function renderModulo2() {
+  const f = filtros(), cats = Object.keys(CATEGORIAS);
+  const dw = dwellTime(f.desde, f.hasta, f.bloque);
+  const lam = llegadasTEUdia(f.desde, f.hasta, f.bloque);
+  const donde = f.bloque === 'todos' ? 'todo el patio' : 'bloque ' + f.bloque;
+  document.getElementById('m2-x').value = METAS.agingX;
+  document.getElementById('m2-titulo-dwell').textContent = `Dwell time por categoría vs meta · días ${f.desde}–${f.hasta} · ${donde}`;
+
+  // TEU de más por categoría (Ley de Little): λ × (dwell actual − meta), solo si supera la meta
+  const exceso = {};
+  cats.forEach(c => {
+    const d = dw.porCategoria[c].dwell;
+    exceso[c] = d === null ? 0 : Math.max(0, lam[c] * (d - METAS.dwell[c]));
+  });
+
+  /* 1) Respuesta a la pregunta 1 */
+  const orden = cats.filter(c => dw.porCategoria[c].dwell !== null).sort((a, b) => exceso[b] - exceso[a]);
+  const critica = orden[0];
+  const resp = document.getElementById('m2-respuesta');
+  if (!critica || exceso[critica] === 0) {
+    resp.innerHTML = '✔ Ninguna categoría supera su meta de dwell en este rango.';
+  } else {
+    const d = dw.porCategoria[critica].dwell, segunda = orden[1];
+    resp.innerHTML = `<strong>${CATEGORIAS[critica]}</strong>: dwell de ${fmt(d)} días contra una meta de ${METAS.dwell[critica]} días. ` +
+      `Con ${fmt(lam[critica], 0)} TEU/día de llegadas, ocupa unos <strong>${Math.round(exceso[critica]).toLocaleString('es-PA')} TEU de más</strong>` +
+      ` (${fmt(exceso[critica] / capacidad(f.bloque) * 100)} puntos de densidad).` +
+      (segunda && exceso[segunda] > 0 ? ` Le sigue ${CATEGORIAS[segunda]} con unos ${Math.round(exceso[segunda]).toLocaleString('es-PA')} TEU de más.` : '');
+  }
+
+  /* 2) Barras de dwell vs meta (HTML: valor y meta siempre visibles) */
+  const escala = Math.max(14, ...cats.map(c => (dw.porCategoria[c].dwell || 0) * 1.1));
+  document.getElementById('m2-barras').innerHTML = cats.map(c => {
+    const r = dw.porCategoria[c], meta = METAS.dwell[c];
+    const ok = r.dwell !== null && r.dwell <= meta;
+    const atenuada = f.categoria !== 'todas' && f.categoria !== c ? ' atenuada' : '';
+    return `<div class="barra-dwell${atenuada}">
+      <div><strong>${CATEGORIAS[c]}</strong><br><span class="nota">${r.n.toLocaleString('es-PA')} contenedores</span></div>
+      <div class="pista" title="${CATEGORIAS[c]}: ${r.dwell === null ? 'sin salidas' : fmt(r.dwell, 2) + ' días'} · meta ${meta} días">
+        <div class="relleno" style="width:${r.dwell === null ? 0 : Math.min(100, r.dwell / escala * 100)}%; background:${COLOR_CAT[c]}"></div>
+        <div class="meta" style="left:${meta / escala * 100}%"><span>meta ${meta}</span></div>
+      </div>
+      <div class="valor">${r.dwell === null ? '—' : fmt(r.dwell, 2) + ' días'}
+        <small>${r.dwell === null ? '' : (ok ? '✔ cumple la meta' : '⛔ +' + fmt(r.dwell - meta) + ' días sobre la meta')}</small></div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('m2-global').innerHTML = dw.global === null ? '' :
+    `<div><div class="num">${fmt(dw.global, 2)} días</div><div class="lbl">Dwell global <strong>ponderado</strong> por contenedores (fórmula del curso) · meta ≤ ${METAS.dwellGlobal} · ${dw.global <= METAS.dwellGlobal ? '✔ cumple' : '⛔ no cumple'}</div></div>
+     <div class="incorrecto"><div class="num">${fmt(dw.simple, 2)} días</div><div class="lbl">Promedio <strong>simple</strong> de las 4 categorías: NO es el KPI. Exagera el peso de los vacíos, que son pocos contenedores pero con dwell alto</div></div>`;
+
+  /* 3) Antigüedad del inventario (aging) */
+  const ag = antiguedad(f.hasta, METAS.agingX, f.bloque, f.categoria);
+  document.getElementById('m2-titulo-aging').textContent = `Antigüedad del inventario · cierre del día ${f.hasta} · ${donde}`;
+  const porCat = cats.map(c => [c, ag.edades.filter(e => e.cat === c && e.edad > METAS.agingX).length]).filter(x => x[1] > 0).sort((a, b) => b[1] - a[1]);
+  document.getElementById('m2-aging-txt').innerHTML =
+    `<strong>${ag.mayores.toLocaleString('es-PA')} contenedores con más de ${METAS.agingX} días</strong> de ${ag.enPatio.toLocaleString('es-PA')} en patio ` +
+    `(${fmt(ag.pct)} %, meta ≤ ${METAS.agingPct} % · ${ag.pct <= METAS.agingPct ? '✔ cumple' : '⛔ no cumple'}). ` +
+    (porCat.length ? 'Por categoría: ' + porCat.map(([c, n]) => `${c} ${n}`).join(' · ') + '.' : '');
+
+  const anchos = 2, tramos = [];                    // tramos de 2 días hasta 30, luego "30+"
+  for (let a = 0; a < 30; a += anchos) tramos.push([a, a + anchos, `${a}–${a + anchos}`]);
+  tramos.push([30, Infinity, '30+']);
+  const catsGraf = f.categoria === 'todas' ? cats : [f.categoria];
+  const series = catsGraf.map(c => ({
+    label: CATEGORIAS[c],
+    data: tramos.map(([a, b]) => ag.edades.filter(e => e.cat === c && e.edad >= a && e.edad < b).length),
+    backgroundColor: COLOR_CAT[c], borderColor: '#ffffff', borderWidth: { top: 2, right: 0, bottom: 0, left: 0 }, borderRadius: 2, borderSkipped: false
+  }));
+
+  if (typeof Chart === 'undefined') {
+    document.querySelector('#m2 .lienzo').innerHTML = '<p class="pendiente">No se pudo cargar Chart.js (¿sin internet?). Los valores están en el texto y la tabla.</p>';
+  } else {
+    const xIndex = tramos.findIndex(([a, b]) => METAS.agingX >= a && METAS.agingX < b);
+    if (graficoM2) graficoM2.destroy();
+    graficoM2 = new Chart(document.getElementById('m2-grafico'), {
+      type: 'bar',
+      data: { labels: tramos.map(t => t[2]), datasets: series },
+      options: {
+        responsive: true, maintainAspectRatio: false, animation: false,
+        interaction: { mode: 'index', intersect: false },
+        scales: {
+          x: { stacked: true, title: { display: true, text: 'Días en patio' }, grid: { display: false }, ticks: { maxRotation: 0, autoSkip: true } },
+          y: { stacked: true, title: { display: true, text: 'Contenedores' }, grid: { color: '#eceff2' } }
+        },
+        plugins: {
+          legend: { position: 'bottom', labels: { boxWidth: 12, boxHeight: 12 } },
+          tooltip: { callbacks: { title: it => `${it[0].label} días en patio`, footer: it => 'Total: ' + it.reduce((a, x) => a + x.parsed.y, 0) } },
+          marcaX: { indice: xIndex, x: METAS.agingX }
+        }
+      },
+      plugins: [{
+        id: 'marcaX',                                 // línea vertical en X días
+        afterDatasetsDraw(chart, _a, o) {
+          if (o.indice < 0) return;
+          const esc = chart.scales.x, ancho = esc.getPixelForValue(1) - esc.getPixelForValue(0);
+          const tramo = tramos[o.indice], frac = tramo[1] === Infinity ? 0 : (o.x - tramo[0]) / (tramo[1] - tramo[0]);
+          const x = esc.getPixelForValue(o.indice) - ancho / 2 + frac * ancho, { top, bottom } = chart.chartArea, ctx = chart.ctx;
+          ctx.save(); ctx.strokeStyle = '#1d2733'; ctx.lineWidth = 1.5; ctx.setLineDash([5, 3]);
+          ctx.beginPath(); ctx.moveTo(x, top); ctx.lineTo(x, bottom); ctx.stroke();
+          ctx.setLineDash([]); ctx.fillStyle = '#1d2733'; ctx.font = '12px Segoe UI, Arial'; ctx.fillText(`X = ${o.x} días →`, x + 4, top + 12);
+          ctx.restore();
+        }
+      }]
+    });
+  }
+
+  /* 4) Tabla del cálculo (sirve para la verificación a mano) */
+  const fila = (c) => {
+    const r = dw.porCategoria[c];
+    return `<tr><td>${CATEGORIAS[c]}</td><td>${r.n.toLocaleString('es-PA')}</td><td>${fmt(r.sumaDias, 2)}</td>
+      <td>${r.dwell === null ? '—' : fmt(r.dwell, 2)}</td><td>${METAS.dwell[c]}</td>
+      <td>${r.dwell === null ? '' : (r.dwell <= METAS.dwell[c] ? '✔' : '⛔')}</td>
+      <td>${fmt(lam[c], 1)}</td><td>${exceso[c] > 0 ? Math.round(exceso[c]).toLocaleString('es-PA') : '0'}</td></tr>`;
+  };
+  document.getElementById('m2-tabla').innerHTML = `<table class="tabla-m2">
+    <tr><th>Categoría</th><th>Contenedores que salieron</th><th>Σ días en patio</th><th>Dwell (días)</th><th>Meta (días)</th><th>Estado</th><th>Llegadas (TEU/día)</th><th>TEU de más</th></tr>
+    ${cats.map(fila).join('')}
+    <tr class="total"><td>Global ponderado</td><td>${dw.n.toLocaleString('es-PA')}</td><td>${fmt(dw.sumaDias, 2)}</td><td>${dw.global === null ? '—' : fmt(dw.global, 2)}</td>
+      <td>${METAS.dwellGlobal}</td><td>${dw.global === null ? '' : (dw.global <= METAS.dwellGlobal ? '✔' : '⛔')}</td><td></td>
+      <td>${Math.round(cats.reduce((a, c) => a + exceso[c], 0)).toLocaleString('es-PA')}</td></tr>
+    <tr class="simple"><td>Promedio simple (no es el KPI)</td><td></td><td></td><td>${dw.simple === null ? '—' : fmt(dw.simple, 2)}</td><td></td><td></td><td></td><td></td></tr>
+  </table>`;
+}
+
+document.getElementById('m2-x').addEventListener('change', (e) => {
+  const x = parseInt(e.target.value, 10);
+  if (isNaN(x)) return;
+  METAS.agingX = Math.min(60, Math.max(1, x));
+  renderTodo();
+});
 function renderModulo3() { /* Adriana Garibaldi */ }
 function renderModulo4() { /* Osmar Chiari */ }
 function renderModulo5() { /* Osmar Chiari */ }

@@ -72,7 +72,7 @@ La ficha completa de cada KPI (meta, fuente y decisión que apoya) está en [`do
 |---|---|---|
 | Datos simulados (semilla 2026) | ✅ Listo | Leslie West |
 | 1 · Mapa del patio | ✅ Listo | Leslie West |
-| 2 · Dwell time | ⏳ Pendiente | Leslie West |
+| 2 · Dwell time | ✅ Listo | Leslie West |
 | 3 · Remanejos | ⏳ Pendiente | Adriana Garibaldi |
 | 4 · Simulador de escenarios | ⏳ Pendiente | Osmar Chiari |
 | 5 · Mejora (A3) | ⏳ Pendiente | Osmar Chiari |
@@ -94,6 +94,14 @@ La ficha completa de cada KPI (meta, fuente y decisión que apoya) está en [`do
 - **Alertas del día**: densidad del patio completo y de cada bloque en alerta, con los TEU que faltan para la roja (o que la superan) y los días seguidos en ese estado.
 - **Evolución de la densidad**: el total del patio o los 6 bloques en el rango de días elegido, con las líneas de umbral y una línea punteada en el día del mapa. Debajo hay una tabla con los mismos datos.
 - **Capacidad operativa** (KPI 1): el cálculo completo aparece al pie del módulo.
+
+**Módulo 2 · Dwell time**
+- **Respuesta a la pregunta 1**: qué categoría presiona más el patio y cuántos TEU ocupa de más. Se calcula con la Ley de Little: llegadas diarias × (dwell actual − meta).
+- **Barras de dwell por categoría** con la marca de la meta y el estado (✔ cumple / ⛔ días sobre la meta). Cuentan los contenedores que **salieron** en el rango de días filtrado.
+- **Dwell global ponderado** (el KPI) junto al **promedio simple** tachado, para explicar por qué no se usa el simple.
+- **Antigüedad del inventario**: histograma por categoría al cierre del día de corte, con la línea de X días. **X se cambia en vivo** y la tarjeta de KPI se actualiza.
+- **Detalle del cálculo**: tabla con contenedores, Σ días, dwell, meta, llegadas y TEU de más. Es la base para la verificación a mano.
+- Respeta los filtros de días, bloque y categoría; el turno no aplica.
 
 Enlace en GitHub Pages: _pendiente_
 
