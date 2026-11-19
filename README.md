@@ -65,11 +65,34 @@ La ficha completa de cada KPI (meta, fuente y decisión que apoya) está en [`do
 └──────────────────────────────────────────────────────────────┘
 ```
 
-## 4. Cómo abrir el dashboard
+### Estado de avance
+
+| Módulo | Estado | Responsable |
+|---|---|---|
+| Datos simulados (semilla 2026) | ✅ Listo | Integrante 1 |
+| 1 · Mapa del patio | ✅ Listo | Integrante 1 |
+| 2 · Dwell time | ⏳ Pendiente | Integrante 2 |
+| 3 · Remanejos | ⏳ Pendiente | Integrante 3 |
+| 4 · Simulador de escenarios | ⏳ Pendiente | Integrante 4 |
+| 5 · Mejora (A3) | ⏳ Pendiente | Integrante 4 |
+| 6 · Camiones y citas (extra) | ⏳ Pendiente | por asignar |
+
+## 4. Cómo abrir y usar el dashboard
 
 1. Descargar o clonar el repositorio.
 2. Abrir `index.html` con doble clic en Chrome o Edge. No hace falta instalar nada ni usar un servidor.
-3. Los gráficos usan Chart.js desde un CDN, así que se necesita internet.
+3. Los gráficos usan Chart.js desde un CDN, así que se necesita internet. Sin internet, el Módulo 1 sigue mostrando el mapa, las alertas y la tabla de datos, pero no el gráfico.
+
+**Filtros globales** (barra superior): rango de días, turno, bloque y categoría. El **"Día hasta"** es el día de corte que usan el mapa y las tarjetas de KPI.
+
+**Módulo 1 · Mapa del patio**
+- **Deslizador "Día del mapa"**: cambia el día de corte (está sincronizado con "Día hasta"). **▶ Reproducir** recorre los 60 días; sirve para la demostración en vivo.
+- **Mapa de calor**: cada bloque muestra su Yard Density, los TEU sobre su capacidad, un medidor con las marcas de los umbrales y la mezcla de categorías. El color siempre va con ícono y texto de estado (✔ Verde, ⚠ Amarilla, ⛔ Roja).
+- **Clic en un bloque**: filtra todo el dashboard por ese bloque. Un segundo clic quita el filtro.
+- **Umbrales amarillo y rojo**: se pueden cambiar en vivo (por ejemplo, si el profesor lo pide) y todo el dashboard se recalcula.
+- **Alertas del día**: densidad del patio completo y de cada bloque en alerta, con los TEU que faltan para la roja (o que la superan) y los días seguidos en ese estado.
+- **Evolución de la densidad**: el total del patio o los 6 bloques en el rango de días elegido, con las líneas de umbral y una línea punteada en el día del mapa. Debajo hay una tabla con los mismos datos.
+- **Capacidad operativa** (KPI 1): el cálculo completo aparece al pie del módulo.
 
 Enlace en GitHub Pages: _pendiente_
 

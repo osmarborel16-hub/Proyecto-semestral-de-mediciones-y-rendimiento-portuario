@@ -9,7 +9,7 @@
   :root {
     --fondo: #f4f6f8; --tarjeta: #ffffff; --texto: #1d2733; --suave: #5b6b7c;
     --borde: #dde3ea; --primario: #1f4e79;
-    --verde: #2e8b57; --amarillo: #d4a017; --rojo: #c0392b; --gris: #8a96a3;
+    --verde: #0ca30c; --amarillo: #fab219; --rojo: #d03b3b; --gris: #8a96a3;
   }
   * { box-sizing: border-box; }
   body { margin: 0; font-family: "Segoe UI", Arial, sans-serif; background: var(--fondo); color: var(--texto); }
@@ -40,6 +40,49 @@
   .panel-datos td, .panel-datos th { border: 1px solid var(--borde); padding: 4px 10px; text-align: left; }
   .botones-csv { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 6px; }
   .botones-csv button { border: 1px solid var(--primario); background: #fff; color: var(--primario); border-radius: 6px; padding: 5px 10px; cursor: pointer; }
+  /* ----- Módulo 1 · Mapa del patio ----- */
+  .nota { font-size: .8rem; color: var(--suave); margin: 4px 0; }
+  .m1-controles { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 18px; margin: 10px 0 14px; }
+  .m1-controles label { font-size: .8rem; color: var(--suave); display: flex; flex-direction: column; gap: 4px; }
+  .m1-controles input[type=number] { width: 80px; padding: 5px 8px; border: 1px solid var(--borde); border-radius: 6px; }
+  .m1-controles input[type=range] { width: 260px; }
+  .m1-controles button, .m1-grafico-cab select { border: 1px solid var(--primario); background: #fff; color: var(--primario); border-radius: 6px; padding: 6px 12px; cursor: pointer; }
+  .m1-cuerpo { display: grid; grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr); gap: 18px; }
+  .patio { border: 1px solid var(--borde); border-radius: 8px; overflow: hidden; background: #f7f8f9; }
+  .muelle, .gate { text-align: center; font-size: .75rem; letter-spacing: 1px; color: #fff; padding: 5px; }
+  .muelle { background: #34495e; }
+  .gate { background: #7f8c8d; }
+  .bloques { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 14px; }
+  .bloque { background: #fff; border: 1px solid var(--borde); border-top: 6px solid var(--gris); border-radius: 8px; padding: 10px 12px; cursor: pointer; transition: box-shadow .15s; }
+  .bloque:hover, .bloque:focus { box-shadow: 0 0 0 2px #b9c7d6; outline: none; }
+  .bloque.seleccionado { box-shadow: 0 0 0 3px var(--primario); }
+  .bloque.verde { border-top-color: var(--verde); background: #f1faf1; }
+  .bloque.amarillo { border-top-color: var(--amarillo); background: #fff8e8; }
+  .bloque.rojo { border-top-color: var(--rojo); background: #fdf0f0; }
+  .b-cab { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+  .b-nombre { font-weight: 700; }
+  .insignia { font-size: .72rem; font-weight: 700; padding: 2px 8px; border-radius: 10px; color: #1d2733; background: #e9eef3; white-space: nowrap; }
+  .insignia.verde { background: #d5f0d5; } .insignia.amarillo { background: #fde7b0; } .insignia.rojo { background: #f6cccc; }
+  .b-valor { font-size: 1.9rem; font-weight: 700; margin: 4px 0 0; }
+  .b-teu, .b-mezcla { font-size: .78rem; color: var(--suave); }
+  .medidor { position: relative; height: 8px; background: #e6eaee; border-radius: 4px; margin: 8px 0 6px; }
+  .medidor .relleno { height: 100%; border-radius: 4px; background: var(--gris); }
+  .bloque.verde .relleno { background: var(--verde); } .bloque.amarillo .relleno { background: var(--amarillo); } .bloque.rojo .relleno { background: var(--rojo); }
+  .medidor .marca { position: absolute; top: -3px; width: 2px; height: 14px; background: #52514e; }
+  .m1-lateral h3, .m1-grafico h3 { margin: 0 0 8px; font-size: 1rem; }
+  .alertas { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
+  .alertas li { border: 1px solid var(--borde); border-left: 5px solid var(--gris); border-radius: 6px; padding: 7px 10px; font-size: .85rem; background: #fff; }
+  .alertas li.verde { border-left-color: var(--verde); } .alertas li.amarillo { border-left-color: var(--amarillo); } .alertas li.rojo { border-left-color: var(--rojo); }
+  .alertas li small { color: var(--suave); display: block; margin-top: 2px; }
+  .m1-grafico { margin-top: 18px; }
+  .m1-grafico-cab { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .lienzo { position: relative; height: 290px; }
+  .tabla-datos { margin-top: 8px; font-size: .8rem; }
+  .tabla-datos summary { cursor: pointer; color: var(--primario); }
+  .tabla-datos .scroll { max-height: 240px; overflow: auto; }
+  .tabla-datos table { border-collapse: collapse; margin-top: 6px; }
+  .tabla-datos th, .tabla-datos td { border: 1px solid var(--borde); padding: 3px 8px; text-align: right; }
+  @media (max-width: 900px) { .m1-cuerpo { grid-template-columns: 1fr; } .bloques { grid-template-columns: repeat(2, 1fr); } }
   footer { text-align: center; font-size: .8rem; color: var(--suave); padding: 12px; }
 </style>
 </head>
@@ -96,7 +139,50 @@
 <!-- ===== MÓDULO 1 · MAPA DEL PATIO ===== Responsable: Integrante 1 -->
 <section class="modulo activo" id="m1">
   <h2>1 · Mapa del patio</h2>
-  <p class="pendiente">Pendiente: mapa de calor por bloque con densidad, alertas amarilla/roja y deslizador de día.</p>
+  <p class="nota">Yard Density = Inventario ÷ capacidad operativa × 100 · inventario en TEU al cierre del día · clic en un bloque para filtrar todo el dashboard</p>
+
+  <div class="m1-controles">
+    <label>Día del mapa: <strong id="m1-dia-txt"></strong>
+      <input type="range" id="m1-dia" min="1" max="60" value="60">
+    </label>
+    <button type="button" id="m1-reproducir">▶ Reproducir los 60 días</button>
+    <label>Umbral amarillo (%)
+      <input type="number" id="m1-umbral-amarillo" min="0" max="100" step="1" value="70">
+    </label>
+    <label>Umbral rojo (%)
+      <input type="number" id="m1-umbral-rojo" min="0" max="100" step="1" value="85">
+    </label>
+  </div>
+
+  <div class="m1-cuerpo">
+    <div class="patio">
+      <div class="muelle">MUELLE · GRÚAS STS</div>
+      <div class="bloques" id="m1-bloques"></div>
+      <div class="gate">GATE · CAMIONES</div>
+    </div>
+    <div class="m1-lateral">
+      <h3 id="m1-alertas-titulo">Alertas del día</h3>
+      <ul class="alertas" id="m1-alertas"></ul>
+      <p class="nota" id="m1-leyenda"></p>
+    </div>
+  </div>
+
+  <div class="m1-grafico">
+    <div class="m1-grafico-cab">
+      <h3>Evolución de la densidad</h3>
+      <select id="m1-vista" aria-label="Vista del gráfico">
+        <option value="total">Total del patio</option>
+        <option value="bloques">Por bloque</option>
+      </select>
+    </div>
+    <div class="lienzo"><canvas id="m1-grafico" aria-label="Densidad del patio por día"></canvas></div>
+    <details class="tabla-datos">
+      <summary>Ver los datos del gráfico en tabla</summary>
+      <div class="scroll" id="m1-tabla"></div>
+    </details>
+  </div>
+
+  <p class="nota" id="m1-capacidad"></p>
 </section>
 
 <!-- ===== MÓDULO 2 · DWELL TIME ===== Responsable: Integrante 2 -->
@@ -469,6 +555,47 @@ function renderResumenDatos() {
 }
 
 /* =====================================================================
+   4b. CONSULTAS COMUNES (las pueden usar todos los módulos)
+   ===================================================================== */
+let INV = {};                                        // INV[dia][bloque][categoria] = TEU al cierre del día
+function indexarDatos() {
+  INV = {};
+  for (const r of DATOS.inventarioDiario) {
+    INV[r.dia] = INV[r.dia] || {};
+    INV[r.dia][r.bloque] = INV[r.dia][r.bloque] || {};
+    INV[r.dia][r.bloque][r.categoria] = r.teu;
+  }
+}
+// Filtros globales, ya validados (desde ≤ hasta, dentro de 1–60)
+function filtros() {
+  const num = (id, def) => { const v = parseInt(document.getElementById(id).value, 10); return isNaN(v) ? def : Math.min(SIM.dias, Math.max(1, v)); };
+  let desde = num('f-desde', 1), hasta = num('f-hasta', SIM.dias);
+  if (desde > hasta) [desde, hasta] = [hasta, desde];
+  return {
+    desde, hasta,
+    turno: document.getElementById('f-turno').value,
+    bloque: document.getElementById('f-bloque').value,
+    categoria: document.getElementById('f-categoria').value
+  };
+}
+function inventarioTEU(dia, bloque = 'todos', categoria = 'todas') {
+  const bloques = bloque === 'todos' ? PATIO.bloques : [bloque];
+  const cats = categoria === 'todas' ? Object.keys(CATEGORIAS) : [categoria];
+  let teu = 0;
+  for (const b of bloques) for (const c of cats) teu += (INV[dia] && INV[dia][b] && INV[dia][b][c]) || 0;
+  return teu;
+}
+function capacidad(bloque = 'todos') { return bloque === 'todos' ? capacidadOperativa() : capacidadBloque(bloque); }
+// KPI 2 · Yard Density = Inventario ÷ capacidad operativa × 100
+function yardDensity(dia, bloque = 'todos', categoria = 'todas') {
+  return inventarioTEU(dia, bloque, categoria) / capacidad(bloque) * 100;
+}
+// verde ≤ umbral amarillo · amarillo ≤ umbral rojo · rojo por encima
+function estadoDensidad(d) { return d > UMBRALES.rojo ? 'rojo' : (d > UMBRALES.amarillo ? 'amarillo' : 'verde'); }
+const ESTADO = { verde: '✔ Verde', amarillo: '⚠ Amarilla', rojo: '⛔ Roja' };
+const fmt = (x, dec = 1) => x.toLocaleString('es-PA', { minimumFractionDigits: dec, maximumFractionDigits: dec });
+
+/* =====================================================================
    5. TARJETAS DE KPI (meta + señal visual)
    ===================================================================== */
 function colorPorMeta(valor, verdeHasta, amarilloHasta) {
@@ -484,7 +611,11 @@ function renderKPIs() {
   const cap = capacidadOperativa();
   document.getElementById('kpis').innerHTML = [
     tarjeta('Capacidad operativa', cap.toLocaleString('es-PA') + ' TEU', 'Referencia: 4 600 TEU', 'verde'),
-    tarjeta('Yard Density', '—', 'Meta ≤ 70 %', ''),
+    (() => {
+      const f = filtros(), d = yardDensity(f.hasta, f.bloque);
+      const donde = f.bloque === 'todos' ? 'patio' : 'bloque ' + f.bloque;
+      return tarjeta('Yard Density', fmt(d) + ' %', `Meta ≤ ${UMBRALES.amarillo} % · ${donde} · día ${f.hasta}`, estadoDensidad(d));
+    })(),
     tarjeta('Dwell time global', '—', 'Meta ≤ 5 días', ''),
     tarjeta('Remanejos', '—', 'Meta ≤ 30 %', ''),
     tarjeta('Servicio en patio', '—', 'Meta ≤ 25 min', ''),
@@ -496,7 +627,185 @@ function renderKPIs() {
 /* =====================================================================
    6. MÓDULOS (cada integrante completa su función)
    ===================================================================== */
-function renderModulo1() { /* Integrante 1 */ }
+/* ---------- MÓDULO 1 · MAPA DEL PATIO (Integrante 1) ---------- */
+const COLOR_SERIE = ['#2a78d6', '#eb6834', '#1baf7a', '#eda100', '#e87ba4', '#008300'];   // paleta categórica validada (orden fijo)
+// Las líneas de umbral van en gris (con trazo distinto) para no confundirse con las series de color
+const ESTILO_UMBRAL = { amarillo: { color: '#9a9994', dash: [6, 4] }, rojo: { color: '#3d3c39', dash: [10, 3, 2, 3] } };
+let graficoM1 = null;
+
+// Días seguidos (hasta el día dado) en que el bloque estuvo en el mismo estado
+function diasSeguidos(dia, bloque, estado) {
+  let n = 0;
+  for (let d = dia; d >= 1 && estadoDensidad(yardDensity(d, bloque)) === estado; d--) n++;
+  return n;
+}
+
+function renderModulo1() {
+  const f = filtros(), dia = f.hasta;
+  document.getElementById('m1-dia').value = dia;
+  document.getElementById('m1-dia-txt').textContent = `día ${dia} (${fechaDe(dia)})`;
+  document.getElementById('m1-umbral-amarillo').value = UMBRALES.amarillo;
+  document.getElementById('m1-umbral-rojo').value = UMBRALES.rojo;
+
+  /* 1) Mapa de calor por bloque */
+  document.getElementById('m1-bloques').innerHTML = PATIO.bloques.map(b => {
+    const teu = inventarioTEU(dia, b), cap = capacidadBloque(b), d = teu / cap * 100, est = estadoDensidad(d);
+    const mezcla = Object.keys(CATEGORIAS)
+      .map(c => [c, inventarioTEU(dia, b, c)]).filter(x => x[1] > 0).sort((x, y) => y[1] - x[1])
+      .map(([c, t]) => `${c} ${Math.round(t / teu * 100)} %`).join(' · ');
+    const lineaCat = f.categoria !== 'todas'
+      ? `<div class="b-teu"><strong>${CATEGORIAS[f.categoria]}: ${inventarioTEU(dia, b, f.categoria).toLocaleString('es-PA')} TEU</strong></div>` : '';
+    return `<div class="bloque ${est}${f.bloque === b ? ' seleccionado' : ''}" data-bloque="${b}" role="button" tabindex="0"
+              title="Bloque ${b}: ${fmt(d)} % · clic para filtrar">
+      <div class="b-cab"><span class="b-nombre">Bloque ${b}</span><span class="insignia ${est}">${ESTADO[est]}</span></div>
+      <div class="b-valor">${fmt(d)} %</div>
+      <div class="b-teu">${teu.toLocaleString('es-PA')} / ${cap.toLocaleString('es-PA')} TEU</div>
+      <div class="medidor"><div class="relleno" style="width:${Math.min(100, d)}%"></div>
+        <span class="marca" style="left:${UMBRALES.amarillo}%"></span><span class="marca" style="left:${UMBRALES.rojo}%"></span></div>
+      <div class="b-mezcla">${mezcla || 'vacío'}</div>${lineaCat}
+    </div>`;
+  }).join('');
+
+  /* 2) Alertas del día */
+  const dTotal = yardDensity(dia), estTotal = estadoDensidad(dTotal);
+  const alertas = [{
+    est: estTotal,
+    txt: `<strong>Patio completo: ${fmt(dTotal)} %</strong> (${ESTADO[estTotal]})`,
+    det: `${inventarioTEU(dia).toLocaleString('es-PA')} de ${capacidadOperativa().toLocaleString('es-PA')} TEU`
+  }];
+  PATIO.bloques
+    .map(b => ({ b, d: yardDensity(dia, b) }))
+    .filter(x => estadoDensidad(x.d) !== 'verde')
+    .sort((x, y) => y.d - x.d)
+    .forEach(({ b, d }) => {
+      const est = estadoDensidad(d), cap = capacidadBloque(b), teu = inventarioTEU(dia, b);
+      const margen = Math.round(cap * UMBRALES.rojo / 100 - teu);
+      const seguidos = diasSeguidos(dia, b, est);
+      alertas.push({
+        est,
+        txt: `<strong>Bloque ${b}: ${fmt(d)} %</strong> (${ESTADO[est]})`,
+        det: (est === 'rojo' ? `${-margen} TEU por encima del umbral rojo` : `faltan ${margen} TEU para la alerta roja`) +
+             ` · ${seguidos} ${seguidos === 1 ? 'día' : 'días seguidos'} en este estado`
+      });
+    });
+  if (alertas.length === 1) alertas.push({ est: 'verde', txt: '✔ Ningún bloque en alerta', det: '' });
+  document.getElementById('m1-alertas-titulo').textContent = `Alertas del día ${dia}`;
+  document.getElementById('m1-alertas').innerHTML = alertas.map(a => `<li class="${a.est}">${a.txt}${a.det ? `<small>${a.det}</small>` : ''}</li>`).join('');
+  document.getElementById('m1-leyenda').textContent =
+    `Umbrales del grupo: verde ≤ ${UMBRALES.amarillo} % · amarilla > ${UMBRALES.amarillo} % y ≤ ${UMBRALES.rojo} % · roja > ${UMBRALES.rojo} %. ` +
+    `Los bloques llevan ícono y texto de estado, no solo color.`;
+
+  /* 3) Capacidad operativa (KPI 1) */
+  const bruta = PATIO.bloques.length * PATIO.stacks * (PATIO.tiers * PATIO.lanes - PATIO.shuffleSlots);
+  const inop = Object.values(PATIO.inoperativos).reduce((a, x) => a + x, 0);
+  document.getElementById('m1-capacidad').textContent =
+    `Capacidad operativa = [${PATIO.bloques.length} bloques × ${PATIO.stacks} stacks × (${PATIO.tiers} tiers × ${PATIO.lanes} lanes − ${PATIO.shuffleSlots} shuffle slots)] − ${inop} slots inoperativos = ` +
+    `${bruta.toLocaleString('es-PA')} − ${inop} = ${capacidadOperativa().toLocaleString('es-PA')} TEU. Capacidad por bloque: ` +
+    PATIO.bloques.map(b => `${b} ${capacidadBloque(b)}`).join(' · ') + ' TEU.';
+
+  /* 4) Gráfico de evolución */
+  const dias = []; for (let d = f.desde; d <= f.hasta; d++) dias.push(d);
+  const vista = document.getElementById('m1-vista').value;
+  let series;
+  if (vista === 'bloques') {
+    series = PATIO.bloques.map((b, i) => ({
+      label: 'Bloque ' + b, data: dias.map(d => +yardDensity(d, b).toFixed(1)),
+      // con un bloque seleccionado, los demás se atenúan (mismo color, más transparente)
+      borderColor: COLOR_SERIE[i] + (f.bloque === 'todos' || f.bloque === b ? '' : '40'), backgroundColor: COLOR_SERIE[i],
+      borderWidth: f.bloque === b ? 3 : 2, pointRadius: 0, pointHoverRadius: 5, tension: 0.2, order: f.bloque === b ? 0 : 1
+    }));
+  } else {
+    const etiqueta = f.bloque === 'todos' ? 'Total del patio' : 'Bloque ' + f.bloque;
+    series = [{ label: etiqueta, data: dias.map(d => +yardDensity(d, f.bloque).toFixed(1)),
+      borderColor: COLOR_SERIE[0], backgroundColor: COLOR_SERIE[0], borderWidth: 2, pointRadius: 0, pointHoverRadius: 5, tension: 0.2 }];
+  }
+  const umbral = (nombre, valor, estilo) => ({ label: `${nombre} (${valor} %)`, data: dias.map(() => valor),
+    borderColor: estilo.color, backgroundColor: estilo.color, borderWidth: 1.5, borderDash: estilo.dash, pointRadius: 0, pointHoverRadius: 0, order: 2 });
+  series.push(umbral('Umbral amarillo', UMBRALES.amarillo, ESTILO_UMBRAL.amarillo), umbral('Umbral rojo', UMBRALES.rojo, ESTILO_UMBRAL.rojo));
+
+  // tabla equivalente (accesibilidad)
+  document.getElementById('m1-tabla').innerHTML = '<table><tr><th>Día</th><th>Fecha</th>' +
+    series.slice(0, -2).map(s => `<th>${s.label} (%)</th>`).join('') + '</tr>' +
+    dias.map((d, i) => `<tr><td>${d}</td><td>${fechaDe(d)}</td>${series.slice(0, -2).map(s => `<td>${fmt(s.data[i])}</td>`).join('')}</tr>`).join('') + '</table>';
+
+  if (typeof Chart === 'undefined') {
+    document.querySelector('#m1 .lienzo').innerHTML = '<p class="pendiente">No se pudo cargar Chart.js (¿sin internet?). Los datos están en la tabla de abajo.</p>';
+    return;
+  }
+  const config = {
+    type: 'line',
+    data: { labels: dias, datasets: series },
+    options: {
+      responsive: true, maintainAspectRatio: false, animation: false,
+      interaction: { mode: 'index', intersect: false },
+      scales: {
+        y: { min: 0, max: 100, title: { display: true, text: 'Densidad (%)' }, grid: { color: '#eceff2' }, ticks: { callback: v => v + ' %' } },
+        x: { title: { display: true, text: 'Día' }, grid: { display: false }, ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 15 } }
+      },
+      plugins: {
+        legend: { position: 'bottom', labels: { boxWidth: 18, boxHeight: 2, usePointStyle: false,
+          sort: (x, y) => x.datasetIndex - y.datasetIndex,
+          generateLabels: (chart) => Chart.defaults.plugins.legend.labels.generateLabels(chart).map(l => {
+            const ds = chart.data.datasets[l.datasetIndex];
+            return { ...l, strokeStyle: ds.backgroundColor, fillStyle: ds.backgroundColor, lineDash: ds.borderDash || [] };   // leyenda con color pleno
+          }) } },
+        tooltip: { filter: item => !item.dataset.label.startsWith('Umbral'),
+          callbacks: { title: items => `Día ${items[0].label} · ${fechaDe(+items[0].label)}`, label: it => ` ${it.dataset.label}: ${fmt(it.parsed.y)} %` } },
+        marcaDia: { dia }
+      }
+    },
+    plugins: [{
+      id: 'marcaDia',                                   // línea vertical en el día del mapa
+      afterDatasetsDraw(chart, _args, opts) {
+        const i = chart.data.labels.indexOf(opts.dia); if (i < 0) return;
+        const x = chart.scales.x.getPixelForValue(i), { top, bottom } = chart.chartArea, ctx = chart.ctx;
+        ctx.save(); ctx.strokeStyle = '#52514e'; ctx.lineWidth = 1; ctx.setLineDash([2, 3]);
+        ctx.beginPath(); ctx.moveTo(x, top); ctx.lineTo(x, bottom); ctx.stroke(); ctx.restore();
+      }
+    }]
+  };
+  if (graficoM1) graficoM1.destroy();
+  graficoM1 = new Chart(document.getElementById('m1-grafico'), config);
+}
+
+// Eventos del módulo 1
+document.getElementById('m1-dia').addEventListener('input', (e) => {
+  const hasta = document.getElementById('f-hasta'), desde = document.getElementById('f-desde');
+  hasta.value = e.target.value;
+  if (+desde.value > +hasta.value) desde.value = hasta.value;
+  renderTodo();
+});
+document.getElementById('m1-bloques').addEventListener('click', (e) => {
+  const tarjetaBloque = e.target.closest('.bloque'); if (!tarjetaBloque) return;
+  const sel = document.getElementById('f-bloque');
+  sel.value = sel.value === tarjetaBloque.dataset.bloque ? 'todos' : tarjetaBloque.dataset.bloque;   // segundo clic quita el filtro
+  renderTodo();
+});
+document.getElementById('m1-bloques').addEventListener('keydown', (e) => {
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.closest('.bloque')) { e.preventDefault(); e.target.click(); }
+});
+['m1-umbral-amarillo', 'm1-umbral-rojo'].forEach(id => document.getElementById(id).addEventListener('change', () => {
+  let am = parseFloat(document.getElementById('m1-umbral-amarillo').value), ro = parseFloat(document.getElementById('m1-umbral-rojo').value);
+  if (isNaN(am) || isNaN(ro)) return;
+  am = Math.min(100, Math.max(0, am)); ro = Math.min(100, Math.max(0, ro));
+  if (am > ro) [am, ro] = [ro, am];
+  UMBRALES.amarillo = am; UMBRALES.rojo = ro;
+  renderTodo();
+}));
+document.getElementById('m1-vista').addEventListener('change', renderModulo1);
+let reproduccionM1 = null;
+document.getElementById('m1-reproducir').addEventListener('click', (e) => {
+  if (reproduccionM1) { clearInterval(reproduccionM1); reproduccionM1 = null; e.target.textContent = '▶ Reproducir los 60 días'; return; }
+  const slider = document.getElementById('m1-dia');
+  if (+slider.value >= SIM.dias) slider.value = 1;
+  document.getElementById('f-desde').value = 1;
+  e.target.textContent = '⏸ Pausar';
+  reproduccionM1 = setInterval(() => {
+    slider.value = +slider.value + 1;
+    slider.dispatchEvent(new Event('input'));
+    if (+slider.value >= SIM.dias) { clearInterval(reproduccionM1); reproduccionM1 = null; e.target.textContent = '▶ Reproducir los 60 días'; }
+  }, 250);
+});
 function renderModulo2() { /* Integrante 2 */ }
 function renderModulo3() { /* Integrante 3 */ }
 function renderModulo4() { /* Integrante 4 */ }
@@ -521,6 +830,7 @@ function renderTodo() {
 document.querySelectorAll('.filtros select, .filtros input').forEach(el => el.addEventListener('change', renderTodo));
 
 generarDatos();
+indexarDatos();
 renderResumenDatos();
 renderTodo();
 </script>

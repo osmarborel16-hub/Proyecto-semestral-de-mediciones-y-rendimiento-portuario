@@ -15,8 +15,8 @@
 |---|---|---|
 | Bloques | 6 (A–F) | tamaño de terminal mediana |
 | Stacks por bloque | 30 | posiciones de 20' a lo largo del bloque |
-| Lanes | 6 | ancho típico de un bloque atendido por RTG |
-| Tiers | 5 | altura máxima de estiba |
+| Lanes | 6 | ancho de bloque estándar para RTG: los fabricantes ofrecen pórticos para 6 filas + carril de camión [F3] |
+| Tiers | 5 | apilado "1 sobre 5": el RTG levanta un contenedor por encima de una pila de 5 [F3] |
 | Shuffle slots | 4 por stack | se reservan Tiers − 1 huecos para poder remanejar |
 | Slots inoperativos | 80 (40 en C y 40 en E) | reparación de pavimento y tomas reefer fuera de servicio |
 | **Capacidad operativa** | **4 600 TEU** | [6 × 30 × (5 × 6 − 4)] − 80 |
@@ -29,6 +29,16 @@
 | Exportación (EXP) | C → E |
 | Transbordo (TRB) | D → E |
 | Vacíos (VAC) | F → E |
+
+## 2b. Umbrales de alerta de densidad (decisión del grupo)
+
+| Estado | Rango | Justificación |
+|---|---|---|
+| ✔ Verde | ≤ 70 % | El Banco Mundial ubica el riesgo de congestión por encima del 70 % de utilización; el promedio mundial de 2025 fue 72.2 % [F1] |
+| ⚠ Amarilla | > 70 % y ≤ 85 % | Zona de vigilancia: el patio funciona, pero los remanejos y las esperas crecen |
+| ⛔ Roja | > 85 % | Con utilizaciones de 80–85 %, puertos de EE. UU. reportaron una alteración severa de la capacidad de almacenar y mover contenedores y más tiempo de camiones [F2]. Pasado cierto umbral, el rendimiento del patio cae de forma marcada [F4] |
+
+Los umbrales se pueden cambiar en vivo en el Módulo 1. Todo el dashboard usa los valores que estén puestos.
 
 ## 3. Llegadas y salidas por categoría
 
@@ -44,6 +54,8 @@
 - **Camiones:** las horas se reparten con picos de 8 a 11 y de 14 a 17 (`PESO_HORA`). Turnos: 1 = 06–14, 2 = 14–22, 3 = 22–06.
 
 **Causa raíz simulada (supuesto central del proyecto).** Los vacíos entran más rápido de lo que la naviera los evacúa, y desde el día 1 la cuota por buque baja de 128 a 120 TEU. El stock de vacíos crece unos **8–9 TEU por día**, desborda hacia el bloque E y sube la densidad total. Es una situación que el grupo **supone** para el ejercicio, no un dato real.
+
+**Rangos de dwell.** Los dwell simulados (importación ≈ 7, exportación ≈ 4, transbordo ≈ 5 días) quedan dentro de los rangos observados en puertos reales: en el tercer trimestre de 2025, el dwell promedio de importación estuvo entre 3 y 9 días en la mayoría de los casos, y el de exportación y transbordo entre 3 y 10 [F5]. El dwell de vacíos (≈ 13 días y subiendo) es alto a propósito: es el problema que el proyecto analiza.
 
 ## 4. Relaciones supuestas
 
@@ -101,4 +113,10 @@ El grupo debe decidir cómo calcula el **crecimiento diario** para "días hasta 
 
 ## 7. Fuentes de referencia
 
-- _Si se usa una cifra real (altura de estiba, rangos de dwell, etc.), citarla aquí con su fuente._
+Solo se usan para justificar parámetros y umbrales. Los datos del dashboard son todos simulados.
+
+- **[F1]** Banco Mundial y S&P Global Market Intelligence, *Container Terminal Performance Improvement Guide*, citado en Trans.info, "Container terminals hit 72.2% capacity. The World Bank says that's already past the congestion line". https://trans.info/world-bank-container-terminals-capacity-congestion-514704
+- **[F2]** Logistics Management, "New reports point to U.S. port congestion in 'Critical' shape". https://www.logisticsmgmt.com/article/new_reports_point_to_u.s._port_congestion_in_critical_shape/Resilience360
+- **[F3]** Liebherr, *Rubber Tyre Gantry Crane (RTG) – Technical Description*: luces de pórtico para 5, 6 y 7 filas + carril de camión y alturas de elevación de 1 sobre 3 a 1 sobre 6. https://www-assets.liebherr.com/media/bu-media/lhbu-mcc/downloads-and-brochures/brochures/lcc/liebherr-rtg-cranes-technical-description.pdf
+- **[F4]** S. Wiersma, *Limiting the Performance Loss of an RTG Container Terminal with a Highly Utilized Storage Yard*, TU Delft. https://repository.tudelft.nl/record/uuid:27aca9f5-4f9c-413c-8b26-473fcf10b15e
+- **[F5]** S&P Global Market Intelligence, *Middle East, India and Africa port congestion analysis Q3 2025* (28 nov 2025). https://www.spglobal.com/market-intelligence/en/news-insights/research/2025/11/middle-east-india-and-africa-port-congestion-analysis-q3-2025
