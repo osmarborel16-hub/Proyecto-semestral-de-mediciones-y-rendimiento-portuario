@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard KPI · Un patio que se llena</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --fondo: #f4f6f8; --tarjeta: #ffffff; --texto: #1d2733; --suave: #5b6b7c;
+    --borde: #dde3ea; --primario: #1f4e79;
+    --verde: #2e8b57; --amarillo: #d4a017; --rojo: #c0392b; --gris: #8a96a3;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "Segoe UI", Arial, sans-serif; background: var(--fondo); color: var(--texto); }
+  .aviso { background: var(--amarillo); color: #1d2733; text-align: center; font-weight: 700; padding: 6px; letter-spacing: .5px; }
+  header { background: var(--primario); color: #fff; padding: 14px 24px; }
+  header h1 { margin: 0; font-size: 1.35rem; }
+  header p { margin: 4px 0 0; opacity: .85; font-size: .9rem; }
+  .filtros { display: flex; flex-wrap: wrap; gap: 12px; padding: 12px 24px; background: var(--tarjeta); border-bottom: 1px solid var(--borde); }
+  .filtros label { font-size: .8rem; color: var(--suave); display: flex; flex-direction: column; gap: 4px; }
+  .filtros select, .filtros input { padding: 5px 8px; border: 1px solid var(--borde); border-radius: 6px; font-size: .9rem; }
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; padding: 16px 24px; }
+  .kpi { background: var(--tarjeta); border: 1px solid var(--borde); border-left: 6px solid var(--gris); border-radius: 8px; padding: 10px 12px; }
+  .kpi .nombre { font-size: .75rem; color: var(--suave); text-transform: uppercase; }
+  .kpi .valor { font-size: 1.5rem; font-weight: 700; margin: 4px 0; }
+  .kpi .meta { font-size: .75rem; color: var(--suave); }
+  .kpi.verde { border-left-color: var(--verde); }
+  .kpi.amarillo { border-left-color: var(--amarillo); }
+  .kpi.rojo { border-left-color: var(--rojo); }
+  nav.pestanas { display: flex; flex-wrap: wrap; gap: 4px; padding: 0 24px; }
+  nav.pestanas button { border: 1px solid var(--borde); border-bottom: none; background: #e9eef3; padding: 9px 16px; border-radius: 8px 8px 0 0; cursor: pointer; font-size: .9rem; }
+  nav.pestanas button.activa { background: var(--tarjeta); font-weight: 700; color: var(--primario); }
+  section.modulo { display: none; background: var(--tarjeta); margin: 0 24px 24px; border: 1px solid var(--borde); border-radius: 0 8px 8px 8px; padding: 18px; min-height: 320px; }
+  section.modulo.activo { display: block; }
+  .pendiente { color: var(--suave); font-style: italic; }
+  footer { text-align: center; font-size: .8rem; color: var(--suave); padding: 12px; }
+</style>
+</head>
+<body>
+
+<div class="aviso">⚠ DATOS SIMULADOS · Proyecto académico UMIP · no son datos reales de ninguna terminal</div>
+
+<header>
+  <h1>Dashboard de KPI portuarios · Un patio que se llena</h1>
+  <p>Densidad, dwell time y remanejos del patio de contenedores · 60 días simulados · 6 bloques (A–F)</p>
+</header>
+
+<!-- ===== FILTROS GLOBALES ===== -->
+<div class="filtros">
+  <label>Día desde <input type="number" id="f-desde" min="1" max="60" value="1"></label>
+  <label>Día hasta <input type="number" id="f-hasta" min="1" max="60" value="60"></label>
+  <label>Turno
+    <select id="f-turno"><option value="todos">Todos</option><option value="1">1 (06–14)</option><option value="2">2 (14–22)</option><option value="3">3 (22–06)</option></select>
+  </label>
+  <label>Bloque
+    <select id="f-bloque"><option value="todos">Todos</option><option>A</option><option>B</option><option>C</option><option>D</option><option>E</option><option>F</option></select>
+  </label>
+  <label>Categoría
+    <select id="f-categoria"><option value="todas">Todas</option><option value="IMP">Importación</option><option value="EXP">Exportación</option><option value="TRB">Transbordo</option><option value="VAC">Vacíos</option></select>
+  </label>
+</div>
+
+<!-- ===== TARJETAS DE KPI ===== -->
+<div class="kpis" id="kpis"></div>
+
+<!-- ===== PESTAÑAS ===== -->
+<nav class="pestanas" id="pestanas">
+  <button data-mod="m1" class="activa">1 · Mapa del patio</button>
+  <button data-mod="m2">2 · Dwell time</button>
+  <button data-mod="m3">3 · Remanejos</button>
+  <button data-mod="m4">4 · Simulador</button>
+  <button data-mod="m5">5 · Mejora (A3)</button>
+  <button data-mod="m6">6 · Camiones y citas</button>
+</nav>
+
+<!-- ===== MÓDULO 1 · MAPA DEL PATIO ===== Responsable: Integrante 1 -->
+<section class="modulo activo" id="m1">
+  <h2>1 · Mapa del patio</h2>
+  <p class="pendiente">Pendiente: mapa de calor por bloque con densidad, alertas amarilla/roja y deslizador de día.</p>
+</section>
+
+<!-- ===== MÓDULO 2 · DWELL TIME ===== Responsable: Integrante 2 -->
+<section class="modulo" id="m2">
+  <h2>2 · Dwell time</h2>
+  <p class="pendiente">Pendiente: dwell por categoría vs meta, dwell global ponderado vs simple y gráfico de antigüedad (aging).</p>
+</section>
+
+<!-- ===== MÓDULO 3 · REMANEJOS ===== Responsable: Integrante 3 -->
+<section class="modulo" id="m3">
+  <h2>3 · Remanejos</h2>
+  <p class="pendiente">Pendiente: remanejos por bloque y por día, dispersión densidad vs remanejos y tiempo de servicio en patio.</p>
+</section>
+
+<!-- ===== MÓDULO 4 · SIMULADOR DE ESCENARIOS ===== Responsable: Integrante 4 -->
+<section class="modulo" id="m4">
+  <h2>4 · Simulador de escenarios</h2>
+  <p class="pendiente">Pendiente: deslizadores de dwell por categoría y llegada de buques; proyección de densidad a 14 días; días hasta alerta roja.</p>
+</section>
+
+<!-- ===== MÓDULO 5 · MEJORA (A3) ===== Responsable: Integrante 4 -->
+<section class="modulo" id="m5">
+  <h2>5 · Mejora (A3)</h2>
+  <p class="pendiente">Pendiente: categoría crítica, propuesta, TEU liberados, nueva densidad y remanejos esperados; actual vs propuesta.</p>
+</section>
+
+<!-- ===== MÓDULO 6 · CAMIONES Y CITAS (EXTRA) ===== Responsable: por asignar -->
+<section class="modulo" id="m6">
+  <h2>6 · Camiones y citas (módulo extra)</h2>
+  <p class="pendiente">Pendiente: tiempo de servicio por hora y efecto de las citas de retiro.</p>
+</section>
+
+<footer>Medición y Rendimiento de Terminales Portuarias · UMIP · Datos simulados con semilla fija 2026</footer>
+
+<script>
+/* =====================================================================
+   1. PARÁMETROS DEL PATIO
+   ===================================================================== */
+const PATIO = {
+  bloques: ['A', 'B', 'C', 'D', 'E', 'F'],
+  stacks: 30,
+  tiers: 5,
+  lanes: 6,
+  shuffleSlots: 4,
+  inoperativos: { A: 0, B: 0, C: 40, D: 0, E: 40, F: 0 }, // slots fuera de servicio por bloque
+  categoriaBloque: { A: 'IMP', B: 'IMP', C: 'EXP', D: 'EXP', E: 'TRB', F: 'VAC' }
+};
+
+const UMBRALES = { amarillo: 70, rojo: 85 }; // % de densidad (editables por el grupo)
+
+const CATEGORIAS = { IMP: 'Importación', EXP: 'Exportación', TRB: 'Transbordo', VAC: 'Vacíos' };
+
+/* =====================================================================
+   2. GENERADOR PSEUDOALEATORIO CON SEMILLA FIJA (reproducible)
+   ===================================================================== */
+function mulberry32(semilla) {
+  return function () {
+    semilla |= 0; semilla = (semilla + 0x6D2B79F5) | 0;
+    let t = Math.imul(semilla ^ (semilla >>> 15), 1 | semilla);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+const azar = mulberry32(2026);
+
+/* =====================================================================
+   3. KPI 1 · CAPACIDAD OPERATIVA
+   [Bloques × Stacks × (Tiers × Lanes − Shuffle slots)] − slots inoperativos
+   ===================================================================== */
+function capacidadBloque(bloque) {
+  return PATIO.stacks * (PATIO.tiers * PATIO.lanes - PATIO.shuffleSlots) - PATIO.inoperativos[bloque];
+}
+function capacidadOperativa() {
+  const bruta = PATIO.bloques.length * PATIO.stacks * (PATIO.tiers * PATIO.lanes - PATIO.shuffleSlots);
+  const inoperativos = Object.values(PATIO.inoperativos).reduce((a, b) => a + b, 0);
+  return bruta - inoperativos; // 6 × 30 × 26 − 80 = 4 600 TEU
+}
+
+/* =====================================================================
+   4. GENERACIÓN DE DATOS SIMULADOS (60 días)  · Responsable: Integrante 1
+   Tablas: contenedores, inventarioDiario, movimientos, visitasCamion, buques
+   ===================================================================== */
+const DATOS = { contenedores: [], inventarioDiario: [], movimientos: [], visitasCamion: [], buques: [] };
+function generarDatos() {
+  // Pendiente: ver data/supuestos.md
+}
+
+/* =====================================================================
+   5. TARJETAS DE KPI (meta + señal visual)
+   ===================================================================== */
+function colorPorMeta(valor, verdeHasta, amarilloHasta) {
+  if (valor == null || isNaN(valor)) return '';
+  if (valor <= verdeHasta) return 'verde';
+  if (valor <= amarilloHasta) return 'amarillo';
+  return 'rojo';
+}
+function tarjeta(nombre, valor, meta, clase) {
+  return `<div class="kpi ${clase}"><div class="nombre">${nombre}</div><div class="valor">${valor}</div><div class="meta">${meta}</div></div>`;
+}
+function renderKPIs() {
+  const cap = capacidadOperativa();
+  document.getElementById('kpis').innerHTML = [
+    tarjeta('Capacidad operativa', cap.toLocaleString('es-PA') + ' TEU', 'Referencia: 4 600 TEU', 'verde'),
+    tarjeta('Yard Density', '—', 'Meta ≤ 70 %', ''),
+    tarjeta('Dwell time global', '—', 'Meta ≤ 5 días', ''),
+    tarjeta('Remanejos', '—', 'Meta ≤ 30 %', ''),
+    tarjeta('Servicio en patio', '—', 'Meta ≤ 25 min', ''),
+    tarjeta('Aging (> X días)', '—', 'Meta ≤ 5 % del inventario', ''),
+    tarjeta('Días a alerta roja', '—', 'Meta ≥ 30 días', '')
+  ].join('');
+}
+
+/* =====================================================================
+   6. MÓDULOS (cada integrante completa su función)
+   ===================================================================== */
+function renderModulo1() { /* Integrante 1 */ }
+function renderModulo2() { /* Integrante 2 */ }
+function renderModulo3() { /* Integrante 3 */ }
+function renderModulo4() { /* Integrante 4 */ }
+function renderModulo5() { /* Integrante 4 */ }
+function renderModulo6() { /* Por asignar */ }
+
+/* =====================================================================
+   7. NAVEGACIÓN Y ARRANQUE
+   ===================================================================== */
+document.getElementById('pestanas').addEventListener('click', (e) => {
+  const boton = e.target.closest('button');
+  if (!boton) return;
+  document.querySelectorAll('#pestanas button').forEach(b => b.classList.toggle('activa', b === boton));
+  document.querySelectorAll('section.modulo').forEach(s => s.classList.toggle('activo', s.id === boton.dataset.mod));
+});
+
+function renderTodo() {
+  renderKPIs();
+  renderModulo1(); renderModulo2(); renderModulo3();
+  renderModulo4(); renderModulo5(); renderModulo6();
+}
+document.querySelectorAll('.filtros select, .filtros input').forEach(el => el.addEventListener('change', renderTodo));
+
+generarDatos();
+renderTodo();
+</script>
+</body>
+</html>
