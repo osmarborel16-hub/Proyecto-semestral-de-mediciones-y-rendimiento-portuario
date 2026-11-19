@@ -73,7 +73,7 @@ La ficha completa de cada KPI (meta, fuente y decisión que apoya) está en [`do
 | Datos simulados (semilla 2026) | ✅ Listo | Leslie West |
 | 1 · Mapa del patio | ✅ Listo | Leslie West |
 | 2 · Dwell time | ✅ Listo | Leslie West |
-| 3 · Remanejos | ⏳ Pendiente | Adriana Garibaldi |
+| 3 · Remanejos | ✅ Listo | Adriana Garibaldi |
 | 4 · Simulador de escenarios | ⏳ Pendiente | Osmar Chiari |
 | 5 · Mejora (A3) | ⏳ Pendiente | Osmar Chiari |
 | 6 · Camiones y citas (extra) | ⏳ Pendiente | por asignar |
@@ -102,6 +102,14 @@ La ficha completa de cada KPI (meta, fuente y decisión que apoya) está en [`do
 - **Antigüedad del inventario**: histograma por categoría al cierre del día de corte, con la línea de X días. **X se cambia en vivo** y la tarjeta de KPI se actualiza.
 - **Detalle del cálculo**: tabla con contenedores, Σ días, dwell, meta, llegadas y TEU de más. Es la base para la verificación a mano.
 - Respeta los filtros de días, bloque y categoría; el turno no aplica.
+
+**Módulo 3 · Remanejos** (con 4 sub-pestañas)
+- **Resumen**: remanejos del patio, bloque con más y con menos remanejos, tiempo de servicio del camión y diferencia entre hora pico y fuera de pico.
+- **Por bloque**: barras de remanejos por bloque con las líneas de meta (30 %) y de rojo (40 %), y una tabla con densidad media, movimientos productivos e improductivos, y estado.
+- **Por día**: evolución diaria (total o por bloque) con la tabla equivalente.
+- **Densidad vs remanejos**: un punto por bloque y día, con la recta de tendencia en el tramo de operación (≥ 60 %). Muestra cuántos puntos de remanejos se suman por cada 10 puntos de densidad. El Módulo 5 usa esta relación para estimar los remanejos con la propuesta.
+- **Servicio en patio**: minutos promedio por hora de entrada al bloque (con la meta de 25 min), por turno y por bloque.
+- Respeta los filtros de días, **turno** y bloque; la categoría solo aplica al tiempo de servicio.
 
 Enlace en GitHub Pages: https://osmarborel16-hub.github.io/Proyecto-semestral-de-mediciones-y-rendimiento-portuario/
 
