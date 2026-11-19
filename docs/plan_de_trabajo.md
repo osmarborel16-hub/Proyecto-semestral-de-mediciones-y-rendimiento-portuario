@@ -152,14 +152,14 @@ Dentro de `index.html`, cada módulo va en su propio bloque marcado (`<!-- =====
 
 ---
 
-## 7. Reparto del trabajo (4 integrantes; con 3, se fusionan los roles 3 y 4)
+## 7. Reparto del trabajo (3 integrantes: Leslie West toma los roles 1 y 2)
 
-| Integrante | Responsable de | Rama |
+| Integrante | Responsable de | Rama sugerida |
 |---|---|---|
-| 1 | Generador de datos y semilla, capacidad operativa, Módulo 1, `supuestos.md`, README | `datos-y-mapa` |
-| 2 | Módulo 2 (dwell y aging), fichas de KPI 3, 4 y 7 | `modulo-dwell` |
-| 3 | Módulo 3 (remanejos y servicio en patio), fichas 5 y 6, **verificación manual** | `modulo-remanejos` |
-| 4 | Módulos 4 y 5 (simulador y A3), fichas 1, 2 y 8, módulo extra, GitHub Pages | `simulador-mejora` |
+| 1 · Leslie West | Generador de datos y semilla, capacidad operativa, Módulo 1, `supuestos.md`, README | `datos-y-mapa` |
+| 2 · Leslie West | Módulo 2 (dwell y aging), fichas de KPI 3, 4 y 7 | `modulo-dwell` |
+| 3 · Adriana Garibaldi | Módulo 3 (remanejos y servicio en patio), fichas 5 y 6, **verificación manual** | `modulo-remanejos` |
+| 4 · Osmar Chiari | Módulos 4 y 5 (simulador y A3), fichas 1, 2 y 8, módulo extra, GitHub Pages | `simulador-mejora` |
 
 Reglas del equipo:
 - Cada quien hace commits propios con mensajes claros.

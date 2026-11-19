@@ -5,12 +5,13 @@ Desarrollado con apoyo de agentes de IA (Claude Code). **Todos los datos son sim
 
 ## Integrantes
 
-| Integrante | Rol en el proyecto | Usuario GitHub |
+| Integrante | Roles | Responsable de |
 |---|---|---|
-| Osmar Chiari | _por asignar_ | _@usuario_ |
-| _Nombre 2_ | _por asignar_ | _@usuario_ |
-| _Nombre 3_ | _por asignar_ | _@usuario_ |
-| _Nombre 4_ | _por asignar_ | _@usuario_ |
+| **Leslie West** | Integrantes 1 y 2 | Datos simulados, capacidad operativa, Módulo 1 · Mapa del patio, Módulo 2 · Dwell time, supuestos, README y fichas 3, 4 y 7 |
+| **Adriana Garibaldi** | Integrante 3 | Módulo 3 · Remanejos y servicio en patio, fichas 5 y 6, verificación manual de KPI |
+| **Osmar Chiari** | Integrante 4 | Coordinación y estructura inicial (H1), Módulo 4 · Simulador, Módulo 5 · Mejora (A3), fichas 1, 2 y 8, GitHub Pages |
+
+Todo se sube desde la cuenta del grupo (`osmarborel16-hub`), pero cada commit lleva como **autor** al integrante responsable de ese trabajo. Los tres primeros PR (#2 a #5: estructura, datos y Módulo 1) se subieron antes de definir los nombres y aparecen con autor "Claude". Sus responsables son Osmar Chiari (estructura inicial) y Leslie West (datos, Módulo 1, supuestos y README).
 
 Grupo: ____ · Profesor: José Abel Diez Cubilla
 
@@ -69,12 +70,12 @@ La ficha completa de cada KPI (meta, fuente y decisión que apoya) está en [`do
 
 | Módulo | Estado | Responsable |
 |---|---|---|
-| Datos simulados (semilla 2026) | ✅ Listo | Integrante 1 |
-| 1 · Mapa del patio | ✅ Listo | Integrante 1 |
-| 2 · Dwell time | ⏳ Pendiente | Integrante 2 |
-| 3 · Remanejos | ⏳ Pendiente | Integrante 3 |
-| 4 · Simulador de escenarios | ⏳ Pendiente | Integrante 4 |
-| 5 · Mejora (A3) | ⏳ Pendiente | Integrante 4 |
+| Datos simulados (semilla 2026) | ✅ Listo | Leslie West |
+| 1 · Mapa del patio | ✅ Listo | Leslie West |
+| 2 · Dwell time | ✅ Listo | Leslie West |
+| 3 · Remanejos | ⏳ Pendiente | Adriana Garibaldi |
+| 4 · Simulador de escenarios | ⏳ Pendiente | Osmar Chiari |
+| 5 · Mejora (A3) | ⏳ Pendiente | Osmar Chiari |
 | 6 · Camiones y citas (extra) | ⏳ Pendiente | por asignar |
 
 ## 4. Cómo abrir y usar el dashboard
@@ -93,6 +94,14 @@ La ficha completa de cada KPI (meta, fuente y decisión que apoya) está en [`do
 - **Alertas del día**: densidad del patio completo y de cada bloque en alerta, con los TEU que faltan para la roja (o que la superan) y los días seguidos en ese estado.
 - **Evolución de la densidad**: el total del patio o los 6 bloques en el rango de días elegido, con las líneas de umbral y una línea punteada en el día del mapa. Debajo hay una tabla con los mismos datos.
 - **Capacidad operativa** (KPI 1): el cálculo completo aparece al pie del módulo.
+
+**Módulo 2 · Dwell time**
+- **Respuesta a la pregunta 1**: qué categoría presiona más el patio y cuántos TEU ocupa de más. Se calcula con la Ley de Little: llegadas diarias × (dwell actual − meta).
+- **Barras de dwell por categoría** con la marca de la meta y el estado (✔ cumple / ⛔ días sobre la meta). Cuentan los contenedores que **salieron** en el rango de días filtrado.
+- **Dwell global ponderado** (el KPI) junto al **promedio simple** tachado, para explicar por qué no se usa el simple.
+- **Antigüedad del inventario**: histograma por categoría al cierre del día de corte, con la línea de X días. **X se cambia en vivo** y la tarjeta de KPI se actualiza.
+- **Detalle del cálculo**: tabla con contenedores, Σ días, dwell, meta, llegadas y TEU de más. Es la base para la verificación a mano.
+- Respeta los filtros de días, bloque y categoría; el turno no aplica.
 
 Enlace en GitHub Pages: _pendiente_
 

@@ -107,7 +107,7 @@ Valores de control para revisar que los datos tienen sentido. **No son los KPI o
 | Dwell de los contenedores que salieron | IMP ≈ 7.1 · EXP ≈ 4.2 · TRB ≈ 5.0 · VAC ≈ 13.2 días |
 | Remanejos (global del periodo) | ≈ 39 % |
 | Visitas de camión | ≈ 246 por día; servicio medio ≈ 22.6 min |
-| Contenedores con más de 10 días al cierre del día 60 | ≈ 18 % de los que siguen en patio |
+| Contenedores con más de 10 días al cierre del día 60 | 365 de 2 328 que siguen en patio (15.7 %) |
 
 El grupo debe decidir cómo calcula el **crecimiento diario** para "días hasta alerta roja". Por la variación semanal, una sola diferencia entre dos días no sirve. Opciones: la pendiente de los últimos 14 días o la pendiente de todo el periodo, sobre el promedio móvil de 7 días. Hay que justificar la elección en la ficha 8.
 
