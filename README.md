@@ -75,9 +75,10 @@ Enlace en GitHub Pages: _pendiente_
 
 ## 5. Datos simulados y supuestos
 
-- Los datos se generan dentro de `index.html` con un generador pseudoaleatorio de **semilla fija (2026)**. Cada vez que se abre salen exactamente los mismos datos.
-- Periodo de 60 días, 6 bloques (A–F) y 4 categorías.
-- Todos los supuestos y sus justificaciones están en [`data/supuestos.md`](data/supuestos.md).
+- Los datos se generan dentro de `index.html` (función `generarDatos()`) con un generador pseudoaleatorio de **semilla fija (2026)**. Cada vez que se abre salen exactamente los mismos datos.
+- Periodo de 60 días (7 sep a 5 nov 2026), 6 bloques (A–F), 4 categorías (importación, exportación, transbordo y vacíos) y 30 buques.
+- Las tablas se descargan en CSV desde el panel "Datos simulados" del dashboard o con `node data/exportar_csv.js`. Los CSV ya generados están en [`data/`](data/).
+- Todos los supuestos, sus justificaciones y el significado de cada columna están en [`data/supuestos.md`](data/supuestos.md).
 
 ## 6. Estructura del repositorio
 

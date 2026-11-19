@@ -34,6 +34,12 @@
   section.modulo { display: none; background: var(--tarjeta); margin: 0 24px 24px; border: 1px solid var(--borde); border-radius: 0 8px 8px 8px; padding: 18px; min-height: 320px; }
   section.modulo.activo { display: block; }
   .pendiente { color: var(--suave); font-style: italic; }
+  .panel-datos { margin: 12px 24px 0; background: var(--tarjeta); border: 1px solid var(--borde); border-radius: 8px; padding: 8px 14px; font-size: .85rem; }
+  .panel-datos summary { cursor: pointer; font-weight: 600; color: var(--primario); }
+  .panel-datos table { border-collapse: collapse; margin: 10px 0; }
+  .panel-datos td, .panel-datos th { border: 1px solid var(--borde); padding: 4px 10px; text-align: left; }
+  .botones-csv { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 6px; }
+  .botones-csv button { border: 1px solid var(--primario); background: #fff; color: var(--primario); border-radius: 6px; padding: 5px 10px; cursor: pointer; }
   footer { text-align: center; font-size: .8rem; color: var(--suave); padding: 12px; }
 </style>
 </head>
@@ -60,6 +66,19 @@
     <select id="f-categoria"><option value="todas">Todas</option><option value="IMP">Importación</option><option value="EXP">Exportación</option><option value="TRB">Transbordo</option><option value="VAC">Vacíos</option></select>
   </label>
 </div>
+
+<!-- ===== DATOS SIMULADOS: resumen y descarga ===== -->
+<details class="panel-datos">
+  <summary>Datos simulados (semilla 2026) · resumen y descarga en CSV</summary>
+  <div id="resumen-datos"></div>
+  <div class="botones-csv">
+    <button type="button" onclick="descargarCSV('contenedores')">contenedores.csv</button>
+    <button type="button" onclick="descargarCSV('inventarioDiario')">inventarioDiario.csv</button>
+    <button type="button" onclick="descargarCSV('movimientos')">movimientos.csv</button>
+    <button type="button" onclick="descargarCSV('visitasCamion')">visitasCamion.csv</button>
+    <button type="button" onclick="descargarCSV('buques')">buques.csv</button>
+  </div>
+</details>
 
 <!-- ===== TARJETAS DE KPI ===== -->
 <div class="kpis" id="kpis"></div>
@@ -141,7 +160,6 @@ function mulberry32(semilla) {
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
 }
-const azar = mulberry32(2026);
 
 /* =====================================================================
    3. KPI 1 · CAPACIDAD OPERATIVA
@@ -157,12 +175,297 @@ function capacidadOperativa() {
 }
 
 /* =====================================================================
-   4. GENERACIÓN DE DATOS SIMULADOS (60 días)  · Responsable: Integrante 1
-   Tablas: contenedores, inventarioDiario, movimientos, visitasCamion, buques
+   4. GENERACIÓN DE DATOS SIMULADOS (60 días · semilla fija 2026)
+   Responsable: Integrante 1 · Supuestos explicados en data/supuestos.md
+   Tablas que produce: DATOS.buques, DATOS.contenedores, DATOS.inventarioDiario,
+                       DATOS.movimientos, DATOS.visitasCamion
    ===================================================================== */
-const DATOS = { contenedores: [], inventarioDiario: [], movimientos: [], visitasCamion: [], buques: [] };
+const SIM = {
+  semilla: 2026,
+  dias: 60,                  // periodo reportado: día 1 a día 60
+  calentamiento: 30,         // días previos simulados para empezar con el patio ya ocupado (no se reportan)
+  fechaInicio: '2026-09-07', // el día 1 es lunes 7 de septiembre de 2026
+  umbralAsignacion: 0.85,    // un bloque recibe carga hasta el 85 % de su capacidad; después desborda al siguiente
+  preferencias: { IMP: ['A', 'B', 'E'], EXP: ['C', 'E'], TRB: ['D', 'E'], VAC: ['F', 'E'] },
+  pct40: { IMP: 0.60, EXP: 0.55, TRB: 0.60, VAC: 0.60 },   // proporción de contenedores de 40' (2 TEU)
+  buques: {
+    diasSemana: [0, 2, 4],   // lunes, miércoles y viernes (0 = lunes)
+    extraSabado: true,       // un sábado sí y otro no → 3.5 buques por semana
+    descargaIMP: 340,        // TEU de importación descargados por buque (media)
+    descargaTRB: 290,        // TEU de transbordo descargados por buque (media)
+    cargaEXP: 300,           // TEU de exportación cargados por buque (media)
+    variacion: 0.15,         // ±15 % entre buques
+    duracionOperacion: 0.75  // días que dura la operación del buque (18 h)
+  },
+  imp: { dwellMedio: 6.5, sigma: 0.5, pctRetenidos: 0.03, retenidoMin: 15, retenidoMax: 30 },
+  trb: { esperaMedia: 3.5, sigma: 0.35, esperaMinima: 2 },  // luego espera el siguiente buque disponible
+  exp: { anticipoMin: 1, anticipoModa: 3, anticipoMax: 7 },  // días que llega antes de su buque
+  vac: { entradaDiaria: 64, stockInicial: 560, cuotaAntes: 128, cuotaDespues: 120 },
+  remanejo: { base: 20, pendiente: 1.2, densidadRef: 60, ruido: 3 },  // % según densidad del bloque
+  camion: { base: 16, porRemanejo: 6, colaPico: [3, 9], colaValle: [0, 3], ruido: 2, minimo: 8 }
+};
+
+// Peso relativo de cada hora (0 a 23) para la llegada de camiones: picos de 8 a 11 y de 14 a 17
+const PESO_HORA = [1, 1, 1, 1, 1, 2, 4, 6, 10, 10, 10, 9, 6, 7, 10, 10, 10, 9, 6, 4, 3, 2, 1, 1];
+const NOMBRES_BUQUE = ['MV ATLANTIC STAR', 'MV CORAL BAY', 'MV ISTMO EXPRESS', 'MV CHAGRES', 'MV PEARL ISLAND',
+  'MV GATUN BRIDGE', 'MV BALBOA SPIRIT', 'MV PACIFIC HORIZON', 'MV DARIEN TRADER', 'MV COLON BREEZE'];
+
+const DATOS = { buques: [], contenedores: [], inventarioDiario: [], movimientos: [], visitasCamion: [] };
+
+/* ---------- utilidades aleatorias (todas usan el PRNG con semilla) ---------- */
+function crearAzar(semilla) {
+  const r = mulberry32(semilla);
+  const azar = {
+    u: () => r(),
+    entre: (a, b) => a + (b - a) * r(),
+    normal: (media, desv) => {                       // Box-Muller
+      const u1 = Math.max(r(), 1e-12), u2 = r();
+      return media + desv * Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+    },
+    lognormal: (media, sigma) => Math.exp(azar.normal(Math.log(media) - sigma * sigma / 2, sigma)),
+    triangular: (a, c, b) => {                       // mínimo a, moda c, máximo b
+      const u = r(), f = (c - a) / (b - a);
+      return u < f ? a + Math.sqrt(u * (b - a) * (c - a)) : b - Math.sqrt((1 - u) * (b - a) * (b - c));
+    },
+    poisson: (lambda) => {                           // Knuth
+      const L = Math.exp(-lambda); let k = 0, p = 1;
+      do { k++; p *= r(); } while (p > L);
+      return k - 1;
+    },
+    hora: () => {                                    // hora ponderada por PESO_HORA
+      const total = PESO_HORA.reduce((a, b) => a + b, 0);
+      let x = r() * total;
+      for (let h = 0; h < 24; h++) { x -= PESO_HORA[h]; if (x < 0) return h + r(); }
+      return 23.5;
+    }
+  };
+  return azar;
+}
+
+/* ---------- utilidades de tiempo ----------
+   t = tiempo en días; el día d va de t = d − 1 a t = d (día 1 = [0, 1)) */
+const diaDe = (t) => Math.floor(t) + 1;
+const diaSemana = (d) => (((d - 1) % 7) + 7) % 7;          // 0 = lunes … 6 = domingo
+const turnoDe = (t) => { const h = (t - Math.floor(t)) * 24; return h >= 6 && h < 14 ? 1 : (h >= 14 && h < 22 ? 2 : 3); };
+function fechaDe(d) {
+  const f = new Date(SIM.fechaInicio + 'T12:00:00Z');
+  f.setUTCDate(f.getUTCDate() + d - 1);
+  return f.toISOString().slice(0, 10);
+}
+function fechaHora(t) {
+  const d = diaDe(t), min = Math.round((t - Math.floor(t)) * 1440);
+  const hh = String(Math.min(23, Math.floor(min / 60))).padStart(2, '0'), mm = String(min % 60).padStart(2, '0');
+  return `${fechaDe(d)} ${hh}:${mm}`;
+}
+
 function generarDatos() {
-  // Pendiente: ver data/supuestos.md
+  const azar = crearAzar(SIM.semilla);
+  const T0 = -SIM.calentamiento, TF = SIM.dias;
+  const redondear = (x, n = 2) => Math.round(x * 10 ** n) / 10 ** n;
+
+  /* 1) Programa de buques (desde antes del calentamiento hasta 2 semanas después del día 60) */
+  const buques = [];
+  for (let d = T0 - 7; d <= TF + 14; d++) {
+    const ds = diaSemana(d), semana = Math.floor((d - 1) / 7);
+    const tocaSabado = SIM.buques.extraSabado && ds === 5 && semana % 2 === 0;
+    if (!SIM.buques.diasSemana.includes(ds) && !tocaSabado) continue;
+    const v = () => azar.entre(1 - SIM.buques.variacion, 1 + SIM.buques.variacion);
+    buques.push({
+      id: 'B' + String(buques.length + 1).padStart(3, '0'),
+      nombre: NOMBRES_BUQUE[buques.length % NOMBRES_BUQUE.length],
+      t: (d - 1) + azar.u(),                         // hora de atraque
+      descargaIMP: Math.round(SIM.buques.descargaIMP * v()),
+      descargaTRB: Math.round(SIM.buques.descargaTRB * v()),
+      cargaEXP: Math.round(SIM.buques.cargaEXP * v()),
+      cuotaVAC: Math.round((d >= 1 ? SIM.vac.cuotaDespues : SIM.vac.cuotaAntes) * azar.entre(0.92, 1.08)),
+      cargaTRB: 0, cargaVAC: 0
+    });
+  }
+  const opBuque = (b) => b.t + azar.u() * SIM.buques.duracionOperacion;
+  const siguienteBuque = (t) => buques.find(b => b.t >= t);
+
+  /* 2) Contenedores: cada uno con categoría, tamaño, entrada y salida */
+  const conts = [];
+  const nuevo = (cat, entrada, salida, origen, buque) => {
+    const es40 = azar.u() < SIM.pct40[cat];
+    conts.push({ cat, tamano: es40 ? 40 : 20, teu: es40 ? 2 : 1, entrada, salida, origen, buque, bloque: null });
+  };
+  // genera contenedores hasta completar una cantidad de TEU
+  const porTEU = (teuObjetivo, fn) => { let teu = 0; while (teu < teuObjetivo) { const c = fn(); teu += c ? c.teu : 1; } };
+
+  for (const b of buques) {
+    if (b.t < T0 || b.t >= TF) continue;
+    // Importación: se descarga del buque y la retira un camión después de su dwell
+    porTEU(b.descargaIMP, () => {
+      const entrada = opBuque(b);
+      let dwell = azar.u() < SIM.imp.pctRetenidos
+        ? azar.entre(SIM.imp.retenidoMin, SIM.imp.retenidoMax)          // retenidos por aduana / sin retirar
+        : azar.lognormal(SIM.imp.dwellMedio, SIM.imp.sigma);
+      let dSal = diaDe(entrada + dwell);
+      if (diaSemana(dSal) === 6) dSal += 1;                               // el domingo casi no se retira: pasa al lunes
+      const salida = Math.max(entrada + 0.5, (dSal - 1) + azar.hora() / 24);
+      nuevo('IMP', entrada, salida, 'buque', b.id); return conts[conts.length - 1];
+    });
+    // Transbordo: se descarga y sale en un buque posterior
+    porTEU(b.descargaTRB, () => {
+      const entrada = opBuque(b);
+      const espera = Math.max(SIM.trb.esperaMinima, azar.lognormal(SIM.trb.esperaMedia, SIM.trb.sigma));
+      const bs = siguienteBuque(entrada + espera);
+      if (!bs) return null;
+      nuevo('TRB', entrada, opBuque(bs), 'buque', b.id);
+      const c = conts[conts.length - 1]; bs.cargaTRB += c.teu; return c;
+    });
+  }
+  // Exportación: llega en camión entre 1 y 7 días antes de su buque y sale con él
+  for (const b of buques) {
+    if (b.t < T0 + SIM.exp.anticipoMax || b.t >= TF + SIM.exp.anticipoMax) continue;
+    porTEU(b.cargaEXP, () => {
+      let dEnt = diaDe(b.t - azar.triangular(SIM.exp.anticipoMin, SIM.exp.anticipoModa, SIM.exp.anticipoMax));
+      if (diaSemana(dEnt) === 6) dEnt -= 1;                               // el domingo no hay entregas: pasa al sábado
+      const entrada = Math.min((dEnt - 1) + azar.hora() / 24, b.t - 0.5);
+      if (entrada >= TF) return null;
+      nuevo('EXP', entrada, opBuque(b), 'camion', b.id); return conts[conts.length - 1];
+    });
+  }
+  // Vacíos: los devuelven los camiones cada día; salen en los buques según la cuota de la naviera (primero los más antiguos)
+  const vacios = [];
+  porTEU(SIM.vac.stockInicial, () => {                                    // stock inicial antes del calentamiento
+    const es40 = azar.u() < SIM.pct40.VAC;
+    const c = { cat: 'VAC', tamano: es40 ? 40 : 20, teu: es40 ? 2 : 1, entrada: T0 - azar.entre(0, 18), salida: null, origen: 'camion', buque: null, bloque: null };
+    vacios.push(c); return c;
+  });
+  for (let d = T0 + 1; d <= TF; d++) {
+    const ds = diaSemana(d), factor = ds === 6 ? 0.4 : (ds === 0 ? 1.3 : 1.05);
+    porTEU(Math.max(0, azar.normal(SIM.vac.entradaDiaria * factor, 8)), () => {
+      const es40 = azar.u() < SIM.pct40.VAC;
+      const c = { cat: 'VAC', tamano: es40 ? 40 : 20, teu: es40 ? 2 : 1, entrada: (d - 1) + azar.hora() / 24, salida: null, origen: 'camion', buque: null, bloque: null };
+      vacios.push(c); return c;
+    });
+  }
+  vacios.sort((a, b) => a.entrada - b.entrada);
+  for (const b of buques) {                                               // evacuación por cuota, primero los más antiguos
+    if (b.t < T0) continue;
+    let cupo = b.cuotaVAC;
+    for (const c of vacios) {
+      if (cupo <= 0) break;
+      if (c.salida !== null || c.entrada > b.t - 0.25) continue;
+      c.salida = opBuque(b); c.buque = b.id; cupo -= c.teu; b.cargaVAC += c.teu;
+    }
+  }
+  for (const c of vacios) { if (c.salida === null) c.salida = Infinity; conts.push(c); }
+
+  /* 3) Asignación de bloque en orden cronológico (se libera espacio con cada salida) */
+  const cap = {}; PATIO.bloques.forEach(bl => cap[bl] = capacidadBloque(bl));
+  const ocupado = {}; PATIO.bloques.forEach(bl => ocupado[bl] = 0);
+  conts.sort((a, b) => a.entrada - b.entrada);
+  const salidas = [];                                                     // montículo mínimo por hora de salida
+  const empujar = (c) => { salidas.push(c); let i = salidas.length - 1; while (i > 0) { const p = (i - 1) >> 1; if (salidas[p].salida <= salidas[i].salida) break; [salidas[p], salidas[i]] = [salidas[i], salidas[p]]; i = p; } };
+  const sacar = () => { const top = salidas[0], ult = salidas.pop(); if (salidas.length) { salidas[0] = ult; let i = 0; for (;;) { const l = 2 * i + 1, r = l + 1; let m = i; if (l < salidas.length && salidas[l].salida < salidas[m].salida) m = l; if (r < salidas.length && salidas[r].salida < salidas[m].salida) m = r; if (m === i) break; [salidas[m], salidas[i]] = [salidas[i], salidas[m]]; i = m; } } return top; };
+  for (const c of conts) {
+    while (salidas.length && salidas[0].salida <= c.entrada) { const s = sacar(); ocupado[s.bloque] -= s.teu; }
+    const prefs = SIM.preferencias[c.cat];
+    let bl = prefs.find(x => ocupado[x] + c.teu <= cap[x] * SIM.umbralAsignacion);
+    if (!bl) bl = prefs.reduce((m, x) => (ocupado[x] / cap[x] < ocupado[m] / cap[m] ? x : m), prefs[0]);
+    c.bloque = bl; ocupado[bl] += c.teu; empujar(c);
+  }
+
+  /* 4) Inventario diario por bloque y categoría (TEU al cierre del día) */
+  const enPeriodo = conts.filter(c => c.entrada < TF && c.salida >= 0);
+  const inv = {}, clave = (d, bl, cat) => d + '|' + bl + '|' + cat;
+  for (let d = 0; d <= TF; d++) for (const bl of PATIO.bloques) for (const cat of Object.keys(CATEGORIAS))
+    inv[clave(d, bl, cat)] = { dia: d, bloque: bl, categoria: cat, teu: 0, entradas: 0, salidas: 0 };
+  for (const c of enPeriodo) {
+    const dE = Math.max(0, diaDe(c.entrada)), dS = Math.min(TF + 1, c.salida === Infinity ? TF + 1 : diaDe(c.salida));
+    for (let d = dE; d < dS && d <= TF; d++) inv[clave(d, c.bloque, c.cat)].teu += c.teu;   // presente al cierre del día d
+    if (c.entrada >= 0) inv[clave(diaDe(c.entrada), c.bloque, c.cat)].entradas += c.teu;
+    if (c.salida < TF) inv[clave(diaDe(c.salida), c.bloque, c.cat)].salidas += c.teu;
+  }
+  const densidadCierre = {};                                              // % por bloque al cierre de cada día (día 0 = inicio)
+  for (let d = 0; d <= TF; d++) for (const bl of PATIO.bloques) {
+    let teu = 0; for (const cat of Object.keys(CATEGORIAS)) teu += inv[clave(d, bl, cat)].teu;
+    densidadCierre[d + '|' + bl] = teu / cap[bl] * 100;
+  }
+
+  /* 5) Movimientos productivos e improductivos (remanejos) por bloque, día y turno
+        Cada movimiento productivo genera remanejos ~ Poisson(ratio/100), con
+        ratio = base + pendiente × max(0, densidad del bloque al inicio del día − 60) + ruido */
+  const mov = {}, visitas = [];
+  const ratioDia = {};
+  for (let d = 1; d <= TF; d++) for (const bl of PATIO.bloques) {
+    const dens = densidadCierre[(d - 1) + '|' + bl];
+    ratioDia[d + '|' + bl] = Math.max(5, SIM.remanejo.base + SIM.remanejo.pendiente * Math.max(0, dens - SIM.remanejo.densidadRef) + azar.normal(0, SIM.remanejo.ruido));
+    for (const tu of [1, 2, 3]) mov[d + '|' + bl + '|' + tu] = { dia: d, bloque: bl, turno: tu, productivos: 0, improductivos: 0 };
+  }
+  const registrarMovimiento = (c, t, tipo) => {
+    const d = diaDe(t), tu = turnoDe(t);
+    const rem = azar.poisson(ratioDia[d + '|' + c.bloque] / 100);
+    const m = mov[d + '|' + c.bloque + '|' + tu]; m.productivos++; m.improductivos += rem;
+    const esCamion = (tipo === 'entrada' && c.origen === 'camion') || (tipo === 'salida' && c.cat === 'IMP');
+    if (esCamion) {
+      const h = (t - Math.floor(t)) * 24;
+      const pico = PESO_HORA[Math.floor(h)] >= 9;
+      const cola = pico ? azar.entre(...SIM.camion.colaPico) : azar.entre(...SIM.camion.colaValle);
+      const min = Math.max(SIM.camion.minimo, SIM.camion.base + SIM.camion.porRemanejo * rem + cola + azar.normal(0, SIM.camion.ruido));
+      visitas.push({ dia: d, fecha: fechaDe(d), turno: tu, entrada_bloque: fechaHora(t), salida_bloque: fechaHora(t + min / 1440),
+        bloque: c.bloque, categoria: c.cat, operacion: tipo === 'entrada' ? 'entrega' : 'retiro', remanejos: rem, minutos: redondear(min, 1) });
+    }
+  };
+  const movimientosOrdenados = [];
+  for (const c of enPeriodo) {
+    if (c.entrada >= 0) movimientosOrdenados.push([c.entrada, c, 'entrada']);
+    if (c.salida < TF) movimientosOrdenados.push([c.salida, c, 'salida']);
+  }
+  movimientosOrdenados.sort((a, b) => a[0] - b[0]);
+  for (const [t, c, tipo] of movimientosOrdenados) registrarMovimiento(c, t, tipo);
+
+  /* 6) Tablas finales (solo días 1 a 60) */
+  DATOS.buques = buques.filter(b => b.t >= 0 && b.t < TF).map(b => ({
+    id: b.id, nombre: b.nombre, dia: diaDe(b.t), fecha: fechaDe(diaDe(b.t)), atraque: fechaHora(b.t),
+    descarga_imp_teu: b.descargaIMP, descarga_trb_teu: b.descargaTRB, carga_exp_teu: b.cargaEXP, carga_trb_teu: b.cargaTRB, cuota_vac_teu: b.cuotaVAC, carga_vac_teu: b.cargaVAC
+  }));
+  DATOS.contenedores = enPeriodo.map((c, i) => {
+    const salio = c.salida < TF;
+    return {
+      id: c.cat + String(i + 1).padStart(6, '0'), categoria: c.cat, tamano: c.tamano, teu: c.teu, bloque: c.bloque,
+      entrada: fechaHora(c.entrada), salida: salio ? fechaHora(c.salida) : '',
+      dia_entrada: diaDe(c.entrada), dia_salida: salio ? diaDe(c.salida) : '',
+      dias_en_patio: salio ? redondear(c.salida - c.entrada) : '',                  // estancia completa (para dwell time)
+      dias_al_cierre: salio ? '' : redondear(TF - c.entrada),                         // antigüedad al cierre del día 60 (para aging)
+      buque: c.buque || ''
+    };
+  });
+  DATOS.inventarioDiario = Object.values(inv).filter(r => r.dia >= 1).map(r => ({ ...r, fecha: fechaDe(r.dia) }));
+  DATOS.movimientos = Object.values(mov).map(r => ({ ...r, fecha: fechaDe(r.dia) }));
+  DATOS.visitasCamion = visitas;
+}
+
+/* ---------- exportar cualquier tabla a CSV (para verificar a mano en Excel) ---------- */
+function aCSV(filas) {
+  if (!filas.length) return '';
+  const cols = Object.keys(filas[0]);
+  const esc = (v) => { const s = String(v); return /[",\n;]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+  return [cols.join(','), ...filas.map(f => cols.map(c => esc(f[c])).join(','))].join('\n');
+}
+function descargarCSV(tabla) {
+  const blob = new Blob(['﻿' + aCSV(DATOS[tabla])], { type: 'text/csv;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = tabla + '.csv'; a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+/* ---------- resumen de los datos generados (para revisar que sean creíbles) ---------- */
+function renderResumenDatos() {
+  const fila = (k, v) => `<tr><th>${k}</th><td>${v}</td></tr>`;
+  const t = DATOS;
+  const inicio = fechaDe(1), fin = fechaDe(SIM.dias);
+  document.getElementById('resumen-datos').innerHTML = '<table>' +
+    fila('Periodo', `día 1 (${inicio}) a día ${SIM.dias} (${fin})`) +
+    fila('Buques atendidos', t.buques.length) +
+    fila('Contenedores en el periodo', t.contenedores.length.toLocaleString('es-PA')) +
+    fila('Filas de inventario diario (día × bloque × categoría)', t.inventarioDiario.length.toLocaleString('es-PA')) +
+    fila('Filas de movimientos (día × bloque × turno)', t.movimientos.length.toLocaleString('es-PA')) +
+    fila('Visitas de camión', t.visitasCamion.length.toLocaleString('es-PA')) +
+    '</table>';
 }
 
 /* =====================================================================
@@ -218,6 +521,7 @@ function renderTodo() {
 document.querySelectorAll('.filtros select, .filtros input').forEach(el => el.addEventListener('change', renderTodo));
 
 generarDatos();
+renderResumenDatos();
 renderTodo();
 </script>
 </body>
