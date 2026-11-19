@@ -18,7 +18,8 @@ Umbrales de densidad que usa todo el dashboard: **verde ≤ 70 %**, **amarilla >
 | Meta | Referencia: 4 600 TEU. Slots inoperativos ≤ 2 % de la capacidad bruta (≤ 94 TEU) |
 | Fuente del dato | Parámetros del patio simulado (`PATIO` en `index.html`) |
 | Decisión que apoya | Base de la densidad; decidir si reparar slots inoperativos o cambiar la altura de estiba |
-| Justificación de la meta | _por completar_ |
+| Justificación de la meta | Los slots inoperativos restan capacidad sin que se note en el inventario: 80 slots son 1.7 % de la capacidad bruta (4 680 TEU), dentro de la meta de 2 %. Pasar de 2 % equivale a perder casi un bloque de 30 stacks en una fila completa, y la densidad sube sin que entre más carga |
+| Cálculo en el dashboard | Módulo 1 · función `capacidadOperativa()`; el cálculo completo se muestra al pie del módulo |
 
 Cálculo: [6 × 30 × (5 × 6 − 4)] − 80 = 4 680 − 80 = **4 600 TEU**
 
@@ -33,7 +34,8 @@ Cálculo: [6 × 30 × (5 × 6 − 4)] − 80 = 4 680 − 80 = **4 600 TEU**
 | Meta | ≤ 70 % (amarilla > 70 %, roja > 85 %) |
 | Fuente del dato | `inventario_diario` simulado (TEU por bloque y día) |
 | Decisión que apoya | Activar medidas para liberar espacio; asignar bloques |
-| Justificación de la meta | _por completar_ |
+| Justificación de la meta | El Banco Mundial ubica el riesgo de congestión por encima del 70 % de utilización [F1], y con 80–85 % los puertos de EE. UU. reportaron una alteración severa de la operación [F2] (fuentes en `data/supuestos.md`, sección 2b). Además, en el Módulo 3 se ve que con densidad ≤ 70 % los remanejos medios son unos 24 %, contra 52 % por encima de 85 % |
+| Cálculo en el dashboard | Módulo 1 · función `yardDensity()`; umbrales editables en vivo |
 
 ## 3. Dwell time por categoría
 
@@ -112,9 +114,12 @@ Cálculo: [6 × 30 × (5 × 6 − 4)] − 80 = 4 680 − 80 = **4 600 TEU**
 | Nombre | Días hasta alerta roja |
 | Definición | Días que faltan para que la densidad pase el umbral rojo si nada cambia |
 | Fórmula | TEU de margen ÷ crecimiento diario del inventario |
-| Definiciones operativas | TEU de margen = (85 % × capacidad operativa) − inventario actual = 3 910 − inventario. Crecimiento diario = _el grupo elige y justifica: pendiente de los últimos 14 días o promedio de (entradas − salidas)_ |
+| Definiciones operativas | TEU de margen = (85 % × capacidad operativa) − inventario actual = 3 910 − inventario. **Crecimiento diario = pendiente de mínimos cuadrados del inventario total en los últimos 28 días** |
+| Por qué 28 días | Los buques generan ciclos de 1 semana (lunes, miércoles, viernes) y de 2 semanas (un sábado sí y otro no). Con ventanas más cortas el resultado depende del día de corte: al día 60, la diferencia simple entre el día 46 y el 60 da +26.9 TEU/día, y la pendiente de 14 días da +15.4, porque el día 46 cae en un valle y el 60 en un pico. La pendiente de 28 días (4 semanas, dos ciclos completos) da +7.0 TEU/día, y por categoría sale estable: los vacíos crecen +8.8 TEU/día con 14 días y +8.7 con 28 |
+| Resultado (día 60) | 220 TEU de margen ÷ 7.0 TEU/día = **32 días** (⚠ justo sobre la meta). Los días de buque la densidad sube 5–8 puntos sobre la tendencia, así que algún pico podría tocar el rojo antes |
 | Unidad y frecuencia | días · diaria |
 | Meta | ≥ 30 días (amarillo 15–30, rojo < 15) |
 | Fuente del dato | `inventario_diario` simulado |
 | Decisión que apoya | Cuándo hay que activar la medida de mejora |
-| Justificación de la meta | _por completar_ |
+| Justificación de la meta | Una medida como la cuota de evacuación de vacíos o el cambio de tiempo libre necesita unas 2 semanas para acordarse y comunicarse (plan del A3) y otro ciclo de dwell para notarse en el patio. Con menos de 30 días de margen ya no hay tiempo de reaccionar antes del rojo; con menos de 15, el rojo es casi seguro |
+| Cálculo en el dashboard | Módulo 4 · función `calibracion()`; tarjeta "Días a alerta roja" |
