@@ -136,7 +136,7 @@
   <button data-mod="m6">6 · Camiones y citas</button>
 </nav>
 
-<!-- ===== MÓDULO 1 · MAPA DEL PATIO ===== Responsable: Integrante 1 -->
+<!-- ===== MÓDULO 1 · MAPA DEL PATIO ===== Responsable: Leslie West -->
 <section class="modulo activo" id="m1">
   <h2>1 · Mapa del patio</h2>
   <p class="nota">Yard Density = Inventario ÷ capacidad operativa × 100 · inventario en TEU al cierre del día · clic en un bloque para filtrar todo el dashboard</p>
@@ -185,25 +185,25 @@
   <p class="nota" id="m1-capacidad"></p>
 </section>
 
-<!-- ===== MÓDULO 2 · DWELL TIME ===== Responsable: Integrante 2 -->
+<!-- ===== MÓDULO 2 · DWELL TIME ===== Responsable: Leslie West -->
 <section class="modulo" id="m2">
   <h2>2 · Dwell time</h2>
   <p class="pendiente">Pendiente: dwell por categoría vs meta, dwell global ponderado vs simple y gráfico de antigüedad (aging).</p>
 </section>
 
-<!-- ===== MÓDULO 3 · REMANEJOS ===== Responsable: Integrante 3 -->
+<!-- ===== MÓDULO 3 · REMANEJOS ===== Responsable: Adriana Garibaldi -->
 <section class="modulo" id="m3">
   <h2>3 · Remanejos</h2>
   <p class="pendiente">Pendiente: remanejos por bloque y por día, dispersión densidad vs remanejos y tiempo de servicio en patio.</p>
 </section>
 
-<!-- ===== MÓDULO 4 · SIMULADOR DE ESCENARIOS ===== Responsable: Integrante 4 -->
+<!-- ===== MÓDULO 4 · SIMULADOR DE ESCENARIOS ===== Responsable: Osmar Chiari -->
 <section class="modulo" id="m4">
   <h2>4 · Simulador de escenarios</h2>
   <p class="pendiente">Pendiente: deslizadores de dwell por categoría y llegada de buques; proyección de densidad a 14 días; días hasta alerta roja.</p>
 </section>
 
-<!-- ===== MÓDULO 5 · MEJORA (A3) ===== Responsable: Integrante 4 -->
+<!-- ===== MÓDULO 5 · MEJORA (A3) ===== Responsable: Osmar Chiari -->
 <section class="modulo" id="m5">
   <h2>5 · Mejora (A3)</h2>
   <p class="pendiente">Pendiente: categoría crítica, propuesta, TEU liberados, nueva densidad y remanejos esperados; actual vs propuesta.</p>
@@ -262,7 +262,7 @@ function capacidadOperativa() {
 
 /* =====================================================================
    4. GENERACIÓN DE DATOS SIMULADOS (60 días · semilla fija 2026)
-   Responsable: Integrante 1 · Supuestos explicados en data/supuestos.md
+   Responsable: Leslie West · Supuestos explicados en data/supuestos.md
    Tablas que produce: DATOS.buques, DATOS.contenedores, DATOS.inventarioDiario,
                        DATOS.movimientos, DATOS.visitasCamion
    ===================================================================== */
@@ -627,7 +627,7 @@ function renderKPIs() {
 /* =====================================================================
    6. MÓDULOS (cada integrante completa su función)
    ===================================================================== */
-/* ---------- MÓDULO 1 · MAPA DEL PATIO (Integrante 1) ---------- */
+/* ---------- MÓDULO 1 · MAPA DEL PATIO (Leslie West) ---------- */
 const COLOR_SERIE = ['#2a78d6', '#eb6834', '#1baf7a', '#eda100', '#e87ba4', '#008300'];   // paleta categórica validada (orden fijo)
 // Las líneas de umbral van en gris (con trazo distinto) para no confundirse con las series de color
 const ESTILO_UMBRAL = { amarillo: { color: '#9a9994', dash: [6, 4] }, rojo: { color: '#3d3c39', dash: [10, 3, 2, 3] } };
@@ -806,10 +806,10 @@ document.getElementById('m1-reproducir').addEventListener('click', (e) => {
     if (+slider.value >= SIM.dias) { clearInterval(reproduccionM1); reproduccionM1 = null; e.target.textContent = '▶ Reproducir los 60 días'; }
   }, 250);
 });
-function renderModulo2() { /* Integrante 2 */ }
-function renderModulo3() { /* Integrante 3 */ }
-function renderModulo4() { /* Integrante 4 */ }
-function renderModulo5() { /* Integrante 4 */ }
+function renderModulo2() { /* Leslie West */ }
+function renderModulo3() { /* Adriana Garibaldi */ }
+function renderModulo4() { /* Osmar Chiari */ }
+function renderModulo5() { /* Osmar Chiari */ }
 function renderModulo6() { /* Por asignar */ }
 
 /* =====================================================================
