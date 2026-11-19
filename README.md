@@ -141,7 +141,8 @@ Enlace en GitHub Pages: https://osmarborel16-hub.github.io/Proyecto-semestral-de
 ├── data/                    # supuestos y datos exportados (CSV)
 ├── docs/
 │   ├── fichas_kpi.md        # una ficha por KPI
-│   ├── verificacion_manual.md
+│   ├── verificacion_manual.md   # 5 KPI verificados a mano, con capturas (img/)
+│   ├── verificacion_manual.xlsx # los mismos cálculos en Excel, con fórmulas sobre los CSV
 │   ├── bitacora_ia.md       # prompts importantes y decisiones del grupo
 │   └── plan_de_trabajo.md
 ├── presentacion/            # diapositivas en PDF
