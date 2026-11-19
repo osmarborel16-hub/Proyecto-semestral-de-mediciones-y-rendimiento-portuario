@@ -74,8 +74,8 @@ La ficha completa de cada KPI (meta, fuente y decisión que apoya) está en [`do
 | 1 · Mapa del patio | ✅ Listo | Leslie West |
 | 2 · Dwell time | ✅ Listo | Leslie West |
 | 3 · Remanejos | ✅ Listo | Adriana Garibaldi |
-| 4 · Simulador de escenarios | ⏳ Pendiente | Osmar Chiari |
-| 5 · Mejora (A3) | ⏳ Pendiente | Osmar Chiari |
+| 4 · Simulador de escenarios | ✅ Listo | Osmar Chiari |
+| 5 · Mejora (A3) | ✅ Listo | Osmar Chiari |
 | 6 · Camiones y citas (extra) | ⏳ Pendiente | por asignar |
 
 ## 4. Cómo abrir y usar el dashboard
@@ -110,6 +110,20 @@ La ficha completa de cada KPI (meta, fuente y decisión que apoya) está en [`do
 - **Densidad vs remanejos**: un punto por bloque y día, con la recta de tendencia en el tramo de operación (≥ 60 %). Muestra cuántos puntos de remanejos se suman por cada 10 puntos de densidad. El Módulo 5 usa esta relación para estimar los remanejos con la propuesta.
 - **Servicio en patio**: minutos promedio por hora de entrada al bloque (con la meta de 25 min), por turno y por bloque.
 - Respeta los filtros de días, **turno** y bloque; la categoría solo aplica al tiempo de servicio.
+
+**Módulo 4 · Simulador de escenarios**
+- Mide el **régimen actual** en los últimos 28 días hasta el día de corte: inventario, crecimiento diario (pendiente de mínimos cuadrados), llegadas y dwell por categoría.
+- **Deslizadores**: dwell de cada categoría (con la marca del valor actual y la meta), buques extra por semana y TEU por buque.
+- **Proyección a 14 días**: densidad real de los últimos 30 días, proyección sin cambios (punteada) y proyección con el escenario, con los umbrales.
+- **Días hasta alerta roja** (KPI 8) = TEU de margen ÷ crecimiento diario, sin cambios y con el escenario, y **TEU liberados**.
+- Cómo proyecta: inventario de hoy + tendencia + cambio por el escenario según la Ley de Little (llegadas × Δdwell), aplicado de forma gradual durante un ciclo de dwell.
+- **↺ Restablecer** vuelve a la situación actual.
+
+**Módulo 5 · Mejora (A3)**
+- **Selector de propuesta**: evacuar vacíos, reducir el tiempo libre de importación, combinada o el escenario armado en el Módulo 4.
+- **Respuestas a las 3 preguntas del proyecto** con los números del día de corte.
+- **Ficha A3** de 8 bloques: antecedentes, situación actual, causa raíz, objetivo, contramedidas, resultado esperado, plan de implementación y seguimiento.
+- **Tabla actual vs propuesta**: inventario, densidad, remanejos esperados, días hasta alerta roja y dwell (global y por categoría).
 
 Enlace en GitHub Pages: https://osmarborel16-hub.github.io/Proyecto-semestral-de-mediciones-y-rendimiento-portuario/
 

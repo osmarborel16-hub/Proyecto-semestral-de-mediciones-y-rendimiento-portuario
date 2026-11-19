@@ -125,6 +125,37 @@
   .m3-dos { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 20px; align-items: start; }
   .m3-dos h3, .subpanel h3 { margin: 0 0 8px; font-size: 1rem; }
   @media (max-width: 900px) { .m3-dos { grid-template-columns: 1fr; } }
+  /* ----- Módulo 4 · Simulador ----- */
+  .m4-cuerpo { display: grid; grid-template-columns: minmax(280px, 1fr) minmax(0, 2.2fr); gap: 22px; align-items: start; }
+  .m4-controles { border: 1px solid var(--borde); border-radius: 8px; padding: 12px 14px; background: #f7f8f9; }
+  .m4-controles h3 { margin: 0 0 6px; font-size: .95rem; }
+  .control-slider { margin: 10px 0; font-size: .82rem; }
+  .control-slider .fila { display: flex; justify-content: space-between; gap: 8px; }
+  .control-slider .fila strong { white-space: nowrap; }
+  .control-slider input[type=range] { width: 100%; }
+  .control-slider .ref { color: var(--suave); font-size: .74rem; }
+  .m4-controles button { border: 1px solid var(--primario); background: #fff; color: var(--primario); border-radius: 6px; padding: 6px 12px; cursor: pointer; margin-top: 6px; }
+  .m4-salidas { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; margin-bottom: 14px; }
+  .m4-salidas > div { border: 1px solid var(--borde); border-left: 5px solid var(--gris); border-radius: 8px; padding: 8px 12px; background: #fff; }
+  .m4-salidas > div.verde { border-left-color: var(--verde); } .m4-salidas > div.amarillo { border-left-color: var(--amarillo); } .m4-salidas > div.rojo { border-left-color: var(--rojo); }
+  .m4-salidas .num { font-size: 1.3rem; font-weight: 700; }
+  .m4-salidas .lbl { font-size: .75rem; color: var(--suave); }
+  @media (max-width: 900px) { .m4-cuerpo { grid-template-columns: 1fr; } }
+  /* ----- Módulo 5 · Mejora (A3) ----- */
+  .m5-preguntas { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px; margin: 10px 0 16px; }
+  .m5-preguntas > div { border: 1px solid var(--borde); border-left: 6px solid var(--primario); border-radius: 8px; background: #f4f8fc; padding: 10px 12px; font-size: .9rem; }
+  .m5-preguntas .pregunta { font-size: .74rem; color: var(--suave); text-transform: uppercase; letter-spacing: .3px; margin-bottom: 4px; }
+  .a3 { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 2px solid #1d2733; border-radius: 6px; overflow: hidden; }
+  .a3 > div { padding: 10px 14px; border-right: 1px solid #c9d1d9; border-bottom: 1px solid #c9d1d9; font-size: .86rem; background: #fff; }
+  .a3 > div:nth-child(2n) { border-right: none; }
+  .a3 h4 { margin: 0 0 6px; font-size: .82rem; text-transform: uppercase; letter-spacing: .4px; color: var(--primario); }
+  .a3 ul { margin: 4px 0; padding-left: 18px; }
+  .a3 .titulo-a3 { grid-column: 1 / -1; background: #1d2733; color: #fff; font-weight: 700; font-size: 1rem; border-right: none; }
+  .m5-selector { display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-end; margin: 8px 0 14px; }
+  .m5-selector label { font-size: .8rem; color: var(--suave); display: flex; flex-direction: column; gap: 4px; }
+  .m5-selector select { padding: 6px 10px; border: 1px solid var(--borde); border-radius: 6px; font-size: .9rem; }
+  .tabla-m2 td.mejor { color: #0a7d0a; font-weight: 700; }
+  @media (max-width: 900px) { .a3 { grid-template-columns: 1fr; } .a3 > div { border-right: none; } }
   @media (max-width: 900px) { .m1-cuerpo { grid-template-columns: 1fr; } .bloques { grid-template-columns: repeat(2, 1fr); } }
   footer { text-align: center; font-size: .8rem; color: var(--suave); padding: 12px; }
 </style>
@@ -337,13 +368,70 @@
 <!-- ===== MÓDULO 4 · SIMULADOR DE ESCENARIOS ===== Responsable: Osmar Chiari -->
 <section class="modulo" id="m4">
   <h2>4 · Simulador de escenarios</h2>
-  <p class="pendiente">Pendiente: deslizadores de dwell por categoría y llegada de buques; proyección de densidad a 14 días; días hasta alerta roja.</p>
+  <p class="nota">Proyecta la densidad del patio completo para los próximos 14 días desde el día de corte ("Día hasta"). El régimen actual se mide en los <strong>últimos 28 días</strong>:
+     crecimiento diario (pendiente de mínimos cuadrados del inventario), llegadas (TEU/día) y dwell de los contenedores que salieron.
+     Días hasta alerta roja = TEU de margen ÷ crecimiento diario del inventario. Se usan 28 días porque las ventanas más cortas quedan sesgadas por el ciclo semanal de buques.</p>
+
+  <div class="m4-cuerpo">
+    <div class="m4-controles">
+      <h3>Supuestos del escenario</h3>
+      <p class="nota">Dwell time por categoría (días). La marca "actual" es lo medido en los últimos 28 días.</p>
+      <div id="m4-sliders-dwell"></div>
+      <h3 style="margin-top:14px">Llegada de buques</h3>
+      <div class="control-slider">
+        <div class="fila"><span>Buques extra por semana</span><strong id="m4-buques-txt"></strong></div>
+        <input type="range" id="m4-buques" min="-2" max="3" step="0.5" value="0">
+        <div class="ref">Hoy llegan 3.5 buques por semana. Valores negativos = menos buques.</div>
+      </div>
+      <div class="control-slider">
+        <div class="fila"><span>TEU por buque extra (descarga + carga)</span><strong id="m4-teu-txt"></strong></div>
+        <input type="range" id="m4-teu" min="300" max="1500" step="10" value="900">
+        <div class="ref" id="m4-teu-ref"></div>
+      </div>
+      <button type="button" id="m4-restablecer">↺ Restablecer a la situación actual</button>
+    </div>
+
+    <div>
+      <div class="m4-salidas" id="m4-salidas"></div>
+      <h3 style="margin:0 0 8px; font-size:1rem" id="m4-titulo-graf">Densidad del patio: real y proyectada</h3>
+      <div class="lienzo" style="height:320px"><canvas id="m4-grafico" aria-label="Proyección de densidad a 14 días"></canvas></div>
+      <details class="tabla-datos"><summary>Ver la proyección en tabla</summary><div class="scroll" id="m4-tabla-proy"></div></details>
+    </div>
+  </div>
+
+  <h3 style="margin-top:18px">Cálculo por categoría</h3>
+  <div id="m4-tabla"></div>
+  <p class="nota">Cómo proyecta: inventario(t) = inventario de hoy + crecimiento diario × t + cambio por el escenario. El cambio sale de la Ley de Little (inventario = llegadas × dwell):
+    si el dwell de una categoría pasa de W a W', su inventario cambia en llegadas × (W' − W); si llegan más buques, cambia en (llegadas extra) × W'.
+    Ese cambio se aplica de forma gradual durante un ciclo de dwell (W' días). Supuesto conservador: la tendencia de crecimiento actual se mantiene.
+    La proyección sigue la tendencia; los días de buque la densidad real sube 5–8 puntos por encima, así que algunos días podrían tocar el rojo antes de lo que indica el KPI.</p>
 </section>
 
 <!-- ===== MÓDULO 5 · MEJORA (A3) ===== Responsable: Osmar Chiari -->
 <section class="modulo" id="m5">
   <h2>5 · Mejora (A3)</h2>
-  <p class="pendiente">Pendiente: categoría crítica, propuesta, TEU liberados, nueva densidad y remanejos esperados; actual vs propuesta.</p>
+  <p class="nota">Compara la situación actual con la propuesta. Usa el régimen de los últimos 28 días hasta el día de corte y la misma proyección del Módulo 4.
+     Por eso la categoría crítica y los TEU de más pueden diferir un poco de los del Módulo 2, que usa el rango de días filtrado.</p>
+
+  <div class="m5-selector">
+    <label>Propuesta a evaluar
+      <select id="m5-propuesta">
+        <option value="vacios">Evacuar vacíos hasta su meta de dwell (7 días)</option>
+        <option value="tiempoLibre">Reducir el tiempo libre de importación (dwell → 5 días)</option>
+        <option value="combinada" selected>Combinada: evacuar vacíos + reducir tiempo libre</option>
+        <option value="simulador">Usar el escenario armado en el Módulo 4</option>
+      </select>
+    </label>
+  </div>
+
+  <div class="m5-preguntas" id="m5-preguntas"></div>
+
+  <div class="a3" id="m5-a3"></div>
+
+  <h3 style="margin-top:18px">Situación actual vs propuesta</h3>
+  <div id="m5-comparacion"></div>
+  <p class="nota">Remanejos esperados: se toma lo medido en los últimos 28 días y se le suma el cambio que predice la relación densidad–remanejos del Módulo 3
+    al pasar de la densidad actual a la nueva. Es una aproximación a nivel de patio (la relación se midió por bloque).</p>
 </section>
 
 <!-- ===== MÓDULO 6 · CAMIONES Y CITAS (EXTRA) ===== Responsable: por asignar -->
@@ -380,8 +468,13 @@ const METAS = {
   agingPct: 5,                                // % máximo del inventario con más de X días
   remanejo: 30,                               // % (verde ≤ 30)
   remanejoAmarillo: 40,                       // % (amarillo ≤ 40, rojo por encima)
-  servicio: 25                                // min de servicio del camión en patio
+  servicio: 25,                               // min de servicio del camión en patio
+  diasAlerta: 30,                             // días hasta alerta roja: verde ≥ 30
+  diasAlertaAmarillo: 15                      // amarillo entre 15 y 30, rojo < 15
 };
+const HORIZONTE = 14;                         // días que proyecta el simulador
+const VENTANA = 28;                           // días hacia atrás para medir el régimen actual (crecimiento, llegadas, dwell).
+                                              // 28 días = 4 semanas: cubre completos los ciclos de buques de 1 y 2 semanas (ver ficha 8)
 
 /* =====================================================================
    2. GENERADOR PSEUDOALEATORIO CON SEMILLA FIJA (reproducible)
@@ -839,6 +932,82 @@ function remanejosEsperados(densidad, rel) {
 }
 
 // TEU que entraron por día en el rango (llegadas λ, para la Ley de Little)
+/* ---------- Motor de proyección (Módulos 4 y 5) ---------- */
+// Pendiente de mínimos cuadrados de una serie diaria (TEU por día)
+function pendiente(dias, valores) {
+  const n = dias.length; if (n < 2) return 0;
+  const mx = dias.reduce((a, x) => a + x, 0) / n, my = valores.reduce((a, y) => a + y, 0) / n;
+  let sxy = 0, sxx = 0;
+  for (let i = 0; i < n; i++) { sxy += (dias[i] - mx) * (valores[i] - my); sxx += (dias[i] - mx) ** 2; }
+  return sxx ? sxy / sxx : 0;
+}
+// Régimen actual: últimos VENTANA días hasta el día de corte
+function calibracion(corte) {
+  const ini = Math.max(1, corte - VENTANA), dias = Math.max(1, corte - ini);
+  const lam = llegadasTEUdia(ini + 1, corte), dw = dwellTime(ini + 1, corte);
+  const diasVentana = []; for (let d = ini; d <= corte; d++) diasVentana.push(d);
+  const cat = {};
+  let I0 = 0;
+  for (const c of Object.keys(CATEGORIAS)) {
+    const i0 = inventarioTEU(corte, 'todos', c);
+    // crecimiento diario de la categoría = pendiente del inventario en la ventana (las pendientes por categoría suman la del patio)
+    const gc = pendiente(diasVentana, diasVentana.map(d => inventarioTEU(d, 'todos', c)));
+    cat[c] = { I0: i0, g: gc, lambda: lam[c], W: dw.porCategoria[c].dwell || METAS.dwell[c], n: dw.porCategoria[c].n };
+    I0 += i0;
+  }
+  const cap = capacidadOperativa(), rojoTEU = cap * UMBRALES.rojo / 100;
+  // crecimiento diario del inventario = pendiente de mínimos cuadrados del inventario total en los últimos VENTANA días
+  const g = pendiente(diasVentana, diasVentana.map(d => inventarioTEU(d)));
+  const margen = rojoTEU - I0;                      // TEU de margen hasta el umbral rojo
+  let diasAlerta, diasAlertaTxt, estadoAlerta;
+  if (margen <= 0) { diasAlerta = 0; diasAlertaTxt = '0 días'; estadoAlerta = 'rojo'; }
+  else if (g <= 0) { diasAlerta = Infinity; diasAlertaTxt = 'no crece'; estadoAlerta = 'verde'; }
+  else {
+    diasAlerta = margen / g;                        // KPI 8 · Días hasta alerta roja = TEU de margen ÷ crecimiento diario
+    diasAlertaTxt = fmt(diasAlerta, 0) + ' días';
+    estadoAlerta = diasAlerta >= METAS.diasAlerta ? 'verde' : (diasAlerta >= METAS.diasAlertaAmarillo ? 'amarillo' : 'rojo');
+  }
+  // TEU por buque y reparto por categoría, según los buques del periodo
+  const bq = DATOS.buques, nb = bq.length || 1;
+  const prom = (k) => bq.reduce((a, b) => a + b[k], 0) / nb;
+  const porBuque = { IMP: prom('descarga_imp_teu'), TRB: prom('descarga_trb_teu'), EXP: prom('carga_exp_teu') };
+  const teuBuque = porBuque.IMP + porBuque.TRB + porBuque.EXP;
+  return { corte, ini, dias, cat, I0, g, cap, rojoTEU, margen, diasAlerta, diasAlertaTxt, estadoAlerta, porBuque, teuBuque };
+}
+// Proyección día a día. esc = { dwell: {cat: días}, buquesExtra, teuBuque }
+function proyectar(cal, esc) {
+  const rampa = (t, W) => Math.min(1, t / Math.max(1, W));
+  const cats = Object.keys(CATEGORIAS), filas = [];
+  const extra = {};                                 // llegadas extra (TEU/día) por buques adicionales
+  cats.forEach(c => extra[c] = 0);
+  if (esc.buquesExtra) {
+    const teu = esc.teuBuque || cal.teuBuque;
+    for (const c of ['IMP', 'TRB', 'EXP']) extra[c] = esc.buquesExtra / 7 * teu * (cal.porBuque[c] / cal.teuBuque);
+  }
+  for (let t = 0; t <= HORIZONTE; t++) {
+    const fila = { t, dia: cal.corte + t, total: 0 };
+    for (const c of cats) {
+      const k = cal.cat[c], Wn = (esc.dwell && esc.dwell[c]) || k.W;
+      const cambioDwell = k.lambda * (Wn - k.W) * rampa(t, Wn);       // Ley de Little: λ × ΔW
+      const cambioBuques = extra[c] * Wn * rampa(t, Wn);              // Ley de Little: Δλ × W'
+      fila[c] = Math.max(0, k.I0 + k.g * t + cambioDwell + cambioBuques);
+      fila.total += fila[c];
+    }
+    fila.densidad = fila.total / cal.cap * 100;
+    filas.push(fila);
+  }
+  // Día en que cruza el umbral rojo
+  const cruce = filas.find(f => f.total > cal.rojoTEU);
+  const fin = filas[filas.length - 1];
+  let diasRojo;
+  if (cruce) diasRojo = cruce.t;
+  else if (cal.g > 0) diasRojo = HORIZONTE + (cal.rojoTEU - fin.total) / cal.g;   // tras el horizonte sigue la tendencia
+  else diasRojo = Infinity;
+  return { filas, fin, diasRojo, cruzaEnHorizonte: !!cruce };
+}
+function escenarioBase(cal) { const d = {}; Object.keys(CATEGORIAS).forEach(c => d[c] = cal.cat[c].W); return { dwell: d, buquesExtra: 0, teuBuque: cal.teuBuque }; }
+const txtDias = (d) => d === Infinity ? 'no llega' : (d <= 0 ? 'ya en rojo' : fmt(d, 0) + ' días');
+
 function llegadasTEUdia(desde, hasta, bloque = 'todos') {
   const r = {}; Object.keys(CATEGORIAS).forEach(c => r[c] = 0);
   for (const c of CONT) {
@@ -891,7 +1060,10 @@ function renderKPIs() {
       return tarjeta(`Aging (> ${METAS.agingX} días)`, ag.mayores.toLocaleString('es-PA') + ' cont.',
         `${fmt(ag.pct)} % del inventario · meta ≤ ${METAS.agingPct} % · día ${f.hasta}`, ag.pct <= METAS.agingPct ? 'verde' : 'rojo');
     })(),
-    tarjeta('Días a alerta roja', '—', 'Meta ≥ 30 días', '')
+    (() => {
+      const cal = calibracion(filtros().hasta);
+      return tarjeta('Días a alerta roja', cal.diasAlertaTxt, `Meta ≥ ${METAS.diasAlerta} días · margen ${Math.round(cal.margen).toLocaleString('es-PA')} TEU · +${fmt(cal.g)} TEU/día`, cal.estadoAlerta);
+    })()
   ].join('');
 }
 
@@ -1385,8 +1557,233 @@ document.querySelectorAll('.subpestanas').forEach(nav => nav.addEventListener('c
   if (modulo.id === 'm3') renderModulo3();
 }));
 document.getElementById('m3-vista').addEventListener('change', renderModulo3);
-function renderModulo4() { /* Osmar Chiari */ }
-function renderModulo5() { /* Osmar Chiari */ }
+/* ---------- MÓDULO 4 · SIMULADOR DE ESCENARIOS (Osmar Chiari) ---------- */
+const ESCENARIO = { dwell: {}, buquesExtra: 0, teuBuque: null, corte: null, tocado: false };
+let graficoM4 = null;
+
+function prepararEscenario(cal) {
+  // Si cambia el día de corte y el usuario no movió nada, los supuestos vuelven a la situación actual
+  if (ESCENARIO.corte !== cal.corte && !ESCENARIO.tocado) {
+    Object.keys(CATEGORIAS).forEach(c => ESCENARIO.dwell[c] = Math.round(cal.cat[c].W * 2) / 2);
+    ESCENARIO.buquesExtra = 0; ESCENARIO.teuBuque = Math.round(cal.teuBuque / 10) * 10;
+  }
+  ESCENARIO.corte = cal.corte;
+}
+function escenarioActual(cal) {
+  // los deslizadores redondean a 0.5 días: si el valor coincide con lo medido, se usa el valor exacto medido
+  const d = {};
+  Object.keys(CATEGORIAS).forEach(c => d[c] = Math.abs(ESCENARIO.dwell[c] - cal.cat[c].W) < 0.25 ? cal.cat[c].W : ESCENARIO.dwell[c]);
+  return { dwell: d, buquesExtra: ESCENARIO.buquesExtra, teuBuque: ESCENARIO.teuBuque };
+}
+
+function renderModulo4() {
+  const f = filtros(), cal = calibracion(f.hasta);
+  prepararEscenario(cal);
+  const base = proyectar(cal, escenarioBase(cal)), esc = proyectar(cal, escenarioActual(cal));
+
+  /* Controles */
+  const cont = document.getElementById('m4-sliders-dwell');
+  if (!cont.dataset.listo) {
+    cont.innerHTML = Object.keys(CATEGORIAS).map(c => `<div class="control-slider">
+      <div class="fila"><span>${CATEGORIAS[c]}</span><strong id="m4-w-txt-${c}"></strong></div>
+      <input type="range" id="m4-w-${c}" data-cat="${c}" min="1" max="20" step="0.5">
+      <div class="ref" id="m4-w-ref-${c}"></div></div>`).join('');
+    cont.querySelectorAll('input').forEach(inp => inp.addEventListener('input', (e) => {
+      ESCENARIO.dwell[e.target.dataset.cat] = parseFloat(e.target.value); ESCENARIO.tocado = true; renderModulo4(); renderModulo5();
+    }));
+    cont.dataset.listo = '1';
+  }
+  Object.keys(CATEGORIAS).forEach(c => {
+    document.getElementById('m4-w-' + c).value = ESCENARIO.dwell[c];
+    document.getElementById('m4-w-txt-' + c).textContent = fmt(ESCENARIO.dwell[c]) + ' días';
+    document.getElementById('m4-w-ref-' + c).textContent = `actual ${fmt(cal.cat[c].W)} · meta ${METAS.dwell[c]} · llegan ${fmt(cal.cat[c].lambda, 0)} TEU/día`;
+  });
+  document.getElementById('m4-buques').value = ESCENARIO.buquesExtra;
+  document.getElementById('m4-buques-txt').textContent = (ESCENARIO.buquesExtra > 0 ? '+' : '') + fmt(ESCENARIO.buquesExtra) + ' / semana';
+  document.getElementById('m4-teu').value = ESCENARIO.teuBuque;
+  document.getElementById('m4-teu-txt').textContent = ESCENARIO.teuBuque.toLocaleString('es-PA') + ' TEU';
+  document.getElementById('m4-teu-ref').textContent = `Promedio actual por buque: ${Math.round(cal.teuBuque)} TEU (importación ${Math.round(cal.porBuque.IMP)}, transbordo ${Math.round(cal.porBuque.TRB)}, exportación ${Math.round(cal.porBuque.EXP)})`;
+
+  /* Salidas */
+  const dB = base.fin.densidad, dE = esc.fin.densidad, liberados = base.fin.total - esc.fin.total;
+  const estDias = (d) => d === Infinity || d >= METAS.diasAlerta ? 'verde' : (d >= METAS.diasAlertaAmarillo ? 'amarillo' : 'rojo');
+  document.getElementById('m4-salidas').innerHTML =
+    `<div class="${cal.estadoAlerta}"><div class="num">${cal.diasAlertaTxt}</div>
+       <div class="lbl">Días hasta alerta roja si nada cambia = ${Math.round(cal.margen).toLocaleString('es-PA')} TEU de margen ÷ ${fmt(cal.g)} TEU/día</div></div>
+     <div class="${estadoDensidad(dB)}"><div class="num">${fmt(dB)} %</div><div class="lbl">Densidad en el día ${cal.corte + HORIZONTE} sin cambios (hoy ${fmt(cal.I0 / cal.cap * 100)} %)</div></div>
+     <div class="${estadoDensidad(dE)}"><div class="num">${fmt(dE)} %</div><div class="lbl">Densidad en el día ${cal.corte + HORIZONTE} con el escenario · ${ESTADO[estadoDensidad(dE)]}</div></div>
+     <div class="${estDias(esc.diasRojo)}"><div class="num">${txtDias(esc.diasRojo)}</div>
+       <div class="lbl">Días hasta la alerta roja (desde hoy) con el escenario${esc.cruzaEnHorizonte ? ' (cruza dentro de los 14 días)' : ''} · ${liberados >= 0 ? Math.round(liberados).toLocaleString('es-PA') + ' TEU liberados' : Math.round(-liberados).toLocaleString('es-PA') + ' TEU más'} en el día ${cal.corte + HORIZONTE}</div></div>`;
+
+  /* Gráfico: últimos 30 días reales + 14 proyectados */
+  const desdeHist = Math.max(1, cal.corte - 30), etiquetas = [];
+  for (let d = desdeHist; d <= cal.corte + HORIZONTE; d++) etiquetas.push(d);
+  const real = etiquetas.map(d => d <= cal.corte ? +yardDensity(d).toFixed(1) : null);
+  const proy = (p) => etiquetas.map(d => d < cal.corte ? null : +p.filas[d - cal.corte].densidad.toFixed(1));
+  document.getElementById('m4-titulo-graf').textContent = `Densidad del patio: real (días ${desdeHist}–${cal.corte}) y proyectada (días ${cal.corte + 1}–${cal.corte + HORIZONTE})`;
+  document.getElementById('m4-tabla-proy').innerHTML = '<table><tr><th>Día</th><th>Sin cambios (TEU)</th><th>Sin cambios (%)</th><th>Escenario (TEU)</th><th>Escenario (%)</th></tr>' +
+    base.filas.map((fb, i) => `<tr><td>${fb.dia}</td><td>${Math.round(fb.total).toLocaleString('es-PA')}</td><td>${fmt(fb.densidad)}</td><td>${Math.round(esc.filas[i].total).toLocaleString('es-PA')}</td><td>${fmt(esc.filas[i].densidad)}</td></tr>`).join('') + '</table>';
+  if (typeof Chart === 'undefined') {
+    document.querySelector('#m4 .lienzo').innerHTML = '<p class="pendiente">No se pudo cargar Chart.js (¿sin internet?). La proyección está en la tabla de abajo.</p>';
+  } else {
+    const umbral = (nombre, valor, estilo) => ({ label: `${nombre} (${valor} %)`, data: etiquetas.map(() => valor), borderColor: estilo.color, backgroundColor: estilo.color,
+      borderWidth: 1.5, borderDash: estilo.dash, pointRadius: 0, pointHoverRadius: 0 });
+    if (graficoM4) graficoM4.destroy();
+    graficoM4 = new Chart(document.getElementById('m4-grafico'), {
+      type: 'line',
+      data: { labels: etiquetas, datasets: [
+        { label: 'Real', data: real, borderColor: '#2a78d6', backgroundColor: '#2a78d6', borderWidth: 2, pointRadius: 0, pointHoverRadius: 5, tension: 0.2 },
+        { label: 'Proyección sin cambios', data: proy(base), borderColor: '#2a78d6', backgroundColor: '#2a78d6', borderWidth: 2, borderDash: [5, 4], pointRadius: 0, pointHoverRadius: 5 },
+        { label: 'Proyección con el escenario', data: proy(esc), borderColor: '#eb6834', backgroundColor: '#eb6834', borderWidth: 2.5, pointRadius: 0, pointHoverRadius: 5 },
+        umbral('Umbral amarillo', UMBRALES.amarillo, ESTILO_UMBRAL.amarillo), umbral('Umbral rojo', UMBRALES.rojo, ESTILO_UMBRAL.rojo)
+      ] },
+      options: { responsive: true, maintainAspectRatio: false, animation: false, interaction: { mode: 'index', intersect: false },
+        scales: { y: { suggestedMin: 40, suggestedMax: 100, title: { display: true, text: 'Densidad (%)' }, grid: { color: '#eceff2' }, ticks: { callback: v => v + ' %' } },
+                  x: { title: { display: true, text: 'Día' }, grid: { display: false }, ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 15 } } },
+        plugins: { legend: { position: 'bottom', labels: { boxWidth: 18, boxHeight: 2,
+            generateLabels: (chart) => Chart.defaults.plugins.legend.labels.generateLabels(chart).map(l => { const ds = chart.data.datasets[l.datasetIndex]; return { ...l, lineDash: ds.borderDash || [] }; }) } },
+          tooltip: { filter: it => !it.dataset.label.startsWith('Umbral') && it.parsed.y !== null,
+            callbacks: { title: it => `Día ${it[0].label}${+it[0].label > cal.corte ? ' (proyectado)' : ''}`, label: it => ` ${it.dataset.label}: ${fmt(it.parsed.y)} %` } },
+          marcaDia: { dia: cal.corte } } },
+      plugins: [{ id: 'marcaDia', afterDatasetsDraw(chart, _a, o) {
+        const i = chart.data.labels.indexOf(o.dia); if (i < 0) return;
+        const x = chart.scales.x.getPixelForValue(i), { top, bottom } = chart.chartArea, ctx = chart.ctx;
+        ctx.save(); ctx.strokeStyle = '#52514e'; ctx.setLineDash([2, 3]); ctx.beginPath(); ctx.moveTo(x, top); ctx.lineTo(x, bottom); ctx.stroke();
+        ctx.setLineDash([]); ctx.fillStyle = '#52514e'; ctx.font = '11px Segoe UI, Arial'; ctx.fillText('hoy (día de corte)', x + 4, top + 12); ctx.restore(); } }]
+    });
+  }
+
+  /* Tabla por categoría */
+  const escAct = escenarioActual(cal);
+  document.getElementById('m4-tabla').innerHTML = `<table class="tabla-m2">
+    <tr><th>Categoría</th><th>Inventario hoy (TEU)</th><th>Crecimiento (TEU/día)</th><th>Llegadas (TEU/día)</th><th>Dwell actual</th><th>Dwell escenario</th>
+        <th>Día ${cal.corte + HORIZONTE} sin cambios</th><th>Día ${cal.corte + HORIZONTE} escenario</th><th>Diferencia</th></tr>
+    ${Object.keys(CATEGORIAS).map(c => { const k = cal.cat[c], dif = esc.fin[c] - base.fin[c];
+      return `<tr><td>${CATEGORIAS[c]}</td><td>${k.I0.toLocaleString('es-PA')}</td><td>${(k.g >= 0 ? '+' : '') + fmt(k.g)}</td><td>${fmt(k.lambda)}</td><td>${fmt(k.W, 2)}</td>
+        <td>${fmt(escAct.dwell[c], 2)}</td><td>${Math.round(base.fin[c]).toLocaleString('es-PA')}</td><td>${Math.round(esc.fin[c]).toLocaleString('es-PA')}</td>
+        <td class="${dif < -0.5 ? 'mejor' : ''}">${(dif > 0 ? '+' : '') + Math.round(dif).toLocaleString('es-PA')}</td></tr>`; }).join('')}
+    <tr class="total"><td>Patio</td><td>${cal.I0.toLocaleString('es-PA')}</td><td>${(cal.g >= 0 ? '+' : '') + fmt(cal.g)}</td><td></td><td></td><td></td>
+      <td>${Math.round(base.fin.total).toLocaleString('es-PA')}</td><td>${Math.round(esc.fin.total).toLocaleString('es-PA')}</td><td>${(esc.fin.total - base.fin.total > 0 ? '+' : '') + Math.round(esc.fin.total - base.fin.total).toLocaleString('es-PA')}</td></tr>
+  </table>`;
+}
+
+document.getElementById('m4-buques').addEventListener('input', (e) => { ESCENARIO.buquesExtra = parseFloat(e.target.value); ESCENARIO.tocado = true; renderModulo4(); renderModulo5(); });
+document.getElementById('m4-teu').addEventListener('input', (e) => { ESCENARIO.teuBuque = parseInt(e.target.value, 10); ESCENARIO.tocado = true; renderModulo4(); renderModulo5(); });
+document.getElementById('m4-restablecer').addEventListener('click', () => { ESCENARIO.tocado = false; ESCENARIO.corte = null; renderModulo4(); renderModulo5(); });
+
+/* ---------- MÓDULO 5 · MEJORA (A3) (Osmar Chiari) ---------- */
+function escenarioPropuesta(cal, tipo) {
+  const e = escenarioBase(cal);
+  if (tipo === 'vacios' || tipo === 'combinada') e.dwell.VAC = Math.min(cal.cat.VAC.W, METAS.dwell.VAC);
+  if (tipo === 'tiempoLibre' || tipo === 'combinada') e.dwell.IMP = Math.min(cal.cat.IMP.W, METAS.dwell.IMP);
+  if (tipo === 'simulador') return escenarioActual(cal);
+  return e;
+}
+const NOMBRE_PROPUESTA = {
+  vacios: 'Evacuar vacíos hasta 7 días de dwell',
+  tiempoLibre: 'Reducir el tiempo libre de importación (dwell 5 días)',
+  combinada: 'Evacuar vacíos (7 días) + reducir el tiempo libre de importación (5 días)',
+  simulador: 'Escenario armado en el Módulo 4'
+};
+
+function renderModulo5() {
+  const f = filtros(), cal = calibracion(f.hasta);
+  prepararEscenario(cal);
+  const tipo = document.getElementById('m5-propuesta').value;
+  const escP = escenarioPropuesta(cal, tipo), base = proyectar(cal, escenarioBase(cal)), prop = proyectar(cal, escP);
+  const cats = Object.keys(CATEGORIAS);
+
+  // Categoría crítica en el régimen actual: TEU de más = λ × (dwell − meta)
+  const exceso = {}; cats.forEach(c => exceso[c] = Math.max(0, cal.cat[c].lambda * (cal.cat[c].W - METAS.dwell[c])));
+  const critica = [...cats].sort((a, b) => exceso[b] - exceso[a])[0];
+  const creceMas = [...cats].sort((a, b) => cal.cat[b].g - cal.cat[a].g)[0];
+
+  // Densidades y remanejos
+  const dHoy = cal.I0 / cal.cap * 100, dBase = base.fin.densidad, dProp = prop.fin.densidad;
+  const liberados = base.fin.total - prop.fin.total;
+  const rel = relacionDensidadRemanejos(1, cal.corte);
+  const remHoy = remanejos(cal.ini + 1, cal.corte).ratio;
+  const remModelo = (d) => remanejosEsperados(d, rel);
+  const remEsp = (d) => remHoy === null || remModelo(d) === null ? null : Math.max(0, remHoy + remModelo(d) - remModelo(dHoy));
+  const remBase = remEsp(dBase), remProp = remEsp(dProp);
+  // Dwell global ponderado con la propuesta (mismos contenedores, dwell nuevo)
+  const nTot = cats.reduce((a, c) => a + cal.cat[c].n, 0);
+  const dwG = (dw) => nTot ? cats.reduce((a, c) => a + cal.cat[c].n * dw[c], 0) / nTot : null;
+  const dwHoy = dwG(Object.fromEntries(cats.map(c => [c, cal.cat[c].W]))), dwProp = dwG(escP.dwell);
+
+  /* Las 3 preguntas del proyecto */
+  document.getElementById('m5-preguntas').innerHTML =
+    `<div><div class="pregunta">1 · ¿Qué categoría presiona más y cuántos TEU ocupa de más?</div>
+       <strong>${CATEGORIAS[critica]}</strong>: ${Math.round(exceso[critica]).toLocaleString('es-PA')} TEU de más (dwell ${fmt(cal.cat[critica].W)} días vs meta ${METAS.dwell[critica]}).</div>
+     <div><div class="pregunta">2 · ¿Cuántos días faltan para la alerta roja si nada cambia?</div>
+       <strong>${cal.diasAlertaTxt}</strong> (${Math.round(cal.margen).toLocaleString('es-PA')} TEU de margen ÷ ${fmt(cal.g)} TEU/día de crecimiento).</div>
+     <div><div class="pregunta">3 · ¿Cuánto bajan la densidad y los remanejos con la propuesta?</div>
+       Densidad <strong>${fmt(dBase)} % → ${fmt(dProp)} %</strong> (${fmt(dBase - dProp)} puntos) y remanejos
+       <strong>${remBase === null ? '—' : fmt(remBase)} % → ${remProp === null ? '—' : fmt(remProp)} %</strong> en el día ${cal.corte + HORIZONTE}, frente a no hacer nada.</div>`;
+
+  /* Ficha A3 */
+  const kpisSeguimiento = ['Yard Density (diaria, por bloque)', 'Dwell time de vacíos e importación (semanal)', 'Remanejos (diario)', 'Días hasta alerta roja (diario)', 'Antigüedad > 10 días (semanal)'];
+  const acciones = {
+    vacios: ['Acordar con la naviera una cuota mínima de evacuación de vacíos por buque', 'Lista diaria de vacíos con más de 7 días (sale del Módulo 2)', 'Cobro de almacenaje a vacíos que superen 7 días'],
+    tiempoLibre: ['Reducir el tiempo libre de almacenaje de importación de forma escalonada', 'Avisar a agentes y consignatarios con dos semanas de anticipación', 'Tarifa creciente desde el día 6'],
+    combinada: ['Cuota mínima de evacuación de vacíos por buque con la naviera', 'Reducir el tiempo libre de importación a 5 días, con tarifa creciente desde el día 6', 'Lista diaria de contenedores envejecidos (Módulo 2) para retiro prioritario'],
+    simulador: ['Aplicar los supuestos del escenario del Módulo 4', 'Definir con operaciones qué medida concreta logra cada cambio de dwell', 'Seguir los KPI semanalmente']
+  }[tipo];
+  document.getElementById('m5-a3').innerHTML = `
+    <div class="titulo-a3">A3 · Liberar espacio en el patio de contenedores · día de corte ${cal.corte} (${fechaDe(cal.corte)})</div>
+    <div><h4>1. Antecedentes y problema</h4>
+      El patio está en <strong>${fmt(dHoy)} %</strong> de densidad (${ESTADO[estadoDensidad(dHoy)]}) y crece <strong>${fmt(cal.g)} TEU/día</strong>.
+      Con alta densidad aumentan los remanejos (<strong>${remHoy === null ? '—' : fmt(remHoy) + ' %'}</strong> en los últimos ${cal.dias} días, meta ≤ ${METAS.remanejo} %)
+      y el tiempo de servicio de los camiones. A este ritmo, la alerta roja llega en <strong>${cal.diasAlertaTxt}</strong>.</div>
+    <div><h4>2. Situación actual</h4><ul>
+      <li>Densidad: ${fmt(dHoy)} % · ${Math.round(cal.I0).toLocaleString('es-PA')} de ${cal.cap.toLocaleString('es-PA')} TEU</li>
+      <li>Dwell global ponderado: ${dwHoy === null ? '—' : fmt(dwHoy, 2)} días (meta ≤ ${METAS.dwellGlobal})</li>
+      ${cats.map(c => `<li>${CATEGORIAS[c]}: dwell ${fmt(cal.cat[c].W)} días (meta ${METAS.dwell[c]}) · ${(cal.cat[c].g >= 0 ? '+' : '') + fmt(cal.cat[c].g)} TEU/día</li>`).join('')}
+    </ul></div>
+    <div><h4>3. Análisis de causa raíz</h4>
+      La categoría crítica es <strong>${CATEGORIAS[critica]}</strong>: ocupa unos ${Math.round(exceso[critica]).toLocaleString('es-PA')} TEU de más.
+      La que más crece es <strong>${CATEGORIAS[creceMas]}</strong>: ${fmt(cal.cat[creceMas].g)} TEU/día${
+        cal.g > 0 && cal.cat[creceMas].g > cal.g ? `, más que el patio completo (${fmt(cal.g)} TEU/día), porque el resto de las categorías, en conjunto, baja`
+        : (cal.g > 0 ? `, el ${fmt(cal.cat[creceMas].g / cal.g * 100, 0)} % del crecimiento del patio` : '')}.
+      <ul><li>Los vacíos entran más rápido de lo que la naviera los evacúa (cuota por buque menor que las devoluciones).</li>
+          <li>Parte de la importación se queda más tiempo del necesario (tiempo libre amplio y contenedores retenidos).</li>
+          <li>Efecto: estiba más alta → más remanejos → camiones y grúas esperando.</li></ul></div>
+    <div><h4>4. Objetivo</h4><ul>
+      <li>Mantener la densidad por debajo del umbral rojo (${UMBRALES.rojo} %) y volver hacia el verde (≤ ${UMBRALES.amarillo} %)</li>
+      <li>Remanejos ≤ ${METAS.remanejo} %</li><li>Días hasta alerta roja ≥ ${METAS.diasAlerta}</li>
+      <li>Dwell de cada categoría en su meta</li></ul></div>
+    <div><h4>5. Propuesta (contramedidas)</h4>
+      <strong>${NOMBRE_PROPUESTA[tipo]}</strong><ul>${acciones.map(a => `<li>${a}</li>`).join('')}</ul></div>
+    <div><h4>6. Resultado esperado (día ${cal.corte + HORIZONTE})</h4><ul>
+      <li><strong>${liberados >= 0 ? Math.round(liberados).toLocaleString('es-PA') + ' TEU liberados' : Math.round(-liberados).toLocaleString('es-PA') + ' TEU más'}</strong> frente a no hacer nada</li>
+      <li>Densidad: ${fmt(dBase)} % → <strong>${fmt(dProp)} %</strong> (${ESTADO[estadoDensidad(dProp)]})</li>
+      <li>Remanejos esperados: ${remBase === null ? '—' : fmt(remBase)} % → <strong>${remProp === null ? '—' : fmt(remProp)} %</strong></li>
+      <li>Días hasta alerta roja (desde hoy): ${txtDias(base.diasRojo)} → <strong>${txtDias(prop.diasRojo)}</strong></li></ul></div>
+    <div><h4>7. Plan de implementación</h4><ul>
+      <li>Semana 1: acordar la medida con la naviera, aduana y agentes; comunicar cambios</li>
+      <li>Semana 2: aplicar la medida y publicar la lista diaria de contenedores envejecidos</li>
+      <li>Semanas 3–4: medir resultados y ajustar cuotas o tarifas</li></ul></div>
+    <div><h4>8. Seguimiento (KPI del dashboard)</h4><ul>${kpisSeguimiento.map(k => `<li>${k}</li>`).join('')}</ul></div>`;
+
+  /* Comparación */
+  const filaC = (nombre, hoy, sinCambios, conPropuesta, mejorSiMenor = true, fmtFn = (x) => x) => {
+    const mejora = typeof sinCambios === 'number' && typeof conPropuesta === 'number' && (mejorSiMenor ? conPropuesta < sinCambios : conPropuesta > sinCambios);
+    return `<tr><td>${nombre}</td><td>${fmtFn(hoy)}</td><td>${fmtFn(sinCambios)}</td><td class="${mejora ? 'mejor' : ''}">${fmtFn(conPropuesta)}</td></tr>`;
+  };
+  const pct = (x) => x === null || x === undefined ? '—' : fmt(x) + ' %';
+  const teu = (x) => Math.round(x).toLocaleString('es-PA') + ' TEU';
+  const dias = (x) => typeof x === 'number' ? txtDias(x) : x;
+  document.getElementById('m5-comparacion').innerHTML = `<table class="tabla-m2">
+    <tr><th>KPI</th><th>Hoy (día ${cal.corte})</th><th>Día ${cal.corte + HORIZONTE} sin cambios</th><th>Día ${cal.corte + HORIZONTE} con la propuesta</th></tr>
+    ${filaC('Inventario', cal.I0, base.fin.total, prop.fin.total, true, teu)}
+    ${filaC('Yard Density', dHoy, dBase, dProp, true, pct)}
+    ${filaC('Remanejos (esperados)', remHoy, remBase, remProp, true, pct)}
+    ${filaC('Días hasta alerta roja (contados desde ese día)', cal.diasAlerta, Math.max(0, base.diasRojo - HORIZONTE), Math.max(0, prop.diasRojo - HORIZONTE), false, dias)}
+    ${filaC('Dwell global ponderado', dwHoy, dwHoy, dwProp, true, (x) => x === null ? '—' : fmt(x, 2) + ' días')}
+    ${cats.map(c => filaC('Dwell ' + CATEGORIAS[c].toLowerCase(), cal.cat[c].W, cal.cat[c].W, escP.dwell[c], true, (x) => fmt(x, 1) + ' días')).join('')}
+  </table>`;
+}
+document.getElementById('m5-propuesta').addEventListener('change', renderModulo5);
 function renderModulo6() { /* Por asignar */ }
 
 /* =====================================================================
