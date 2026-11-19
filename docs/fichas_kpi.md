@@ -74,7 +74,8 @@ Cálculo: [6 × 30 × (5 × 6 − 4)] − 80 = 4 680 − 80 = **4 600 TEU**
 | Meta | ≤ 30 % (amarillo 30–40 %, rojo > 40 %) |
 | Fuente del dato | `movimientos` simulados |
 | Decisión que apoya | Reducir la altura de estiba; segregar mejor las cajas; evaluar el beneficio de liberar espacio |
-| Justificación de la meta | _por completar_ |
+| Justificación de la meta | La meta se alinea con los umbrales de densidad. Según la relación que mide el Módulo 3 (desde 60 %: remanejos ≈ −49.9 + 1.18 × densidad), un bloque cerca del umbral verde (≈ 68 %) produce unos 30 % de remanejos, y uno a ≈ 76 % llega a 40 %. Meta ≤ 30 % equivale a operar en verde; más de 40 % indica estiba demasiado alta |
+| Cálculo en el dashboard | Módulo 3 · función `remanejos()`: Σ improductivos ÷ Σ productivos × 100 sobre la tabla `movimientos`, con filtros de días, turno y bloque |
 
 ## 6. Tiempo de servicio en patio
 
@@ -87,7 +88,8 @@ Cálculo: [6 × 30 × (5 × 6 − 4)] − 80 = 4 680 − 80 = **4 600 TEU**
 | Meta | ≤ 25 min de promedio por turno |
 | Fuente del dato | `visitas_camion` simuladas (hora de entrada y de salida del bloque) |
 | Decisión que apoya | Implementar citas de retiro; reforzar equipos en hora pico |
-| Justificación de la meta | _por completar_ |
+| Justificación de la meta | 25 min es la parte del ciclo del camión que ocurre dentro del bloque: unos 16 min de maniobra, más la espera, más los remanejos. El aumento del tiempo de los camiones con la congestión del patio y con los remanejos excesivos está documentado para terminales de EE. UU. (National Academies, *Truck Drayage Productivity Guide*, cap. 9: https://nap.nationalacademies.org/read/14536/chapter/10). Hoy el promedio cumple (22.6 min), pero el 27 % de las visitas pasa de 25 min y en hora pico se acerca al límite (24.2 min) |
+| Cálculo en el dashboard | Módulo 3 · función `servicioPatio()`: promedio de `minutos` de la tabla `visitasCamion`, con filtros de días, turno, bloque y categoría |
 
 ## 7. Antigüedad del inventario (aging)
 

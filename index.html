@@ -110,6 +110,21 @@
   .tabla-m2 tr.total td { font-weight: 700; background: #f4f6f8; }
   .tabla-m2 tr.simple td { color: var(--suave); font-style: italic; }
   @media (max-width: 900px) { .m2-cuerpo { grid-template-columns: 1fr; } }
+  /* ----- Sub-pestañas (dentro de un módulo) ----- */
+  .subpestanas { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0 14px; border-bottom: 1px solid var(--borde); }
+  .subpestanas button { border: none; background: none; padding: 8px 14px; cursor: pointer; font-size: .88rem; color: var(--suave); border-bottom: 3px solid transparent; margin-bottom: -1px; }
+  .subpestanas button.activa { color: var(--primario); font-weight: 700; border-bottom-color: var(--primario); }
+  .subpanel { display: none; }
+  .subpanel.activo { display: block; }
+  /* ----- Módulo 3 · Remanejos ----- */
+  .m3-resumen { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; margin-top: 8px; }
+  .m3-resumen > div { border: 1px solid var(--borde); border-left: 5px solid var(--gris); border-radius: 8px; padding: 8px 12px; background: #fff; }
+  .m3-resumen > div.verde { border-left-color: var(--verde); } .m3-resumen > div.amarillo { border-left-color: var(--amarillo); } .m3-resumen > div.rojo { border-left-color: var(--rojo); }
+  .m3-resumen .num { font-size: 1.35rem; font-weight: 700; }
+  .m3-resumen .lbl { font-size: .76rem; color: var(--suave); }
+  .m3-dos { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 20px; align-items: start; }
+  .m3-dos h3, .subpanel h3 { margin: 0 0 8px; font-size: 1rem; }
+  @media (max-width: 900px) { .m3-dos { grid-template-columns: 1fr; } }
   @media (max-width: 900px) { .m1-cuerpo { grid-template-columns: 1fr; } .bloques { grid-template-columns: repeat(2, 1fr); } }
   footer { text-align: center; font-size: .8rem; color: var(--suave); padding: 12px; }
 </style>
@@ -251,7 +266,72 @@
 <!-- ===== MÓDULO 3 · REMANEJOS ===== Responsable: Adriana Garibaldi -->
 <section class="modulo" id="m3">
   <h2>3 · Remanejos</h2>
-  <p class="pendiente">Pendiente: remanejos por bloque y por día, dispersión densidad vs remanejos y tiempo de servicio en patio.</p>
+  <p class="nota">Remanejos (rehandle ratio) = Movimientos improductivos ÷ movimientos productivos × 100 · Tiempo de servicio en patio = tiempo del camión desde que entra al bloque hasta que sale ·
+     usa los filtros de días, turno y bloque; la categoría solo aplica al tiempo de servicio (los movimientos se registran por bloque y turno)</p>
+
+  <div class="m3-resumen" id="m3-resumen"></div>
+
+  <nav class="subpestanas" aria-label="Vistas del módulo 3">
+    <button type="button" data-sub="m3-bloque" class="activa">Por bloque</button>
+    <button type="button" data-sub="m3-dia">Por día</button>
+    <button type="button" data-sub="m3-relacion">Densidad vs remanejos</button>
+    <button type="button" data-sub="m3-servicio">Servicio en patio</button>
+  </nav>
+
+  <div class="subpanel activo" id="m3-bloque">
+    <div class="m3-dos">
+      <div>
+        <h3 id="m3-titulo-bloque">Remanejos por bloque</h3>
+        <div class="lienzo"><canvas id="m3-graf-bloque" aria-label="Remanejos por bloque"></canvas></div>
+      </div>
+      <div>
+        <h3>Detalle por bloque</h3>
+        <div id="m3-tabla-bloque"></div>
+        <p class="nota">El bloque con más remanejos coincide con el más lleno: a más altura de estiba, más contenedores quedan encima del que se busca.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="subpanel" id="m3-dia">
+    <div class="m1-grafico-cab">
+      <h3 id="m3-titulo-dia">Remanejos por día</h3>
+      <select id="m3-vista" aria-label="Vista del gráfico por día">
+        <option value="total">Total (o bloque filtrado)</option>
+        <option value="bloques">Por bloque</option>
+      </select>
+    </div>
+    <div class="lienzo"><canvas id="m3-graf-dia" aria-label="Remanejos por día"></canvas></div>
+    <details class="tabla-datos"><summary>Ver los datos del gráfico en tabla</summary><div class="scroll" id="m3-tabla-dia"></div></details>
+  </div>
+
+  <div class="subpanel" id="m3-relacion">
+    <div class="m3-dos">
+      <div>
+        <h3>Densidad del bloque vs remanejos (un punto por bloque y día)</h3>
+        <div class="lienzo" style="height:340px"><canvas id="m3-graf-relacion" aria-label="Relación entre densidad y remanejos"></canvas></div>
+      </div>
+      <div>
+        <h3>Qué muestra</h3>
+        <div id="m3-relacion-txt"></div>
+        <p class="nota">Densidad al <strong>inicio</strong> del día (cierre del día anterior), porque es la altura de estiba con la que trabajan los equipos ese día.
+          La recta es de mínimos cuadrados; no es un KPI, solo describe la relación. El Módulo 5 la usa para estimar los remanejos esperados con la propuesta.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="subpanel" id="m3-servicio">
+    <div class="m3-dos">
+      <div>
+        <h3 id="m3-titulo-servicio">Tiempo de servicio del camión por hora de entrada al bloque</h3>
+        <div class="lienzo"><canvas id="m3-graf-servicio" aria-label="Tiempo de servicio por hora"></canvas></div>
+      </div>
+      <div>
+        <h3>Por turno y por bloque</h3>
+        <div id="m3-tabla-servicio"></div>
+        <p class="nota" id="m3-servicio-txt"></p>
+      </div>
+    </div>
+  </div>
 </section>
 
 <!-- ===== MÓDULO 4 · SIMULADOR DE ESCENARIOS ===== Responsable: Osmar Chiari -->
@@ -297,7 +377,10 @@ const METAS = {
   dwell: { IMP: 5, EXP: 4, TRB: 4, VAC: 7 },  // días, por categoría
   dwellGlobal: 5,                             // días
   agingX: 10,                                 // X días para la antigüedad del inventario (editable en el Módulo 2)
-  agingPct: 5                                 // % máximo del inventario con más de X días
+  agingPct: 5,                                // % máximo del inventario con más de X días
+  remanejo: 30,                               // % (verde ≤ 30)
+  remanejoAmarillo: 40,                       // % (amarillo ≤ 40, rojo por encima)
+  servicio: 25                                // min de servicio del camión en patio
 };
 
 /* =====================================================================
@@ -703,6 +786,58 @@ function antiguedad(dia, x, bloque = 'todos', categoria = 'todas') {
   }
   return { enPatio, mayores, pct: enPatio ? mayores / enPatio * 100 : 0, edades };
 }
+// KPI 5 · Remanejos = movimientos improductivos ÷ movimientos productivos × 100
+function remanejos(desde, hasta, turno = 'todos', bloque = 'todos') {
+  let prod = 0, improd = 0;
+  for (const m of DATOS.movimientos) {
+    if (m.dia < desde || m.dia > hasta) continue;
+    if (turno !== 'todos' && m.turno !== +turno) continue;
+    if (bloque !== 'todos' && m.bloque !== bloque) continue;
+    prod += m.productivos; improd += m.improductivos;
+  }
+  return { prod, improd, ratio: prod ? improd / prod * 100 : null };
+}
+function estadoRemanejo(r) { return r === null ? '' : (r <= METAS.remanejo ? 'verde' : (r <= METAS.remanejoAmarillo ? 'amarillo' : 'rojo')); }
+// KPI 6 · Tiempo de servicio en patio: promedio de minutos de las visitas de camión filtradas
+function servicioPatio(desde, hasta, turno = 'todos', bloque = 'todos', categoria = 'todas', filtroExtra = null) {
+  let n = 0, suma = 0, sobreMeta = 0;
+  for (const v of DATOS.visitasCamion) {
+    if (v.dia < desde || v.dia > hasta) continue;
+    if (turno !== 'todos' && v.turno !== +turno) continue;
+    if (bloque !== 'todos' && v.bloque !== bloque) continue;
+    if (categoria !== 'todas' && v.categoria !== categoria) continue;
+    if (filtroExtra && !filtroExtra(v)) continue;
+    n++; suma += v.minutos; if (v.minutos > METAS.servicio) sobreMeta++;
+  }
+  return { n, promedio: n ? suma / n : null, pctSobreMeta: n ? sobreMeta / n * 100 : 0 };
+}
+// Relación densidad del bloque (inicio del día) → remanejos del día, con recta de mínimos cuadrados.
+// La recta se ajusta solo en el tramo de operación (densidad ≥ densidadMin): por debajo, los remanejos
+// se mantienen casi planos y una sola recta para todo el rango daría valores sin sentido (negativos).
+const DENSIDAD_TRAMO = 60;   // % · inicio del tramo donde la relación es lineal (ver data/supuestos.md)
+function relacionDensidadRemanejos(desde, hasta, turno = 'todos', densidadMin = DENSIDAD_TRAMO) {
+  const puntos = [];
+  for (let d = Math.max(2, desde); d <= hasta; d++) for (const b of PATIO.bloques) {
+    const r = remanejos(d, d, turno, b);
+    if (r.ratio === null || r.prod < 20) continue;    // días con muy pocos movimientos dan ratios inestables
+    puntos.push({ x: yardDensity(d - 1, b), y: r.ratio, dia: d, bloque: b });
+  }
+  const tramo = puntos.filter(p => p.x >= densidadMin), bajo = puntos.filter(p => p.x < densidadMin);
+  const base = bajo.length ? bajo.reduce((a, p) => a + p.y, 0) / bajo.length : null;   // remanejos medios bajo el tramo
+  const n = tramo.length;
+  if (n < 3) return { puntos, tramo, densidadMin, base, pendiente: null, intercepto: null, r: null };
+  const mx = tramo.reduce((a, p) => a + p.x, 0) / n, my = tramo.reduce((a, p) => a + p.y, 0) / n;
+  let sxy = 0, sxx = 0, syy = 0;
+  for (const p of tramo) { sxy += (p.x - mx) * (p.y - my); sxx += (p.x - mx) ** 2; syy += (p.y - my) ** 2; }
+  const pendiente = sxy / sxx;
+  return { puntos, tramo, densidadMin, base, pendiente, intercepto: my - pendiente * mx, r: sxy / Math.sqrt(sxx * syy) };
+}
+// Remanejos esperados para una densidad dada, según la relación observada (la usa el Módulo 5)
+function remanejosEsperados(densidad, rel) {
+  if (!rel || rel.pendiente === null) return null;
+  return densidad < rel.densidadMin && rel.base !== null ? rel.base : rel.intercepto + rel.pendiente * densidad;
+}
+
 // TEU que entraron por día en el rango (llegadas λ, para la Ley de Little)
 function llegadasTEUdia(desde, hasta, bloque = 'todos') {
   const r = {}; Object.keys(CATEGORIAS).forEach(c => r[c] = 0);
@@ -742,8 +877,15 @@ function renderKPIs() {
       return tarjeta('Dwell time global', fmt(dw.global, 2) + ' días', `Meta ≤ ${METAS.dwellGlobal} días · ponderado · días ${f.desde}–${f.hasta}`,
         dw.global <= METAS.dwellGlobal ? 'verde' : 'rojo');
     })(),
-    tarjeta('Remanejos', '—', 'Meta ≤ 30 %', ''),
-    tarjeta('Servicio en patio', '—', 'Meta ≤ 25 min', ''),
+    (() => {
+      const f = filtros(), r = remanejos(f.desde, f.hasta, f.turno, f.bloque);
+      return tarjeta('Remanejos', r.ratio === null ? '—' : fmt(r.ratio) + ' %', `Meta ≤ ${METAS.remanejo} % · días ${f.desde}–${f.hasta}`, estadoRemanejo(r.ratio));
+    })(),
+    (() => {
+      const f = filtros(), sv = servicioPatio(f.desde, f.hasta, f.turno, f.bloque, f.categoria);
+      return tarjeta('Servicio en patio', sv.promedio === null ? '—' : fmt(sv.promedio) + ' min',
+        `Meta ≤ ${METAS.servicio} min · ${fmt(sv.pctSobreMeta, 0)} % de visitas la superan`, sv.promedio === null ? '' : (sv.promedio <= METAS.servicio ? 'verde' : 'rojo'));
+    })(),
     (() => {
       const f = filtros(), ag = antiguedad(f.hasta, METAS.agingX, f.bloque);
       return tarjeta(`Aging (> ${METAS.agingX} días)`, ag.mayores.toLocaleString('es-PA') + ' cont.',
@@ -1069,7 +1211,180 @@ document.getElementById('m2-x').addEventListener('change', (e) => {
   METAS.agingX = Math.min(60, Math.max(1, x));
   renderTodo();
 });
-function renderModulo3() { /* Adriana Garibaldi */ }
+/* ---------- MÓDULO 3 · REMANEJOS (Adriana Garibaldi) ---------- */
+const graficosM3 = {};
+// Plugin: líneas horizontales de meta con su texto (gris, para no confundirse con las series)
+const pluginLineasMeta = {
+  id: 'lineasMeta',
+  afterDatasetsDraw(chart, _a, o) {
+    if (!o || !o.lineas) return;
+    const y = chart.scales.y, { left, right } = chart.chartArea, ctx = chart.ctx;
+    for (const l of o.lineas) {
+      const py = y.getPixelForValue(l.valor);
+      ctx.save(); ctx.strokeStyle = l.color || '#3d3c39'; ctx.lineWidth = 1.5; ctx.setLineDash(l.dash || [6, 4]);
+      ctx.beginPath(); ctx.moveTo(left, py); ctx.lineTo(right, py); ctx.stroke();
+      ctx.setLineDash([]); ctx.fillStyle = l.color || '#3d3c39'; ctx.font = '11px Segoe UI, Arial'; ctx.textAlign = 'right';
+      ctx.fillText(l.texto, right - 4, py - 4); ctx.restore();
+    }
+  }
+};
+function graficoM3(id, config) {
+  if (typeof Chart === 'undefined') {
+    const c = document.getElementById(id); if (c) c.parentElement.innerHTML = '<p class="pendiente">No se pudo cargar Chart.js (¿sin internet?). Los valores están en las tablas.</p>';
+    return;
+  }
+  if (graficosM3[id]) graficosM3[id].destroy();
+  graficosM3[id] = new Chart(document.getElementById(id), config);
+}
+const lineasRemanejo = () => [
+  { valor: METAS.remanejoAmarillo, texto: `rojo > ${METAS.remanejoAmarillo} %`, color: '#3d3c39', dash: [10, 3, 2, 3] },
+  { valor: METAS.remanejo, texto: `meta ${METAS.remanejo} %`, color: '#7a7974', dash: [6, 4] }
+];
+const ESTADO_TXT = { verde: '✔ cumple', amarillo: '⚠ vigilancia', rojo: '⛔ no cumple', '': '' };
+
+function renderModulo3() {
+  const f = filtros(), turnoTxt = f.turno === 'todos' ? 'todos los turnos' : 'turno ' + f.turno;
+  const donde = f.bloque === 'todos' ? 'todo el patio' : 'bloque ' + f.bloque;
+
+  /* 0) Resumen */
+  const rTot = remanejos(f.desde, f.hasta, f.turno, f.bloque);
+  const sTot = servicioPatio(f.desde, f.hasta, f.turno, f.bloque, f.categoria);
+  const porBloque = PATIO.bloques.map(b => ({ b, ...remanejos(f.desde, f.hasta, f.turno, b),
+    dens: (() => { let s = 0; for (let d = f.desde; d <= f.hasta; d++) s += yardDensity(d, b); return s / (f.hasta - f.desde + 1); })() }));
+  const peor = [...porBloque].sort((a, b) => b.ratio - a.ratio)[0], mejor = [...porBloque].sort((a, b) => a.ratio - b.ratio)[0];
+  const pico = servicioPatio(f.desde, f.hasta, f.turno, f.bloque, f.categoria, v => PESO_HORA[+v.entrada_bloque.slice(11, 13)] >= 9);
+  const valle = servicioPatio(f.desde, f.hasta, f.turno, f.bloque, f.categoria, v => PESO_HORA[+v.entrada_bloque.slice(11, 13)] < 9);
+  const estS = sTot.promedio === null ? '' : (sTot.promedio <= METAS.servicio ? 'verde' : 'rojo');
+  document.getElementById('m3-resumen').innerHTML =
+    `<div class="${estadoRemanejo(rTot.ratio)}"><div class="num">${rTot.ratio === null ? '—' : fmt(rTot.ratio) + ' %'}</div>
+       <div class="lbl">Remanejos · ${donde} · ${turnoTxt} · ${rTot.improd.toLocaleString('es-PA')} improductivos de ${rTot.prod.toLocaleString('es-PA')} productivos · ${ESTADO_TXT[estadoRemanejo(rTot.ratio)]}</div></div>
+     <div class="${estadoRemanejo(peor.ratio)}"><div class="num">Bloque ${peor.b}: ${fmt(peor.ratio)} %</div>
+       <div class="lbl">Bloque con más remanejos (densidad media ${fmt(peor.dens, 0)} %). El de menos: ${mejor.b} con ${fmt(mejor.ratio)} % (densidad ${fmt(mejor.dens, 0)} %)</div></div>
+     <div class="${estS}"><div class="num">${sTot.promedio === null ? '—' : fmt(sTot.promedio) + ' min'}</div>
+       <div class="lbl">Servicio del camión en patio · meta ≤ ${METAS.servicio} min · ${fmt(sTot.pctSobreMeta, 0)} % de las ${sTot.n.toLocaleString('es-PA')} visitas la superan</div></div>
+     <div class="${pico.promedio > METAS.servicio ? 'rojo' : 'verde'}"><div class="num">${pico.promedio === null ? '—' : fmt(pico.promedio) + ' min'} en hora pico</div>
+       <div class="lbl">contra ${valle.promedio === null ? '—' : fmt(valle.promedio)} min fuera de pico (picos: 8–12 h y 14–18 h)</div></div>`;
+
+  /* 1) Por bloque */
+  document.getElementById('m3-titulo-bloque').textContent = `Remanejos por bloque · días ${f.desde}–${f.hasta} · ${turnoTxt}`;
+  document.getElementById('m3-tabla-bloque').innerHTML = `<table class="tabla-m2">
+    <tr><th>Bloque</th><th>Densidad media</th><th>Productivos</th><th>Improductivos</th><th>Remanejos</th><th>Estado</th></tr>
+    ${porBloque.map(x => `<tr${f.bloque === x.b ? ' class="total"' : ''}><td>${x.b}</td><td>${fmt(x.dens, 1)} %</td><td>${x.prod.toLocaleString('es-PA')}</td>
+      <td>${x.improd.toLocaleString('es-PA')}</td><td>${x.ratio === null ? '—' : fmt(x.ratio) + ' %'}</td><td>${ESTADO_TXT[estadoRemanejo(x.ratio)]}</td></tr>`).join('')}
+    <tr class="total"><td>Patio</td><td></td><td>${porBloque.reduce((a, x) => a + x.prod, 0).toLocaleString('es-PA')}</td>
+      <td>${porBloque.reduce((a, x) => a + x.improd, 0).toLocaleString('es-PA')}</td>
+      <td>${fmt(remanejos(f.desde, f.hasta, f.turno).ratio)} %</td><td></td></tr></table>`;
+  graficoM3('m3-graf-bloque', {
+    type: 'bar',
+    data: { labels: PATIO.bloques.map(b => 'Bloque ' + b), datasets: [{
+      label: 'Remanejos (%)', data: porBloque.map(x => x.ratio === null ? 0 : +x.ratio.toFixed(1)),
+      backgroundColor: porBloque.map(x => f.bloque === 'todos' || f.bloque === x.b ? '#2a78d6' : '#2a78d640'),
+      borderRadius: { topLeft: 4, topRight: 4 }, borderSkipped: 'bottom', maxBarThickness: 56 }] },
+    options: { responsive: true, maintainAspectRatio: false, animation: false,
+      scales: { y: { min: 0, suggestedMax: 60, title: { display: true, text: 'Remanejos (%)' }, grid: { color: '#eceff2' }, ticks: { callback: v => v + ' %' } },
+                x: { grid: { display: false } } },
+      plugins: { legend: { display: false }, lineasMeta: { lineas: lineasRemanejo() },
+        tooltip: { callbacks: { label: it => { const x = porBloque[it.dataIndex]; return [` Remanejos: ${fmt(x.ratio)} %`, ` ${x.improd} improductivos / ${x.prod} productivos`, ` Densidad media: ${fmt(x.dens, 1)} %`]; } } } } },
+    plugins: [pluginLineasMeta]
+  });
+
+  /* 2) Por día */
+  const dias = []; for (let d = f.desde; d <= f.hasta; d++) dias.push(d);
+  const vista = document.getElementById('m3-vista').value;
+  let series;
+  if (vista === 'bloques') {
+    series = PATIO.bloques.map((b, i) => ({ label: 'Bloque ' + b, data: dias.map(d => { const r = remanejos(d, d, f.turno, b).ratio; return r === null ? null : +r.toFixed(1); }),
+      borderColor: COLOR_SERIE[i] + (f.bloque === 'todos' || f.bloque === b ? '' : '40'), backgroundColor: COLOR_SERIE[i],
+      borderWidth: f.bloque === b ? 3 : 2, pointRadius: 0, pointHoverRadius: 5, tension: 0.2, spanGaps: true }));
+  } else {
+    series = [{ label: f.bloque === 'todos' ? 'Todo el patio' : 'Bloque ' + f.bloque,
+      data: dias.map(d => { const r = remanejos(d, d, f.turno, f.bloque).ratio; return r === null ? null : +r.toFixed(1); }),
+      borderColor: COLOR_SERIE[0], backgroundColor: COLOR_SERIE[0], borderWidth: 2, pointRadius: 0, pointHoverRadius: 5, tension: 0.2, spanGaps: true }];
+  }
+  document.getElementById('m3-titulo-dia').textContent = `Remanejos por día · ${turnoTxt}`;
+  document.getElementById('m3-tabla-dia').innerHTML = '<table><tr><th>Día</th><th>Fecha</th>' + series.map(x => `<th>${x.label} (%)</th>`).join('') + '</tr>' +
+    dias.map((d, i) => `<tr><td>${d}</td><td>${fechaDe(d)}</td>${series.map(x => `<td>${x.data[i] === null ? '—' : fmt(x.data[i])}</td>`).join('')}</tr>`).join('') + '</table>';
+  graficoM3('m3-graf-dia', {
+    type: 'line', data: { labels: dias, datasets: series },
+    options: { responsive: true, maintainAspectRatio: false, animation: false, interaction: { mode: 'index', intersect: false },
+      scales: { y: { min: 0, suggestedMax: 70, title: { display: true, text: 'Remanejos (%)' }, grid: { color: '#eceff2' }, ticks: { callback: v => v + ' %' } },
+                x: { title: { display: true, text: 'Día' }, grid: { display: false }, ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 15 } } },
+      plugins: { legend: { display: series.length > 1, position: 'bottom', labels: { boxWidth: 18, boxHeight: 2 } }, lineasMeta: { lineas: lineasRemanejo() },
+        tooltip: { callbacks: { title: it => `Día ${it[0].label} · ${fechaDe(+it[0].label)}`, label: it => ` ${it.dataset.label}: ${fmt(it.parsed.y)} %` } } } },
+    plugins: [pluginLineasMeta]
+  });
+
+  /* 3) Densidad vs remanejos */
+  const rel = relacionDensidadRemanejos(f.desde, f.hasta, f.turno);
+  const ptsSerie = PATIO.bloques.map((b, i) => ({
+    type: 'scatter', label: 'Bloque ' + b,
+    data: rel.puntos.filter(p => p.bloque === b).map(p => ({ x: +p.x.toFixed(1), y: +p.y.toFixed(1), dia: p.dia })),
+    backgroundColor: COLOR_SERIE[i] + (f.bloque === 'todos' || f.bloque === b ? 'cc' : '33'), borderColor: '#ffffff', borderWidth: 1, pointRadius: f.bloque === b ? 5 : 4, pointHoverRadius: 7
+  }));
+  if (rel.pendiente !== null) {
+    const xs = rel.tramo.map(p => p.x), x0 = rel.densidadMin, x1 = Math.max(...xs);
+    ptsSerie.push({ type: 'line', label: `Recta de tendencia (densidad ≥ ${rel.densidadMin} %)`, data: [{ x: x0, y: rel.intercepto + rel.pendiente * x0 }, { x: x1, y: rel.intercepto + rel.pendiente * x1 }],
+      borderColor: '#1d2733', backgroundColor: '#1d2733', borderWidth: 2, pointRadius: 0, pointHoverRadius: 0 });
+    const bajo = rel.puntos.filter(p => p.x <= UMBRALES.amarillo), alto = rel.puntos.filter(p => p.x > UMBRALES.rojo);
+    const prom = (arr) => arr.length ? arr.reduce((a, p) => a + p.y, 0) / arr.length : null;
+    document.getElementById('m3-relacion-txt').innerHTML = `<table class="tabla-m2">
+      <tr><th>Densidad del bloque</th><th>Bloque-días</th><th>Remanejos medios</th></tr>
+      <tr><td>✔ Verde (≤ ${UMBRALES.amarillo} %)</td><td>${bajo.length}</td><td>${prom(bajo) === null ? '—' : fmt(prom(bajo)) + ' %'}</td></tr>
+      <tr><td>⚠ Amarilla</td><td>${rel.puntos.length - bajo.length - alto.length}</td><td>${(() => { const m = rel.puntos.filter(p => p.x > UMBRALES.amarillo && p.x <= UMBRALES.rojo); return m.length ? fmt(prom(m)) + ' %' : '—'; })()}</td></tr>
+      <tr><td>⛔ Roja (> ${UMBRALES.rojo} %)</td><td>${alto.length}</td><td>${prom(alto) === null ? '—' : fmt(prom(alto)) + ' %'}</td></tr></table>
+      <p style="margin:10px 0 4px">Desde ${rel.densidadMin} % de densidad: <strong>remanejos ≈ ${fmt(rel.intercepto)} + ${fmt(rel.pendiente, 2)} × densidad</strong> (r = ${fmt(rel.r, 2)}, ${rel.tramo.length} puntos).</p>
+      <p style="margin:0 0 4px">En ese tramo, cada <strong>10 puntos más de densidad</strong> se asocian con unos <strong>${fmt(rel.pendiente * 10)} puntos más de remanejos</strong>.</p>
+      <p style="margin:0">Por debajo de ${rel.densidadMin} %, los remanejos se mantienen en torno a ${rel.base === null ? '—' : fmt(rel.base) + ' %'} (${rel.puntos.length - rel.tramo.length} puntos).</p>`;
+  } else {
+    document.getElementById('m3-relacion-txt').innerHTML = '<p class="pendiente">Elige un rango de días más amplio para ver la relación.</p>';
+  }
+  graficoM3('m3-graf-relacion', {
+    type: 'scatter', data: { datasets: ptsSerie },
+    options: { responsive: true, maintainAspectRatio: false, animation: false,
+      scales: { x: { min: 0, max: 100, title: { display: true, text: 'Densidad del bloque al inicio del día (%)' }, grid: { color: '#f1f3f5' }, ticks: { callback: v => v + ' %' } },
+                y: { min: 0, suggestedMax: 70, title: { display: true, text: 'Remanejos del día (%)' }, grid: { color: '#eceff2' }, ticks: { callback: v => v + ' %' } } },
+      plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, boxHeight: 10 } }, lineasMeta: { lineas: lineasRemanejo() },
+        tooltip: { callbacks: { label: it => it.dataset.type === 'line' ? ' Recta de tendencia' : ` ${it.dataset.label} · día ${it.raw.dia}: densidad ${fmt(it.parsed.x)} %, remanejos ${fmt(it.parsed.y)} %` } } } },
+    plugins: [pluginLineasMeta]
+  });
+
+  /* 4) Servicio en patio */
+  document.getElementById('m3-titulo-servicio').textContent = `Tiempo de servicio del camión por hora de entrada al bloque · ${donde}`;
+  const porHora = Array.from({ length: 24 }, (_, h) => servicioPatio(f.desde, f.hasta, f.turno, f.bloque, f.categoria, v => +v.entrada_bloque.slice(11, 13) === h));
+  graficoM3('m3-graf-servicio', {
+    type: 'bar',
+    data: { labels: porHora.map((_, h) => String(h).padStart(2, '0') + ' h'), datasets: [{
+      label: 'Minutos promedio', data: porHora.map(x => x.promedio === null ? null : +x.promedio.toFixed(1)),
+      backgroundColor: '#2a78d6', borderRadius: { topLeft: 4, topRight: 4 }, borderSkipped: 'bottom' }] },
+    options: { responsive: true, maintainAspectRatio: false, animation: false,
+      scales: { y: { min: 0, suggestedMax: 35, title: { display: true, text: 'Minutos en el bloque' }, grid: { color: '#eceff2' } },
+                x: { grid: { display: false }, ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 12 } } },
+      plugins: { legend: { display: false }, lineasMeta: { lineas: [{ valor: METAS.servicio, texto: `meta ${METAS.servicio} min`, color: '#3d3c39', dash: [6, 4] }] },
+        tooltip: { callbacks: { label: it => { const x = porHora[it.dataIndex]; return [` Promedio: ${fmt(x.promedio)} min`, ` Visitas: ${x.n.toLocaleString('es-PA')}`, ` ${fmt(x.pctSobreMeta, 0)} % supera la meta`]; } } } } },
+    plugins: [pluginLineasMeta]
+  });
+  const filaS = (nombre, x, resaltar) => x.n === 0
+    ? `<tr${resaltar ? ' class="total"' : ''}><td>${nombre}</td><td colspan="4" style="text-align:left;color:var(--suave)">sin camiones (solo transbordo: entra y sale por buque)</td></tr>`
+    : `<tr${resaltar ? ' class="total"' : ''}><td>${nombre}</td><td>${x.n.toLocaleString('es-PA')}</td><td>${fmt(x.promedio) + ' min'}</td>
+    <td>${fmt(x.pctSobreMeta, 0)} %</td><td>${x.promedio <= METAS.servicio ? '✔' : '⛔'}</td></tr>`;
+  document.getElementById('m3-tabla-servicio').innerHTML = `<table class="tabla-m2">
+    <tr><th></th><th>Visitas</th><th>Promedio</th><th>> ${METAS.servicio} min</th><th></th></tr>
+    ${[1, 2, 3].map(t => filaS(`Turno ${t} (${['06–14', '14–22', '22–06'][t - 1]})`, servicioPatio(f.desde, f.hasta, t, f.bloque, f.categoria), String(t) === f.turno)).join('')}
+    ${PATIO.bloques.map(b => filaS('Bloque ' + b, servicioPatio(f.desde, f.hasta, f.turno, b, f.categoria), f.bloque === b)).join('')}
+  </table>`;
+  document.getElementById('m3-servicio-txt').textContent =
+    'Cada remanejo agrega minutos a la visita del camión: por eso los bloques más llenos, con más remanejos, tienen servicios más largos. Las citas de retiro (módulo extra) apuntan a bajar las horas pico.';
+}
+
+// Sub-pestañas: muestran un panel dentro del mismo módulo y redibujan sus gráficos con el tamaño correcto
+document.querySelectorAll('.subpestanas').forEach(nav => nav.addEventListener('click', (e) => {
+  const boton = e.target.closest('button'); if (!boton) return;
+  const modulo = nav.closest('section.modulo');
+  nav.querySelectorAll('button').forEach(b => b.classList.toggle('activa', b === boton));
+  modulo.querySelectorAll('.subpanel').forEach(p => p.classList.toggle('activo', p.id === boton.dataset.sub));
+  if (modulo.id === 'm3') renderModulo3();
+}));
+document.getElementById('m3-vista').addEventListener('change', renderModulo3);
 function renderModulo4() { /* Osmar Chiari */ }
 function renderModulo5() { /* Osmar Chiari */ }
 function renderModulo6() { /* Por asignar */ }
