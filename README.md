@@ -103,7 +103,7 @@ La ficha completa de cada KPI (meta, fuente y decisión que apoya) está en [`do
 - **Detalle del cálculo**: tabla con contenedores, Σ días, dwell, meta, llegadas y TEU de más. Es la base para la verificación a mano.
 - Respeta los filtros de días, bloque y categoría; el turno no aplica.
 
-Enlace en GitHub Pages: _pendiente_
+Enlace en GitHub Pages: https://osmarborel16-hub.github.io/Proyecto-semestral-de-mediciones-y-rendimiento-portuario/
 
 ## 5. Datos simulados y supuestos
 
