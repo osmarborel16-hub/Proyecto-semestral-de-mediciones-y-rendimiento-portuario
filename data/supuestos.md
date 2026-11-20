@@ -65,6 +65,21 @@ Los umbrales se pueden cambiar en vivo en el Módulo 1. Todo el dashboard usa lo
 - **Tiempo de servicio del camión en el bloque** = 16 min + 6 min por cada remanejo de esa visita + cola (de 3 a 9 min en hora pico, de 0 a 3 min fuera de pico) + ruido (desviación de 2 min), con un mínimo de 8 min.
   Visitas que generan camión: retiro de importación, entrega de exportación y entrega de vacíos. El transbordo no usa camión.
 
+## 4b. Escenario de citas de camiones (Módulo 6)
+
+Las citas no están en los datos: los datos simulan la situación actual, sin citas. El Módulo 6 estima su efecto con estos supuestos:
+
+- **Modelo del tiempo de servicio.** Se ajusta por mínimos cuadrados, sobre las visitas del rango de días filtrado, la regresión
+  minutos = a + b × remanejos de la visita + c × camiones que entraron al patio en esa misma hora del mismo día.
+  Con los 60 días: a ≈ 17.3 min, **b ≈ 5.97 min por remanejo** (recupera el supuesto de 6 min de los datos) y **c ≈ 0.16 min por camión**, R² ≈ 0.64.
+- **Asignación de las citas.** Un porcentaje de los camiones (solo retiros de importación, o también las entregas) reserva una cita.
+  Las citas se dan primero en las horas de la ventana con menos camiones, hasta nivelarlas (llenado por niveles). El total de camiones del día no cambia.
+- **Efecto en la cola.** Cada camión, con cita o sin ella, cambia su servicio en c × (camiones en su hora con citas − camiones en su hora hoy).
+- **Pre-ubicación** (supuesto del grupo, editable, valor inicial **20 %**). Si se conoce la hora del retiro, el contenedor se puede subir a la parte alta de la pila durante la noche.
+  En los retiros con cita se resta ese porcentaje de sus remanejos × b minutos. Las entregas no se benefician.
+- **Por qué la estimación es conservadora.** En los datos, la cola depende de si la hora es pico o no (de 3 a 9 min o de 0 a 3 min), no del número exacto de camiones.
+  La regresión lineal reparte ese salto entre todos los camiones de diferencia, así que el ahorro por pasar un camión de una hora pico a una hora valle sale menor que los ~4.5 min que implican los datos.
+
 ## 5. Tablas (archivos CSV)
 
 ### `contenedores.csv`
