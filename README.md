@@ -94,7 +94,7 @@ La ficha completa de cada KPI (meta, fuente y decisión que apoya) está en [`do
 - **Tarjetas por bloque** (vista alternativa): cada bloque muestra su Yard Density, los TEU sobre su capacidad, un medidor con las marcas de los umbrales y la mezcla de categorías. El color siempre va con ícono y texto de estado (✔ Verde, ⚠ Amarilla, ⛔ Roja).
 - **Clic en un bloque**: filtra todo el dashboard por ese bloque. Un segundo clic quita el filtro.
 - **Umbrales amarillo y rojo**: se pueden cambiar en vivo (por ejemplo, si el profesor lo pide) y todo el dashboard se recalcula.
-- **Alertas del día**: densidad del patio completo y de cada bloque en alerta, con los TEU que faltan para la roja (o que la superan) y los días seguidos en ese estado.
+- **Alertas del día** (sección desplegable, debajo del patio; el encabezado resume la densidad del patio y cuántos bloques están en alerta, y con "Haz clic para ver más" se abre el detalle): densidad del patio completo y de cada bloque en alerta, con los TEU que faltan para la roja (o que la superan) y los días seguidos en ese estado.
 - **Evolución de la densidad**: el total del patio o los 6 bloques en el rango de días elegido, con las líneas de umbral y una línea punteada en el día del mapa. Debajo hay una tabla con los mismos datos.
 - **Capacidad operativa** (KPI 1): el cálculo completo aparece al pie del módulo.
 

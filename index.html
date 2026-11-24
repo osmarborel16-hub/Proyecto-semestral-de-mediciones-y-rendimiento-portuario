@@ -83,6 +83,16 @@
   .patio3d .blq:hover .pad, .patio3d .blq:focus .pad { stroke-width: 2.5; }
   .patio3d .blq:focus { outline: none; }
   .m1-lateral h3, .m1-grafico h3 { margin: 0 0 8px; font-size: 1rem; }
+  .desplegable { border: 1px solid var(--borde); border-radius: 8px; background: #fff; }
+  .desplegable > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 10px 14px; font-size: 1rem; }
+  .desplegable > summary::-webkit-details-marker { display: none; }
+  .desplegable > summary:hover { background: #f4f8fc; border-radius: 8px; }
+  .desplegable > summary:focus-visible { outline: 2px solid var(--primario); outline-offset: 2px; }
+  .desplegable .flecha { display: inline-block; color: var(--primario); transition: transform .15s; }
+  .desplegable[open] .flecha { transform: rotate(90deg); }
+  .desplegable .resumen { font-size: .85rem; color: var(--suave); font-weight: 400; }
+  .desplegable .accion { margin-left: auto; font-size: .8rem; color: var(--primario); text-decoration: underline; }
+  .desplegable > .alertas, .desplegable > .nota { margin: 0 14px 12px; }
   .alertas { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 8px; }
   .alertas li { border: 1px solid var(--borde); border-left: 5px solid var(--gris); border-radius: 6px; padding: 7px 10px; font-size: .85rem; background: #fff; }
   .alertas li.verde { border-left-color: var(--verde); } .alertas li.amarillo { border-left-color: var(--amarillo); } .alertas li.rojo { border-left-color: var(--rojo); }
@@ -267,10 +277,15 @@
         <div class="gate">GATE · CAMIONES</div>
       </div>
     </div>
-    <div class="m1-lateral">
-      <h3 id="m1-alertas-titulo">Alertas del día</h3>
+    <details class="m1-lateral desplegable" id="m1-alertas-det">
+      <summary>
+        <span class="flecha" aria-hidden="true">▸</span>
+        <span><strong id="m1-alertas-titulo">Alertas del día</strong> <span id="m1-alertas-resumen" class="resumen"></span></span>
+        <span class="accion" id="m1-alertas-accion">Haz clic para ver más</span>
+      </summary>
       <ul class="alertas" id="m1-alertas"></ul>
       <p class="nota" id="m1-leyenda"></p>
+    </details>
     </div>
   </div>
 
@@ -1400,6 +1415,10 @@ function renderModulo1() {
     });
   if (alertas.length === 1) alertas.push({ est: 'verde', txt: '✔ Ningún bloque en alerta', det: '' });
   document.getElementById('m1-alertas-titulo').textContent = `Alertas del día ${dia}`;
+  const enAlerta = alertas.filter(a => a.est !== 'verde' && !a.txt.includes('Patio completo')).length;
+  const enRoja = alertas.filter(a => a.est === 'rojo' && !a.txt.includes('Patio completo')).length;
+  document.getElementById('m1-alertas-resumen').textContent =
+    `· patio ${fmt(dTotal)} % (${ESTADO[estTotal]}) · ` + (enAlerta ? `${enAlerta} ${enAlerta === 1 ? 'bloque' : 'bloques'} en alerta${enRoja ? `, ${enRoja} en roja` : ''}` : 'ningún bloque en alerta');
   document.getElementById('m1-alertas').innerHTML = alertas.map(a => `<li class="${a.est}">${a.txt}${a.det ? `<small>${a.det}</small>` : ''}</li>`).join('');
   document.getElementById('m1-leyenda').textContent =
     `Umbrales del grupo: verde ≤ ${UMBRALES.amarillo} % · amarilla > ${UMBRALES.amarillo} % y ≤ ${UMBRALES.rojo} % · roja > ${UMBRALES.rojo} %. ` +
@@ -1526,6 +1545,9 @@ document.getElementById('m1-bloques').addEventListener('keydown', (e) => {
   renderTodo();
 }));
 document.getElementById('m1-vista').addEventListener('change', renderModulo1);
+document.getElementById('m1-alertas-det').addEventListener('toggle', (e) => {
+  document.getElementById('m1-alertas-accion').textContent = e.target.open ? 'Haz clic para ocultar' : 'Haz clic para ver más';
+});
 let reproduccionM1 = null;
 document.getElementById('m1-reproducir').addEventListener('click', (e) => {
   if (reproduccionM1) { clearInterval(reproduccionM1); reproduccionM1 = null; e.target.textContent = '▶ Reproducir los 60 días'; return; }
