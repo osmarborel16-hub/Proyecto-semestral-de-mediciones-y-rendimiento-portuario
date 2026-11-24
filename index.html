@@ -434,10 +434,63 @@
     al pasar de la densidad actual a la nueva. Es una aproximación a nivel de patio (la relación se midió por bloque).</p>
 </section>
 
-<!-- ===== MÓDULO 6 · CAMIONES Y CITAS (EXTRA) ===== Responsable: por asignar -->
+<!-- ===== MÓDULO 6 · CAMIONES Y CITAS (EXTRA) ===== Responsable: Adriana Garibaldi -->
 <section class="modulo" id="m6">
   <h2>6 · Camiones y citas (módulo extra)</h2>
-  <p class="pendiente">Pendiente: tiempo de servicio por hora y efecto de las citas de retiro.</p>
+  <p class="nota">Tiempo de servicio en patio = tiempo del camión desde que entra al bloque hasta que sale (KPI 6) · usa los filtros de días, bloque y categoría.
+     El filtro de turno no aplica: las citas mueven camiones de una hora a otra del día.</p>
+
+  <div class="m4-cuerpo">
+    <div class="m4-controles">
+      <h3>Sistema de citas</h3>
+      <div class="control-slider">
+        <div class="fila"><span>% de camiones con cita</span><strong id="m6-pct-txt"></strong></div>
+        <input type="range" id="m6-pct" min="0" max="100" step="5" value="50">
+        <div class="ref">Hoy: 0 % (todos llegan sin cita).</div>
+      </div>
+      <label class="control-slider" style="display:block">Aplica a
+        <select id="m6-alcance" style="width:100%;padding:5px 8px;border:1px solid var(--borde);border-radius:6px;margin-top:4px">
+          <option value="retiros">Solo retiros de importación</option>
+          <option value="todos">Retiros y entregas (exportación y vacíos)</option>
+        </select>
+      </label>
+      <div class="control-slider">
+        <div class="fila"><span>Ventana de citas</span><strong id="m6-ventana-txt"></strong></div>
+        <div style="display:flex;gap:8px">
+          <input type="range" id="m6-desde" min="0" max="23" step="1" value="6" aria-label="Primera hora con citas">
+          <input type="range" id="m6-hasta" min="1" max="24" step="1" value="22" aria-label="Última hora con citas">
+        </div>
+        <div class="ref">Las citas se dan primero en las horas con menos camiones de la ventana, hasta nivelarlas.</div>
+      </div>
+      <div class="control-slider">
+        <div class="fila"><span>Remanejos evitados en retiros con cita</span><strong id="m6-pre-txt"></strong></div>
+        <input type="range" id="m6-pre" min="0" max="60" step="5" value="20">
+        <div class="ref">Supuesto: con la cita conocida, el contenedor se pre-ubica de noche arriba de la pila.</div>
+      </div>
+      <button type="button" id="m6-restablecer">↺ Valores iniciales</button>
+    </div>
+
+    <div>
+      <div class="m4-salidas" id="m6-salidas"></div>
+      <h3 style="margin:0 0 8px; font-size:1rem" id="m6-titulo-llegadas">Camiones por hora (promedio por día)</h3>
+      <div class="lienzo"><canvas id="m6-graf-llegadas" aria-label="Camiones por hora, actual y con citas"></canvas></div>
+    </div>
+  </div>
+
+  <div class="m3-dos" style="margin-top:18px">
+    <div>
+      <h3 id="m6-titulo-servicio">Tiempo de servicio por hora: actual y con citas</h3>
+      <div class="lienzo"><canvas id="m6-graf-servicio" aria-label="Tiempo de servicio por hora, actual y con citas"></canvas></div>
+    </div>
+    <div>
+      <h3>Cómo se estima</h3>
+      <div id="m6-modelo"></div>
+    </div>
+  </div>
+
+  <details class="tabla-datos" style="margin-top:10px"><summary>Ver el detalle por hora en tabla</summary><div class="scroll" id="m6-tabla"></div></details>
+  <p class="nota">Las citas no cambian cuántos camiones llegan en el día, solo a qué hora. Lo que baja es la cola en las horas pico
+    y, si el contenedor se pre-ubica, los remanejos del retiro. La estimación usa una regresión sobre las visitas simuladas; no es un KPI medido, es un escenario.</p>
 </section>
 
 <footer>Medición y Rendimiento de Terminales Portuarias · UMIP · Datos simulados con semilla fija 2026</footer>
@@ -1784,7 +1837,200 @@ function renderModulo5() {
   </table>`;
 }
 document.getElementById('m5-propuesta').addEventListener('change', renderModulo5);
-function renderModulo6() { /* Por asignar */ }
+/* ---------- MÓDULO 6 · CAMIONES Y CITAS (extra · Adriana Garibaldi) ---------- */
+const horaVisita = (v) => +v.entrada_bloque.slice(11, 13);
+const CITAS_INICIAL = { pct: 50, alcance: 'retiros', desde: 6, hasta: 22, pre: 20 };
+
+// Regresión lineal múltiple por mínimos cuadrados: minutos = a + b × remanejos + c × camiones en el patio en esa hora (del mismo día)
+function modeloServicio(desde, hasta) {
+  const carga = {};
+  const visitas = DATOS.visitasCamion.filter(v => v.dia >= desde && v.dia <= hasta);
+  for (const v of visitas) { const k = v.dia + '|' + horaVisita(v); carga[k] = (carga[k] || 0) + 1; }
+  // Ecuaciones normales (XᵀX) β = Xᵀy con X = [1, remanejos, carga]
+  const S = [[0, 0, 0], [0, 0, 0], [0, 0, 0]], Y = [0, 0, 0];
+  let sy = 0, syy = 0;
+  for (const v of visitas) {
+    const x = [1, v.remanejos, carga[v.dia + '|' + horaVisita(v)]];
+    for (let i = 0; i < 3; i++) { Y[i] += x[i] * v.minutos; for (let j = 0; j < 3; j++) S[i][j] += x[i] * x[j]; }
+    sy += v.minutos; syy += v.minutos * v.minutos;
+  }
+  const n = visitas.length;
+  if (n < 10) return null;
+  const det = (m) => m[0][0] * (m[1][1] * m[2][2] - m[1][2] * m[2][1]) - m[0][1] * (m[1][0] * m[2][2] - m[1][2] * m[2][0]) + m[0][2] * (m[1][0] * m[2][1] - m[1][1] * m[2][0]);
+  const D = det(S); if (Math.abs(D) < 1e-9) return null;
+  const beta = [0, 1, 2].map(k => det(S.map((fila, i) => fila.map((x, j) => j === k ? Y[i] : x))) / D);   // regla de Cramer
+  const [a, b, c] = beta;
+  let sse = 0;
+  for (const v of visitas) { const e = v.minutos - (a + b * v.remanejos + c * carga[v.dia + '|' + horaVisita(v)]); sse += e * e; }
+  const sst = syy - sy * sy / n;
+  return { a, b, c, n, r2: sst > 0 ? 1 - sse / sst : null };
+}
+
+// Nivelación: reparte "cantidad" camiones/día en las horas de la ventana con menos carga, hasta igualarlas (llenado por niveles)
+function nivelar(base, horas, cantidad) {
+  const add = new Array(24).fill(0);
+  if (cantidad <= 0 || !horas.length) return { add, nivel: null };
+  const orden = [...horas].sort((x, y) => base[x] - base[y]);
+  let suma = 0, nivel = 0;
+  for (let k = 0; k < orden.length; k++) {
+    suma += base[orden[k]];
+    nivel = (cantidad + suma) / (k + 1);
+    if (k + 1 === orden.length || nivel <= base[orden[k + 1]]) break;
+  }
+  for (const h of horas) add[h] = Math.max(0, nivel - base[h]);
+  return { add, nivel };
+}
+
+function escenarioCitas(f, opc, mod) {
+  const D = f.hasta - f.desde + 1;
+  const elegible = (v) => v.operacion === 'retiro' || opc.alcance === 'todos';
+  const delRango = DATOS.visitasCamion.filter(v => v.dia >= f.desde && v.dia <= f.hasta);
+  // Carga del patio completo por hora (camiones/día): la cola depende de todos los camiones, no solo de los filtrados
+  const Lp = new Array(24).fill(0), Ep = new Array(24).fill(0);
+  for (const v of delRango) { const h = horaVisita(v); Lp[h] += 1 / D; if (elegible(v)) Ep[h] += 1 / D; }
+  const p = opc.pct / 100, q = opc.pre / 100;
+  const base = Lp.map((x, h) => x - p * Ep[h]);
+  const horas = []; for (let h = opc.desde; h < opc.hasta; h++) horas.push(h);
+  const movidos = p * Ep.reduce((s, x) => s + x, 0);
+  const { add, nivel } = nivelar(base, horas, movidos);
+  const Lp2 = base.map((x, h) => x + add[h]);
+  const w = add.map(x => movidos > 0 ? x / movidos : 0);              // a qué hora va cada camión con cita
+
+  // Visitas filtradas (bloque y categoría): cada una se reparte entre "se queda a su hora" y "se mueve con cita"
+  const sub = delRango.filter(v => (f.bloque === 'todos' || v.bloque === f.bloque) && (f.categoria === 'todas' || v.categoria === f.categoria));
+  const act = Array.from({ length: 24 }, () => ({ n: 0, suma: 0, sobre: 0 }));
+  const nue = Array.from({ length: 24 }, () => ({ n: 0, suma: 0, sobre: 0 }));
+  const acumular = (celda, peso, min) => { celda.n += peso; celda.suma += peso * min; if (min > METAS.servicio) celda.sobre += peso; };
+  let remAntes = 0, remDespues = 0;
+  for (const v of sub) {
+    const h = horaVisita(v), e = elegible(v) ? 1 : 0;
+    acumular(act[h], 1, v.minutos);
+    remAntes += v.remanejos;
+    const quedan = 1 - p * e;
+    if (quedan > 0) acumular(nue[h], quedan, Math.max(SIM.camion.minimo, v.minutos + mod.c * (Lp2[h] - Lp[h])));
+    if (p * e > 0) {
+      const remEvitados = v.operacion === 'retiro' ? v.remanejos * q : 0;
+      for (const h2 of horas) if (w[h2] > 0)
+        acumular(nue[h2], p * e * w[h2], Math.max(SIM.camion.minimo, v.minutos + mod.c * (Lp2[h2] - Lp[h]) - mod.b * remEvitados));
+      remDespues += quedan * v.remanejos + p * e * (v.remanejos - remEvitados);
+    } else remDespues += v.remanejos;
+  }
+  const total = (arr) => { const t = arr.reduce((s, x) => ({ n: s.n + x.n, suma: s.suma + x.suma, sobre: s.sobre + x.sobre }), { n: 0, suma: 0, sobre: 0 });
+    return { n: t.n, prom: t.n ? t.suma / t.n : null, pctSobre: t.n ? t.sobre / t.n * 100 : null }; };
+  return { D, Lp, Lp2, Ep, movidos, nivel, horas, act, nue, tAct: total(act), tNue: total(nue), nSub: sub.length, remAntes, remDespues };
+}
+
+function leerCitas() {
+  const val = (id) => +document.getElementById(id).value;
+  let desde = val('m6-desde'), hasta = val('m6-hasta');
+  if (hasta <= desde) {                                             // la ventana debe tener al menos una hora: se corrige el deslizador
+    if (desde >= 23) desde = 23; hasta = desde + 1;
+    document.getElementById('m6-desde').value = desde; document.getElementById('m6-hasta').value = hasta;
+  }
+  return { pct: val('m6-pct'), alcance: document.getElementById('m6-alcance').value, desde, hasta, pre: val('m6-pre') };
+}
+
+function renderModulo6() {
+  const f = filtros(), opc = leerCitas();
+  const donde = (f.bloque === 'todos' ? 'todo el patio' : 'bloque ' + f.bloque) + (f.categoria === 'todas' ? '' : ' · ' + CATEGORIAS[f.categoria].toLowerCase());
+  const hh = (h) => String(h).padStart(2, '0');
+  document.getElementById('m6-pct-txt').textContent = opc.pct + ' %';
+  document.getElementById('m6-ventana-txt').textContent = `${hh(opc.desde)}:00 a ${hh(opc.hasta)}:00`;
+  document.getElementById('m6-pre-txt').textContent = opc.pre + ' %';
+
+  const mod = modeloServicio(f.desde, f.hasta);
+  if (!mod) {
+    document.getElementById('m6-salidas').innerHTML = '<p class="pendiente">No hay suficientes visitas de camión en el rango de días elegido.</p>';
+    return;
+  }
+  const esc = escenarioCitas(f, opc, mod);
+  const { tAct, tNue } = esc;
+  const picoAct = Math.max(...esc.Lp), picoNue = Math.max(...esc.Lp2);
+  const hPicoAct = esc.Lp.indexOf(picoAct), hPicoNue = esc.Lp2.indexOf(picoNue);
+  const horasAhorradas = tAct.prom === null ? 0 : (tAct.prom - tNue.prom) * (esc.nSub / esc.D) / 60;
+  const est = (x) => x === null ? '' : (x <= METAS.servicio ? 'verde' : 'rojo');
+
+  document.getElementById('m6-salidas').innerHTML = esc.nSub === 0
+    ? '<p class="pendiente">El filtro elegido no tiene camiones (el transbordo entra y sale por buque).</p>'
+    : `<div class="${est(tNue.prom)}"><div class="num">${fmt(tAct.prom)} → ${fmt(tNue.prom)} min</div>
+         <div class="lbl">Servicio promedio en patio · ${donde} · meta ≤ ${METAS.servicio} min · ${tNue.prom <= METAS.servicio ? '✔ cumple con citas' : '⛔ no cumple'}</div></div>
+       <div class="${tNue.pctSobre < tAct.pctSobre ? 'verde' : ''}"><div class="num">${fmt(tAct.pctSobre, 0)} % → ${fmt(tNue.pctSobre, 0)} %</div>
+         <div class="lbl">Visitas que superan ${METAS.servicio} min</div></div>
+       <div><div class="num">${fmt(picoAct, 0)} → ${fmt(picoNue, 0)} camiones/h</div>
+         <div class="lbl">Hora más cargada del patio: ${hh(hPicoAct)} h hoy, ${hh(hPicoNue)} h con citas (${fmt(esc.movidos, 0)} camiones/día con cita)</div></div>
+       <div class="${horasAhorradas >= 0 ? 'verde' : 'rojo'}"><div class="num">${fmt(Math.abs(horasAhorradas))} h-camión/día</div>
+         <div class="lbl">Tiempo de camión ${horasAhorradas >= 0 ? 'ahorrado' : 'perdido'} en el patio · ${fmt(esc.nSub / esc.D, 0)} visitas/día${opc.pre > 0 ? ` · remanejos de estas visitas −${fmt((1 - esc.remDespues / Math.max(1, esc.remAntes)) * 100, 0)} %` : ''}</div></div>
+       ${picoNue > picoAct ? `<div class="rojo"><div class="num">⚠ Ventana muy corta</div>
+         <div class="lbl">Las citas no caben sin crear una hora pico nueva (${fmt(picoNue, 0)} camiones/h a las ${hh(hPicoNue)} h, más que el pico actual). Amplía la ventana o baja el % con cita.</div></div>` : ''}`;
+
+  // Camiones por hora (visitas filtradas)
+  const etiquetas = Array.from({ length: 24 }, (_, h) => hh(h) + ' h');
+  const enVentana = (h) => h >= opc.desde && h < opc.hasta;
+  document.getElementById('m6-titulo-llegadas').textContent = `Camiones por hora · promedio por día · ${donde} · días ${f.desde}–${f.hasta}`;
+  graficoM3('m6-graf-llegadas', {
+    type: 'bar',
+    data: { labels: etiquetas, datasets: [
+      { type: 'bar', label: 'Hoy (sin citas)', data: esc.act.map(x => +(x.n / esc.D).toFixed(2)),
+        backgroundColor: etiquetas.map((_, h) => enVentana(h) ? '#9fb3c8' : '#c9d3de'), borderRadius: { topLeft: 3, topRight: 3 }, borderSkipped: 'bottom' },
+      { type: 'line', label: `Con citas (${opc.pct} %)`, data: esc.nue.map(x => +(x.n / esc.D).toFixed(2)),
+        borderColor: '#2a78d6', backgroundColor: '#2a78d6', borderWidth: 2.5, pointRadius: 2, pointHoverRadius: 5, tension: 0.25 }] },
+    options: { responsive: true, maintainAspectRatio: false, animation: false, interaction: { mode: 'index', intersect: false },
+      scales: { y: { min: 0, title: { display: true, text: 'Camiones por hora' }, grid: { color: '#eceff2' } },
+                x: { grid: { display: false }, ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 12 } } },
+      plugins: { legend: { position: 'bottom', labels: { boxWidth: 14, boxHeight: 8 } },
+        tooltip: { callbacks: { label: it => ` ${it.dataset.label}: ${fmt(it.parsed.y)} camiones/h` } } } }
+  });
+
+  // Servicio por hora
+  const promH = (c) => c.n ? c.suma / c.n : null;
+  document.getElementById('m6-titulo-servicio').textContent = `Tiempo de servicio por hora de entrada · ${donde}`;
+  graficoM3('m6-graf-servicio', {
+    type: 'bar',
+    data: { labels: etiquetas, datasets: [
+      { type: 'bar', label: 'Hoy (medido)', data: esc.act.map(c => promH(c) === null ? null : +promH(c).toFixed(1)),
+        backgroundColor: '#c9d3de', borderRadius: { topLeft: 3, topRight: 3 }, borderSkipped: 'bottom' },
+      { type: 'line', label: 'Con citas (estimado)', data: esc.nue.map(c => promH(c) === null ? null : +promH(c).toFixed(1)),
+        borderColor: '#2a78d6', backgroundColor: '#2a78d6', borderWidth: 2.5, pointRadius: 2, pointHoverRadius: 5, tension: 0.25, spanGaps: true }] },
+    options: { responsive: true, maintainAspectRatio: false, animation: false, interaction: { mode: 'index', intersect: false },
+      scales: { y: { min: 0, suggestedMax: 35, title: { display: true, text: 'Minutos en el bloque' }, grid: { color: '#eceff2' } },
+                x: { grid: { display: false }, ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 12 } } },
+      plugins: { legend: { position: 'bottom', labels: { boxWidth: 14, boxHeight: 8 } },
+        lineasMeta: { lineas: [{ valor: METAS.servicio, texto: `meta ${METAS.servicio} min`, color: '#3d3c39', dash: [6, 4] }] },
+        tooltip: { callbacks: { label: it => it.parsed.y === null ? '' : ` ${it.dataset.label}: ${fmt(it.parsed.y)} min` } } } },
+    plugins: [pluginLineasMeta]
+  });
+
+  // Modelo
+  document.getElementById('m6-modelo').innerHTML = `
+    <p style="margin:0 0 6px">Regresión sobre las ${mod.n.toLocaleString('es-PA')} visitas de camión de los días ${f.desde}–${f.hasta}:</p>
+    <p style="margin:0 0 6px"><strong>minutos ≈ ${fmt(mod.a)} + ${fmt(mod.b, 2)} × remanejos + ${fmt(mod.c, 2)} × camiones en el patio en esa hora</strong> (R² = ${mod.r2 === null ? '—' : fmt(mod.r2, 2)})</p>
+    <table class="tabla-m2">
+      <tr><th>Qué dice</th><th>Valor</th></tr>
+      <tr><td>Cada remanejo agrega</td><td>${fmt(mod.b, 1)} min</td></tr>
+      <tr><td>Cada camión más en la misma hora agrega</td><td>${fmt(mod.c, 2)} min</td></tr>
+      <tr><td>Camiones con cita (por día)</td><td>${fmt(esc.movidos, 0)}</td></tr>
+      <tr><td>Nivel al que se llenan las horas de la ventana</td><td>${esc.nivel === null ? '—' : fmt(esc.nivel, 0) + ' camiones/h'}</td></tr>
+    </table>
+    <p class="nota">Con cita, cada camión pasa a una hora de la ventana con menos carga. Su servicio cambia en ${fmt(mod.c, 2)} min por cada camión de diferencia
+      entre la hora nueva y la anterior. En los retiros con cita se restan además los remanejos evitados × ${fmt(mod.b, 1)} min. Los camiones sin cita se quedan a su hora,
+      pero también cambia la carga que encuentran.</p>`;
+
+  // Tabla por hora
+  document.getElementById('m6-tabla').innerHTML = `<table><tr><th>Hora</th><th>Camiones/h patio hoy</th><th>Camiones/h patio con citas</th>
+    <th>Visitas/día (filtro) hoy</th><th>Visitas/día con citas</th><th>Servicio hoy (min)</th><th>Servicio con citas (min)</th></tr>
+    ${etiquetas.map((e, h) => `<tr><td>${e}</td><td>${fmt(esc.Lp[h])}</td><td>${fmt(esc.Lp2[h])}</td><td>${fmt(esc.act[h].n / esc.D)}</td><td>${fmt(esc.nue[h].n / esc.D)}</td>
+      <td>${promH(esc.act[h]) === null ? '—' : fmt(promH(esc.act[h]))}</td><td>${promH(esc.nue[h]) === null ? '—' : fmt(promH(esc.nue[h]))}</td></tr>`).join('')}
+    <tr class="total"><td>Día</td><td>${fmt(esc.Lp.reduce((s, x) => s + x, 0), 0)}</td><td>${fmt(esc.Lp2.reduce((s, x) => s + x, 0), 0)}</td>
+      <td>${fmt(tAct.n / esc.D, 0)}</td><td>${fmt(tNue.n / esc.D, 0)}</td><td>${tAct.prom === null ? '—' : fmt(tAct.prom)}</td><td>${tNue.prom === null ? '—' : fmt(tNue.prom)}</td></tr></table>`;
+}
+['m6-pct', 'm6-desde', 'm6-hasta', 'm6-pre'].forEach(id => document.getElementById(id).addEventListener('input', renderModulo6));
+document.getElementById('m6-alcance').addEventListener('change', renderModulo6);
+document.getElementById('m6-restablecer').addEventListener('click', () => {
+  const ini = CITAS_INICIAL;
+  document.getElementById('m6-pct').value = ini.pct; document.getElementById('m6-alcance').value = ini.alcance;
+  document.getElementById('m6-desde').value = ini.desde; document.getElementById('m6-hasta').value = ini.hasta; document.getElementById('m6-pre').value = ini.pre;
+  renderModulo6();
+});
 
 /* =====================================================================
    7. NAVEGACIÓN Y ARRANQUE
