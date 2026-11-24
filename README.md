@@ -84,11 +84,13 @@ La ficha completa de cada KPI (meta, fuente y decisión que apoya) está en [`do
 2. Abrir `index.html` con doble clic en Chrome o Edge. No hace falta instalar nada ni usar un servidor.
 3. Los gráficos usan Chart.js desde un CDN, así que se necesita internet. Sin internet, el Módulo 1 sigue mostrando el mapa, las alertas y la tabla de datos, pero no el gráfico.
 
-**Filtros globales** (barra superior): rango de días, turno, bloque y categoría. El **"Día hasta"** es el día de corte que usan el mapa y las tarjetas de KPI.
+**Filtros globales** (barra superior): rango de días, turno, bloque y categoría. El **"Día hasta"** es el día de corte que usan el mapa y el panel de KPI.
+
+**KPI**: los 7 indicadores (capacidad operativa, Yard Density, dwell global, remanejos, servicio en patio, aging y días a alerta roja) se ven en el **panel de KPI dentro del patio en 3D** del Módulo 1, con su meta y su color de estado.
 
 **Módulo 1 · Mapa del patio**
 - **Deslizador "Día del mapa"** con flechas **◀ ▶** para ir al día anterior o al siguiente (también con las teclas ← y →). Cambia el día de corte y está sincronizado con "Día hasta". **▶ Reproducir** recorre los 60 días; sirve para la demostración en vivo.
-- **Patio en 3D** (vista inicial): vista isométrica del patio, bloque por bloque. Cada bloque tiene sus 6 filas de contenedores; la altura de las pilas es la Yard Density del bloque y el marco punteado marca la altura máxima (5 tiers). La grúa RTG y la etiqueta de cada bloque llevan el color y el ícono del estado. Se ven también los slots inoperativos (en gris), el buque atracado ese día con su descarga y carga, las grúas STS, los camiones del día en el gate y un **panel con las 7 tarjetas de KPI** (los mismos valores y colores que la barra de arriba, según los filtros). Los contenedores se pueden colorear **por categoría**; con el filtro de categoría, las demás se atenúan. Los datos son por bloque, así que el reparto por fila es ilustrativo.
+- **Patio en 3D** (vista inicial): vista isométrica del patio, bloque por bloque. Cada bloque tiene sus 6 filas de contenedores; la altura de las pilas es la Yard Density del bloque y el marco punteado marca la altura máxima (5 tiers). La grúa RTG y la etiqueta de cada bloque llevan el color y el ícono del estado. Se ven también los slots inoperativos (en gris), el buque atracado ese día con su descarga y carga, las grúas STS, los camiones del día en el gate y un **panel con los 7 KPI** del dashboard (según los filtros). Los contenedores se pueden colorear **por categoría**; con el filtro de categoría, las demás se atenúan. Los datos son por bloque, así que el reparto por fila es ilustrativo.
 - **Tarjetas por bloque** (vista alternativa): cada bloque muestra su Yard Density, los TEU sobre su capacidad, un medidor con las marcas de los umbrales y la mezcla de categorías. El color siempre va con ícono y texto de estado (✔ Verde, ⚠ Amarilla, ⛔ Roja).
 - **Clic en un bloque**: filtra todo el dashboard por ese bloque. Un segundo clic quita el filtro.
 - **Umbrales amarillo y rojo**: se pueden cambiar en vivo (por ejemplo, si el profesor lo pide) y todo el dashboard se recalcula.
@@ -100,7 +102,7 @@ La ficha completa de cada KPI (meta, fuente y decisión que apoya) está en [`do
 - **Respuesta a la pregunta 1**: qué categoría presiona más el patio y cuántos TEU ocupa de más. Se calcula con la Ley de Little: llegadas diarias × (dwell actual − meta).
 - **Barras de dwell por categoría** con la marca de la meta y el estado (✔ cumple / ⛔ días sobre la meta). Cuentan los contenedores que **salieron** en el rango de días filtrado.
 - **Dwell global ponderado** (el KPI) junto al **promedio simple** tachado, para explicar por qué no se usa el simple.
-- **Antigüedad del inventario**: histograma por categoría al cierre del día de corte, con la línea de X días. **X se cambia en vivo** y la tarjeta de KPI se actualiza.
+- **Antigüedad del inventario**: histograma por categoría al cierre del día de corte, con la línea de X días. **X se cambia en vivo** y el KPI de aging del panel se actualiza.
 - **Detalle del cálculo**: tabla con contenedores, Σ días, dwell, meta, llegadas y TEU de más. Es la base para la verificación a mano.
 - Respeta los filtros de días, bloque y categoría; el turno no aplica.
 

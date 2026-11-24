@@ -208,8 +208,6 @@
   </div>
 </details>
 
-<!-- ===== TARJETAS DE KPI ===== -->
-<div class="kpis" id="kpis"></div>
 
 <!-- ===== PESTAÑAS ===== -->
 <nav class="pestanas" id="pestanas">
@@ -1106,7 +1104,7 @@ function llegadasTEUdia(desde, hasta, bloque = 'todos') {
 }
 
 /* =====================================================================
-   5. TARJETAS DE KPI (meta + señal visual)
+   5. KPI (meta + señal visual) · se muestran en el panel del patio en 3D (Módulo 1)
    ===================================================================== */
 function colorPorMeta(valor, verdeHasta, amarilloHasta) {
   if (valor == null || isNaN(valor)) return '';
@@ -1114,10 +1112,7 @@ function colorPorMeta(valor, verdeHasta, amarilloHasta) {
   if (valor <= amarilloHasta) return 'amarillo';
   return 'rojo';
 }
-function tarjeta(nombre, valor, meta, clase) {
-  return `<div class="kpi ${clase}"><div class="nombre">${nombre}</div><div class="valor">${valor}</div><div class="meta">${meta}</div></div>`;
-}
-// Las 7 tarjetas como datos [nombre, valor, meta, clase]: las usan la barra de KPI y el panel del patio en 3D
+// Los 7 KPI como datos [nombre, valor, meta, clase]: los dibuja el panel del patio en 3D
 function datosKPIs() {
   const tarjeta = (nombre, valor, meta, clase) => ({ nombre, valor, meta, clase });
   const cap = capacidadOperativa();
@@ -1153,9 +1148,6 @@ function datosKPIs() {
       return tarjeta('Días a alerta roja', cal.diasAlertaTxt, `Meta ≥ ${METAS.diasAlerta} días · margen ${Math.round(cal.margen).toLocaleString('es-PA')} TEU · +${fmt(cal.g)} TEU/día`, cal.estadoAlerta);
     })()
   ];
-}
-function renderKPIs() {
-  document.getElementById('kpis').innerHTML = datosKPIs().map(k => tarjeta(k.nombre, k.valor, k.meta, k.clase)).join('');
 }
 
 /* =====================================================================
@@ -1325,7 +1317,7 @@ function renderPatio3D(dia, f) {
     <text y="24" font-size="15" fill="${COLOR_ESTADO_3D[eT]}">Patio ${fmt(dT)} % · ${ESTADO[eT]} · ${inventarioTEU(dia).toLocaleString('es-PA')} de ${capacidadOperativa().toLocaleString('es-PA')} TEU</text>
     ${modoCat ? Object.keys(CATEGORIAS).map((c, n) => `<g transform="translate(${n * 120},42)"><rect width="13" height="13" rx="2" fill="${COLOR_CAT_3D[c]}"/><text x="19" y="11.5" font-size="13" fill="#cfe0ff">${CATEGORIAS[c]}</text></g>`).join('') : ''}</g>`;
 
-  // Panel de KPI (las mismas 7 tarjetas de arriba), en la esquina libre superior derecha
+  // Panel con los 7 KPI del dashboard, en la esquina libre superior derecha
   const kpis = datosKPIs(), CW = 226, CH = 54, COLS = 2, FILAS = Math.ceil(kpis.length / COLS);
   const PW = 8 + COLS * CW + 4, px = maxX - PW - 14, py = minY + 12;
   const colorKPI = (clase) => COLOR_ESTADO_3D[clase] || '#8a96a3';
@@ -2286,7 +2278,6 @@ document.getElementById('pestanas').addEventListener('click', (e) => {
 });
 
 function renderTodo() {
-  renderKPIs();
   renderModulo1(); renderModulo2(); renderModulo3();
   renderModulo4(); renderModulo5(); renderModulo6();
 }
