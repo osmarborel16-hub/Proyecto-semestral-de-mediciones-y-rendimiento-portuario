@@ -87,8 +87,9 @@ La ficha completa de cada KPI (meta, fuente y decisión que apoya) está en [`do
 **Filtros globales** (barra superior): rango de días, turno, bloque y categoría. El **"Día hasta"** es el día de corte que usan el mapa y las tarjetas de KPI.
 
 **Módulo 1 · Mapa del patio**
-- **Deslizador "Día del mapa"**: cambia el día de corte (está sincronizado con "Día hasta"). **▶ Reproducir** recorre los 60 días; sirve para la demostración en vivo.
-- **Mapa de calor**: cada bloque muestra su Yard Density, los TEU sobre su capacidad, un medidor con las marcas de los umbrales y la mezcla de categorías. El color siempre va con ícono y texto de estado (✔ Verde, ⚠ Amarilla, ⛔ Roja).
+- **Deslizador "Día del mapa"** con flechas **◀ ▶** para ir al día anterior o al siguiente (también con las teclas ← y →). Cambia el día de corte y está sincronizado con "Día hasta". **▶ Reproducir** recorre los 60 días; sirve para la demostración en vivo.
+- **Patio en 3D** (vista inicial): vista isométrica del patio, bloque por bloque. Cada bloque tiene sus 6 filas de contenedores; la altura de las pilas es la Yard Density del bloque y el marco punteado marca la altura máxima (5 tiers). La grúa RTG y la etiqueta de cada bloque llevan el color y el ícono del estado. Se ven también los slots inoperativos (en gris), el buque atracado ese día con su descarga y carga, las grúas STS y los camiones del día en el gate. Los contenedores se pueden colorear **por categoría**; con el filtro de categoría, las demás se atenúan. Los datos son por bloque, así que el reparto por fila es ilustrativo.
+- **Tarjetas por bloque** (vista alternativa): cada bloque muestra su Yard Density, los TEU sobre su capacidad, un medidor con las marcas de los umbrales y la mezcla de categorías. El color siempre va con ícono y texto de estado (✔ Verde, ⚠ Amarilla, ⛔ Roja).
 - **Clic en un bloque**: filtra todo el dashboard por ese bloque. Un segundo clic quita el filtro.
 - **Umbrales amarillo y rojo**: se pueden cambiar en vivo (por ejemplo, si el profesor lo pide) y todo el dashboard se recalcula.
 - **Alertas del día**: densidad del patio completo y de cada bloque en alerta, con los TEU que faltan para la roja (o que la superan) y los días seguidos en ese estado.
