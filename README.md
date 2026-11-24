@@ -8,7 +8,7 @@ Desarrollado con apoyo de agentes de IA (Claude Code). **Todos los datos son sim
 | Integrante | Roles | Responsable de |
 |---|---|---|
 | **Leslie West** | Integrantes 1 y 2 | Datos simulados, capacidad operativa, Módulo 1 · Mapa del patio, Módulo 2 · Dwell time, supuestos, README y fichas 3, 4 y 7 |
-| **Adriana Garibaldi** | Integrante 3 | Módulo 3 · Remanejos y servicio en patio, fichas 5 y 6, verificación manual de KPI |
+| **Adriana Garibaldi** | Integrante 3 | Módulo 3 · Remanejos y servicio en patio, Módulo 6 · Camiones y citas (extra), fichas 5 y 6, verificación manual de KPI |
 | **Osmar Chiari** | Integrante 4 | Coordinación y estructura inicial (H1), Módulo 4 · Simulador, Módulo 5 · Mejora (A3), fichas 1, 2 y 8, GitHub Pages |
 
 Todo se sube desde la cuenta del grupo (`osmarborel16-hub`), pero cada commit lleva como **autor** al integrante responsable de ese trabajo. Los tres primeros PR (#2 a #5: estructura, datos y Módulo 1) se subieron antes de definir los nombres y aparecen con autor "Claude". Sus responsables son Osmar Chiari (estructura inicial) y Leslie West (datos, Módulo 1, supuestos y README).
@@ -76,7 +76,7 @@ La ficha completa de cada KPI (meta, fuente y decisión que apoya) está en [`do
 | 3 · Remanejos | ✅ Listo | Adriana Garibaldi |
 | 4 · Simulador de escenarios | ✅ Listo | Osmar Chiari |
 | 5 · Mejora (A3) | ✅ Listo | Osmar Chiari |
-| 6 · Camiones y citas (extra) | ⏳ Pendiente | por asignar |
+| 6 · Camiones y citas (extra) | ✅ Listo | Adriana Garibaldi |
 
 ## 4. Cómo abrir y usar el dashboard
 
@@ -124,6 +124,14 @@ La ficha completa de cada KPI (meta, fuente y decisión que apoya) está en [`do
 - **Respuestas a las 3 preguntas del proyecto** con los números del día de corte.
 - **Ficha A3** de 8 bloques: antecedentes, situación actual, causa raíz, objetivo, contramedidas, resultado esperado, plan de implementación y seguimiento.
 - **Tabla actual vs propuesta**: inventario, densidad, remanejos esperados, días hasta alerta roja y dwell (global y por categoría).
+
+**Módulo 6 · Camiones y citas (extra)**
+- **Controles**: % de camiones con cita, a quién aplica (solo retiros de importación, o también entregas), ventana horaria de citas y % de remanejos evitados en los retiros con cita (pre-ubicación, supuesto editable).
+- **Tarjetas**: servicio promedio en patio hoy → con citas, % de visitas que superan 25 min, camiones en la hora más cargada del patio y horas-camión ahorradas por día. Si la ventana es muy corta, avisa que se crea una hora pico nueva.
+- **Camiones por hora** (hoy vs con citas): las citas se asignan primero a las horas menos cargadas de la ventana, hasta nivelarlas.
+- **Servicio por hora**: medido hoy vs estimado con citas, con la meta de 25 min.
+- **Cómo se estima**: regresión minutos ≈ a + b × remanejos + c × camiones en esa hora, con sus coeficientes y R². Debajo, una tabla por hora con todos los valores.
+- Respeta los filtros de días, bloque y categoría; el turno no aplica. Supuestos en [`data/supuestos.md`](data/supuestos.md#4b-escenario-de-citas-de-camiones-módulo-6).
 
 Enlace en GitHub Pages: https://osmarborel16-hub.github.io/Proyecto-semestral-de-mediciones-y-rendimiento-portuario/
 
