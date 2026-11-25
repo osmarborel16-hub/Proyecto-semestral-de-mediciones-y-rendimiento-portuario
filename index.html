@@ -7,16 +7,19 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
   :root {
-    --fondo: #f4f6f8; --tarjeta: #ffffff; --texto: #1d2733; --suave: #5b6b7c;
-    --borde: #dde3ea; --primario: #1f4e79;
-    --verde: #0ca30c; --amarillo: #fab219; --rojo: #d03b3b; --gris: #8a96a3;
-    /* Fondo de la página: azul oscuro con detalles en blanco (los módulos siguen en tarjetas blancas para que se lean bien) */
-    --pagina: #0a1a33; --pagina-2: #0f2a52; --linea-clara: rgba(255, 255, 255, .28); --texto-claro: #e8f0ff; --texto-claro-suave: #a9bfdf;
+    --fondo: #EEF0FB; --tarjeta: #ffffff; --texto: #161B8E; --suave: #5A5F8F;
+    --borde: #D9DCF3; --primario: #223CCC;
+    --verde: #0ca30c; --amarillo: #fab219; --rojo: #ED4563; --gris: #8a96a3;
+    /* Paleta "Digital Artist": ED4563 coral · 223CCC azul real · 161B8E azul marino · 8D39D0 violeta · 077BED celeste.
+       Fondo en degradado marino → real → violeta, con detalles en blanco; los módulos siguen en tarjetas blancas para que se lean bien.
+       Verde y amarillo de estado se conservan: significan "cumple" y "vigilancia" y la paleta no los tiene. */
+    --coral: #ED4563; --real: #223CCC; --marino: #161B8E; --violeta: #8D39D0; --celeste: #077BED;
+    --pagina: #161B8E; --pagina-2: #223CCC; --linea-clara: rgba(255, 255, 255, .32); --texto-claro: #ffffff; --texto-claro-suave: #d6d9ff;
   }
   * { box-sizing: border-box; }
   body { margin: 0; font-family: "Segoe UI", Arial, sans-serif; color: var(--texto);
-         background: var(--pagina) radial-gradient(ellipse at 50% -10%, var(--pagina-2) 0%, var(--pagina) 60%) fixed; min-height: 100vh; }
-  .aviso { background: var(--amarillo); color: #1d2733; text-align: center; font-weight: 700; padding: 6px; letter-spacing: .5px; }
+         background: var(--marino) linear-gradient(180deg, var(--marino) 0%, var(--real) 45%, var(--violeta) 100%) fixed; min-height: 100vh; }
+  .aviso { background: var(--amarillo); color: #161B8E; text-align: center; font-weight: 700; padding: 6px; letter-spacing: .5px; }
   header { background: transparent; color: #fff; padding: 18px 24px 14px; border-bottom: 1px solid var(--linea-clara); }
   header h1 { margin: 0; font-size: 1.45rem; letter-spacing: .3px; }
   header p { margin: 4px 0 0; color: var(--texto-claro-suave); font-size: .9rem; }
@@ -53,24 +56,24 @@
   .m1-controles input[type=range] { width: 260px; }
   .m1-controles button, .m1-grafico-cab select { border: 1px solid var(--primario); background: #fff; color: var(--primario); border-radius: 6px; padding: 6px 12px; cursor: pointer; }
   .m1-cuerpo { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; }   /* el patio usa todo el ancho; las alertas van debajo */
-  .patio { border: 1px solid var(--borde); border-radius: 8px; overflow: hidden; background: #f7f8f9; }
+  .patio { border: 1px solid var(--borde); border-radius: 8px; overflow: hidden; background: #F4F5FD; }
   .muelle, .gate { text-align: center; font-size: .75rem; letter-spacing: 1px; color: #fff; padding: 5px; }
-  .muelle { background: #34495e; }
-  .gate { background: #7f8c8d; }
+  .muelle { background: #161B8E; }
+  .gate { background: #5A5F8F; }
   .bloques { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 14px; }
   .bloque { background: #fff; border: 1px solid var(--borde); border-top: 6px solid var(--gris); border-radius: 8px; padding: 10px 12px; cursor: pointer; transition: box-shadow .15s; }
-  .bloque:hover, .bloque:focus { box-shadow: 0 0 0 2px #b9c7d6; outline: none; }
+  .bloque:hover, .bloque:focus { box-shadow: 0 0 0 2px #B9BFEB; outline: none; }
   .bloque.seleccionado { box-shadow: 0 0 0 3px var(--primario); }
   .bloque.verde { border-top-color: var(--verde); background: #f1faf1; }
   .bloque.amarillo { border-top-color: var(--amarillo); background: #fff8e8; }
   .bloque.rojo { border-top-color: var(--rojo); background: #fdf0f0; }
   .b-cab { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
   .b-nombre { font-weight: 700; }
-  .insignia { font-size: .72rem; font-weight: 700; padding: 2px 8px; border-radius: 10px; color: #1d2733; background: #e9eef3; white-space: nowrap; }
+  .insignia { font-size: .72rem; font-weight: 700; padding: 2px 8px; border-radius: 10px; color: #161B8E; background: #E6E8F8; white-space: nowrap; }
   .insignia.verde { background: #d5f0d5; } .insignia.amarillo { background: #fde7b0; } .insignia.rojo { background: #f6cccc; }
   .b-valor { font-size: 1.9rem; font-weight: 700; margin: 4px 0 0; }
   .b-teu, .b-mezcla { font-size: .78rem; color: var(--suave); }
-  .medidor { position: relative; height: 8px; background: #e6eaee; border-radius: 4px; margin: 8px 0 6px; }
+  .medidor { position: relative; height: 8px; background: #E3E6F7; border-radius: 4px; margin: 8px 0 6px; }
   .medidor .relleno { height: 100%; border-radius: 4px; background: var(--gris); }
   .bloque.verde .relleno { background: var(--verde); } .bloque.amarillo .relleno { background: var(--amarillo); } .bloque.rojo .relleno { background: var(--rojo); }
   .medidor .marca { position: absolute; top: -3px; width: 2px; height: 14px; background: #52514e; }
@@ -80,7 +83,7 @@
   .m1-vistas { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 8px; }
   .m1-vistas label { font-size: .8rem; color: var(--suave); display: flex; flex-direction: column; gap: 4px; }
   .m1-vistas select { padding: 5px 8px; border: 1px solid var(--borde); border-radius: 6px; font-size: .85rem; }
-  .patio3d { border-radius: 10px; overflow: hidden; background: radial-gradient(ellipse at 40% 30%, #16305a 0%, #0a1830 55%, #050c19 100%); border: 1px solid #0f2340; }
+  .patio3d { border-radius: 10px; overflow: hidden; background: radial-gradient(ellipse at 40% 30%, #2A3FD0 0%, #161B8E 55%, #0D1166 100%); border: 1px solid #2A2FA0; }
   .patio3d svg { display: block; width: 100%; height: auto; }
   /* en pantallas angostas (celular) el patio no se encoge más de 900 px: se desplaza de lado para que el texto siga legible */
   @media (max-width: 900px) { .patio3d { overflow-x: auto; } .patio3d svg { min-width: 900px; } }
@@ -91,7 +94,7 @@
   .desplegable { border: 1px solid var(--borde); border-radius: 8px; background: #fff; }
   .desplegable > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 10px 14px; font-size: 1rem; }
   .desplegable > summary::-webkit-details-marker { display: none; }
-  .desplegable > summary:hover { background: #f4f8fc; border-radius: 8px; }
+  .desplegable > summary:hover { background: #EEF0FB; border-radius: 8px; }
   .desplegable > summary:focus-visible { outline: 2px solid var(--primario); outline-offset: 2px; }
   .desplegable .flecha { display: inline-block; color: var(--primario); transition: transform .15s; }
   .desplegable[open] .flecha { transform: rotate(90deg); }
@@ -114,16 +117,16 @@
   .m2-controles { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 18px; margin: 10px 0 14px; }
   .m2-controles label { font-size: .8rem; color: var(--suave); display: flex; flex-direction: column; gap: 4px; }
   .m2-controles input { width: 80px; padding: 5px 8px; border: 1px solid var(--borde); border-radius: 6px; }
-  .m2-respuesta { border: 1px solid var(--borde); border-left: 6px solid var(--primario); border-radius: 8px; background: #f4f8fc; padding: 10px 14px; margin-bottom: 16px; }
+  .m2-respuesta { border: 1px solid var(--borde); border-left: 6px solid var(--primario); border-radius: 8px; background: #EEF0FB; padding: 10px 14px; margin-bottom: 16px; }
   .m2-respuesta .pregunta { font-size: .78rem; color: var(--suave); text-transform: uppercase; letter-spacing: .4px; }
   .m2-respuesta .respuesta { font-size: 1.05rem; margin-top: 4px; }
   .m2-cuerpo { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 22px; }
   .m2-cuerpo h3 { margin: 0 0 8px; font-size: 1rem; }
   .barra-dwell { display: grid; grid-template-columns: 110px 1fr 120px; align-items: center; gap: 10px; margin: 10px 0; font-size: .85rem; }
   .barra-dwell.atenuada { opacity: .35; }
-  .barra-dwell .pista { position: relative; height: 22px; background: #eef1f4; border-radius: 4px; }
+  .barra-dwell .pista { position: relative; height: 22px; background: #ECEEFA; border-radius: 4px; }
   .barra-dwell .relleno { height: 100%; border-radius: 0 4px 4px 0; }
-  .barra-dwell .meta { position: absolute; top: -4px; width: 2px; height: 30px; background: #1d2733; }
+  .barra-dwell .meta { position: absolute; top: -4px; width: 2px; height: 30px; background: #161B8E; }
   .barra-dwell .meta span { position: absolute; top: -16px; left: -18px; font-size: .68rem; color: var(--suave); white-space: nowrap; }
   .barra-dwell .valor { font-weight: 700; }
   .barra-dwell .valor small { display: block; font-weight: 400; color: var(--suave); }
@@ -135,7 +138,7 @@
   .tabla-m2 { border-collapse: collapse; width: 100%; font-size: .82rem; margin-top: 8px; }
   .tabla-m2 th, .tabla-m2 td { border: 1px solid var(--borde); padding: 5px 8px; text-align: right; }
   .tabla-m2 th:first-child, .tabla-m2 td:first-child { text-align: left; }
-  .tabla-m2 tr.total td { font-weight: 700; background: #f4f6f8; }
+  .tabla-m2 tr.total td { font-weight: 700; background: #EEF0FB; }
   .tabla-m2 tr.simple td { color: var(--suave); font-style: italic; }
   @media (max-width: 900px) { .m2-cuerpo { grid-template-columns: 1fr; } }
   /* ----- Sub-pestañas (dentro de un módulo) ----- */
@@ -155,7 +158,7 @@
   @media (max-width: 900px) { .m3-dos { grid-template-columns: 1fr; } }
   /* ----- Módulo 4 · Simulador ----- */
   .m4-cuerpo { display: grid; grid-template-columns: minmax(280px, 1fr) minmax(0, 2.2fr); gap: 22px; align-items: start; }
-  .m4-controles { border: 1px solid var(--borde); border-radius: 8px; padding: 12px 14px; background: #f7f8f9; }
+  .m4-controles { border: 1px solid var(--borde); border-radius: 8px; padding: 12px 14px; background: #F4F5FD; }
   .m4-controles h3 { margin: 0 0 6px; font-size: .95rem; }
   .control-slider { margin: 10px 0; font-size: .82rem; }
   .control-slider .fila { display: flex; justify-content: space-between; gap: 8px; }
@@ -171,14 +174,14 @@
   @media (max-width: 900px) { .m4-cuerpo { grid-template-columns: 1fr; } }
   /* ----- Módulo 5 · Mejora (A3) ----- */
   .m5-preguntas { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px; margin: 10px 0 16px; }
-  .m5-preguntas > div { border: 1px solid var(--borde); border-left: 6px solid var(--primario); border-radius: 8px; background: #f4f8fc; padding: 10px 12px; font-size: .9rem; }
+  .m5-preguntas > div { border: 1px solid var(--borde); border-left: 6px solid var(--primario); border-radius: 8px; background: #EEF0FB; padding: 10px 12px; font-size: .9rem; }
   .m5-preguntas .pregunta { font-size: .74rem; color: var(--suave); text-transform: uppercase; letter-spacing: .3px; margin-bottom: 4px; }
-  .a3 { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 2px solid #1d2733; border-radius: 6px; overflow: hidden; }
-  .a3 > div { padding: 10px 14px; border-right: 1px solid #c9d1d9; border-bottom: 1px solid #c9d1d9; font-size: .86rem; background: #fff; }
+  .a3 { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 2px solid #161B8E; border-radius: 6px; overflow: hidden; }
+  .a3 > div { padding: 10px 14px; border-right: 1px solid #D9DCF3; border-bottom: 1px solid #D9DCF3; font-size: .86rem; background: #fff; }
   .a3 > div:nth-child(2n) { border-right: none; }
   .a3 h4 { margin: 0 0 6px; font-size: .82rem; text-transform: uppercase; letter-spacing: .4px; color: var(--primario); }
   .a3 ul { margin: 4px 0; padding-left: 18px; }
-  .a3 .titulo-a3 { grid-column: 1 / -1; background: #1d2733; color: #fff; font-weight: 700; font-size: 1rem; border-right: none; }
+  .a3 .titulo-a3 { grid-column: 1 / -1; background: #161B8E; color: #fff; font-weight: 700; font-size: 1rem; border-right: none; }
   .m5-selector { display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-end; margin: 8px 0 14px; }
   .m5-selector label { font-size: .8rem; color: var(--suave); display: flex; flex-direction: column; gap: 4px; }
   .m5-selector select { padding: 6px 10px; border: 1px solid var(--borde); border-radius: 6px; font-size: .9rem; }
@@ -1176,7 +1179,7 @@ function datosKPIs() {
    6. MÓDULOS (cada integrante completa su función)
    ===================================================================== */
 /* ---------- MÓDULO 1 · MAPA DEL PATIO (Leslie West) ---------- */
-const COLOR_SERIE = ['#2a78d6', '#eb6834', '#1baf7a', '#eda100', '#e87ba4', '#008300'];   // paleta categórica validada (orden fijo)
+const COLOR_SERIE = ['#223CCC', '#ED4563', '#8D39D0', '#077BED', '#F3909F', '#161B8E'];   // paleta Digital Artist (orden fijo, un color por bloque)
 // Las líneas de umbral van en gris (con trazo distinto) para no confundirse con las series de color
 const ESTILO_UMBRAL = { amarillo: { color: '#9a9994', dash: [6, 4] }, rojo: { color: '#3d3c39', dash: [10, 3, 2, 3] } };
 let graficoM1 = null;
@@ -1193,8 +1196,8 @@ const P3D = { L: 30, NS: 10, SG: 0.35, LW: 1.15, LG: 0.3, GX: 6, GY: 7, TH: 0.75
 P3D.DEP = PATIO.lanes * P3D.LW + (PATIO.lanes - 1) * P3D.LG;                      // fondo de un bloque
 P3D.QY0 = 2 * P3D.DEP + P3D.GY + 7; P3D.QY1 = P3D.QY0 + 3.5;                       // franja del muelle
 const POS_BLOQUE = { D: [0, 0], E: [1, 0], F: [2, 0], A: [0, 1], B: [1, 1], C: [2, 1] };   // A–C junto al muelle, como en las tarjetas
-const COLOR_ESTADO_3D = { verde: '#3ddc84', amarillo: '#ffb547', rojo: '#ff4d6d' };
-const COLOR_CAT_3D = { IMP: '#3d8bff', EXP: '#ff8a4c', TRB: '#2fd39a', VAC: '#ffd04a' };
+const COLOR_ESTADO_3D = { verde: '#3DDC84', amarillo: '#FFB547', rojo: '#ED4563' };
+const COLOR_CAT_3D = { IMP: '#077BED', EXP: '#A45BE6', TRB: '#F3909F', VAC: '#D7DBFF' };
 const iso = (x, y, z) => [(x - y) * Math.cos(Math.PI / 6) * P3D.k, ((x + y) * 0.5 - z) * P3D.k];
 const pts = (lista) => lista.map(p => iso(...p).map(v => v.toFixed(1)).join(',')).join(' ');
 function tono(hex, f) {                                   // aclara (f > 1) u oscurece (f < 1) un color
@@ -1235,12 +1238,12 @@ function renderPatio3D(dia, f) {
   let suelo = '', bloques = '', etiquetas = '';
 
   // Suelo: patio, calle del gate, muelle y agua
-  suelo += `<polygon points="${pts([[-6, -7, 0], [X1 + 6, -7, 0], [X1 + 6, QY0, 0], [-6, QY0, 0]])}" fill="#0d1f3b" fill-opacity=".85" stroke="#1d3b66" stroke-width="1"/>`;
+  suelo += `<polygon points="${pts([[-6, -7, 0], [X1 + 6, -7, 0], [X1 + 6, QY0, 0], [-6, QY0, 0]])}" fill="#121A7A" fill-opacity=".85" stroke="#2C3BB5" stroke-width="1"/>`;
   for (let x = 0; x <= X1; x += 6) suelo += linea3D([x, -7, 0], [x, QY0, 0], 'rgba(90,140,210,.07)', 0.8);
   for (let y = -6; y <= QY0; y += 3) suelo += linea3D([-6, y, 0], [X1 + 6, y, 0], 'rgba(90,140,210,.07)', 0.8);
-  suelo += `<polygon points="${pts([[-6, -6.5, 0], [X1 + 6, -6.5, 0], [X1 + 6, -3.5, 0], [-6, -3.5, 0]])}" fill="#16294a" stroke="#28497a" stroke-width=".8"/>`;
-  suelo += `<polygon points="${pts([[-6, QY0, 0], [X1 + 6, QY0, 0], [X1 + 6, QY1, 0], [-6, QY1, 0]])}" fill="#1c2f4f" stroke="#3a5d8f" stroke-width="1"/>`;
-  suelo += `<polygon points="${pts([[-6, QY1, -0.3], [X1 + 6, QY1, -0.3], [X1 + 6, QY1 + 11, -0.3], [-6, QY1 + 11, -0.3]])}" fill="#06152b"/>`;
+  suelo += `<polygon points="${pts([[-6, -6.5, 0], [X1 + 6, -6.5, 0], [X1 + 6, -3.5, 0], [-6, -3.5, 0]])}" fill="#1A2390" stroke="#3A4CCF" stroke-width=".8"/>`;
+  suelo += `<polygon points="${pts([[-6, QY0, 0], [X1 + 6, QY0, 0], [X1 + 6, QY1, 0], [-6, QY1, 0]])}" fill="#1E2A9E" stroke="#4A5FD8" stroke-width="1"/>`;
+  suelo += `<polygon points="${pts([[-6, QY1, -0.3], [X1 + 6, QY1, -0.3], [X1 + 6, QY1 + 11, -0.3], [-6, QY1 + 11, -0.3]])}" fill="#0B0F5C"/>`;
 
   // Bloques (de atrás hacia adelante para que lo cercano tape a lo lejano)
   const orden = ['D', 'E', 'F', 'A', 'B', 'C'];
@@ -1272,7 +1275,7 @@ function renderPatio3D(dia, f) {
         }
         const cat = cats[i++];
         if (h <= 0.01) continue;
-        const color = modoCat ? COLOR_CAT_3D[cat] : '#2f80ed';
+        const color = modoCat ? COLOR_CAT_3D[cat] : '#077BED';
         const opac = f.categoria !== 'todas' && cat !== f.categoria ? 0.18 : 0.92;
         g += caja3D(x0, y0, 0, x1, y1, h, color, opac);
       }
@@ -1287,7 +1290,7 @@ function renderPatio3D(dia, f) {
     const [lx, ly] = iso(bx + L * 0.5, by + DEP * 0.5, zMax + 4.2);
     etiquetas += `<g pointer-events="none" transform="translate(${lx.toFixed(1)},${ly.toFixed(1)})">
       <line x1="0" y1="22" x2="0" y2="${(zMax + 4.2 - h) * P3D.k - 4}" stroke="${cEst}" stroke-opacity=".6" stroke-width="1"/>
-      <rect x="-58" y="-22" width="116" height="44" rx="7" fill="#071226" fill-opacity=".88" stroke="${cEst}" stroke-width="1.4"/>
+      <rect x="-58" y="-22" width="116" height="44" rx="7" fill="#0E1260" fill-opacity=".88" stroke="${cEst}" stroke-width="1.4"/>
       <text x="0" y="-5" text-anchor="middle" font-size="13" fill="#cfe0ff">Bloque ${b}</text>
       <text x="0" y="14" text-anchor="middle" font-size="16" font-weight="700" fill="${cEst}">${ESTADO[est].split(' ')[0]} ${fmt(d)} %</text></g>`;
   }
@@ -1300,18 +1303,18 @@ function renderPatio3D(dia, f) {
   buquesDia.forEach((bq, n) => {
     const xs = xsBuque(n), xe = xs + 46;
     muelle += `<g filter="url(#p3d-brillo)">
-      <polygon points="${pts([[xs + 3, yb0, -0.3], [xe - 4, yb0, -0.3], [xe + 2, (yb0 + yb1) / 2, -0.3], [xe - 4, yb1, -0.3], [xs + 3, yb1, -0.3], [xs, (yb0 + yb1) / 2, -0.3]])}" fill="#0f3b7a" stroke="#6fb6ff" stroke-width="1.4"/>
-      <polygon points="${pts([[xs + 3, yb0, 1.6], [xe - 4, yb0, 1.6], [xe + 2, (yb0 + yb1) / 2, 1.6], [xe - 4, yb1, 1.6], [xs + 3, yb1, 1.6], [xs, (yb0 + yb1) / 2, 1.6]])}" fill="#1b5bb3" fill-opacity=".9" stroke="#8cc7ff" stroke-width="1"/></g>`;
-    for (let k = 0; k < 7; k++) muelle += caja3D(xs + 6 + k * 4.6, yb0 + 0.8, 1.6, xs + 9.8 + k * 4.6, yb1 - 0.8, 1.6 + 1.1 + (k % 3) * 0.5, k % 2 ? '#3d8bff' : '#2f6fd0', 0.9);
+      <polygon points="${pts([[xs + 3, yb0, -0.3], [xe - 4, yb0, -0.3], [xe + 2, (yb0 + yb1) / 2, -0.3], [xe - 4, yb1, -0.3], [xs + 3, yb1, -0.3], [xs, (yb0 + yb1) / 2, -0.3]])}" fill="#161B8E" stroke="#62A8F3" stroke-width="1.4"/>
+      <polygon points="${pts([[xs + 3, yb0, 1.6], [xe - 4, yb0, 1.6], [xe + 2, (yb0 + yb1) / 2, 1.6], [xe - 4, yb1, 1.6], [xs + 3, yb1, 1.6], [xs, (yb0 + yb1) / 2, 1.6]])}" fill="#223CCC" fill-opacity=".9" stroke="#9FD0FF" stroke-width="1"/></g>`;
+    for (let k = 0; k < 7; k++) muelle += caja3D(xs + 6 + k * 4.6, yb0 + 0.8, 1.6, xs + 9.8 + k * 4.6, yb1 - 0.8, 1.6 + 1.1 + (k % 3) * 0.5, k % 2 ? '#3d8bff' : '#223CCC', 0.9);
     muelle += caja3D(xs + 1.5, yb0 + 1.2, 1.6, xs + 5, yb1 - 1.2, 4.2, '#d9e6ff', 0.9);   // puente
     const [cx, cy] = iso(xs + 14, yb1 + 1, 0);
     etiquetas += `<g pointer-events="none" transform="translate(${cx.toFixed(1)},${cy.toFixed(1)})">
-      <rect x="-60" y="6" width="230" height="64" rx="7" fill="#071226" fill-opacity=".9" stroke="#6fb6ff" stroke-width="1.2"/>
+      <rect x="-60" y="6" width="230" height="64" rx="7" fill="#0E1260" fill-opacity=".9" stroke="#62A8F3" stroke-width="1.2"/>
       <text x="-50" y="25" font-size="14" font-weight="700" fill="#e6f0ff">${bq.nombre}</text>
       <text x="-50" y="43" font-size="12" fill="#9fc3ff">Atraque ${bq.atraque.slice(11)} h · ${bq.id}</text>
       <text x="-50" y="60" font-size="12" fill="#9fc3ff">Descarga ${bq.descarga_imp_teu + bq.descarga_trb_teu} · carga ${bq.carga_exp_teu + bq.carga_trb_teu + bq.carga_vac_teu} TEU</text></g>`;
   });
-  const hayBuque = buquesDia.length > 0, cSTS = hayBuque ? '#ffa630' : '#6b5a3e';
+  const hayBuque = buquesDia.length > 0, cSTS = hayBuque ? '#9FD0FF' : '#4A5296';
   const xsSTS = hayBuque ? buquesDia.flatMap((_, n) => [xsBuque(n) + 12, xsBuque(n) + 25, xsBuque(n) + 38]) : [X1 / 2 - 14, X1 / 2, X1 / 2 + 14];
   let gruas = '';
   for (const x of xsSTS) {
@@ -1344,14 +1347,14 @@ function renderPatio3D(dia, f) {
   const PW = 8 + COLS * CW + 4, px = maxX - PW - 14, py = minY + 12;
   const colorKPI = (clase) => COLOR_ESTADO_3D[clase] || '#8a96a3';
   const panelKPI = `<g pointer-events="none" transform="translate(${px.toFixed(1)},${py.toFixed(1)})">
-    <rect width="${PW}" height="${28 + FILAS * CH + 6}" rx="9" fill="#061022" fill-opacity=".84" stroke="#2b4f80" stroke-width="1"/>
+    <rect width="${PW}" height="${28 + FILAS * CH + 6}" rx="9" fill="#0E1260" fill-opacity=".84" stroke="#4A5BD6" stroke-width="1"/>
     <text x="12" y="19" font-size="13" font-weight="700" fill="#8fb2e6" letter-spacing="1">KPI · ${f.bloque === 'todos' ? 'PATIO' : 'BLOQUE ' + f.bloque} · DÍAS ${f.desde}–${f.hasta}</text>
     ${kpis.map((k, n) => `<g transform="translate(${8 + (n % COLS) * CW},${28 + Math.floor(n / COLS) * CH})">
-      <rect width="${CW - 6}" height="${CH - 6}" rx="6" fill="#0b1a33" stroke="${colorKPI(k.clase)}" stroke-opacity=".5" stroke-width="1"/>
+      <rect width="${CW - 6}" height="${CH - 6}" rx="6" fill="#1A2390" stroke="${colorKPI(k.clase)}" stroke-opacity=".5" stroke-width="1"/>
       <rect width="4" height="${CH - 6}" rx="2" fill="${colorKPI(k.clase)}"/>
-      <text x="12" y="18" font-size="13" fill="#9fb6d6" letter-spacing=".5">${k.nombre.toUpperCase()}</text>
+      <text x="12" y="18" font-size="13" fill="#C9CDF7" letter-spacing=".5">${k.nombre.toUpperCase()}</text>
       <text x="12" y="45" font-size="23" font-weight="700" fill="${colorKPI(k.clase)}">${k.valor}</text>
-      <text x="${CW - 14}" y="45" font-size="12" fill="#8aa3c4" text-anchor="end">${k.meta.split(' · ')[0]}</text></g>`).join('')}</g>`;
+      <text x="${CW - 14}" y="45" font-size="12" fill="#B9BFEB" text-anchor="end">${k.meta.split(' · ')[0]}</text></g>`).join('')}</g>`;
 
   document.getElementById('m1-patio3d').innerHTML =
     `<svg viewBox="${minX.toFixed(0)} ${minY.toFixed(0)} ${(maxX - minX).toFixed(0)} ${(maxY - minY).toFixed(0)}" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Arial, sans-serif" role="img" aria-label="Patio en 3D, día ${dia}">
@@ -1473,7 +1476,7 @@ function renderModulo1() {
       responsive: true, maintainAspectRatio: false, animation: false,
       interaction: { mode: 'index', intersect: false },
       scales: {
-        y: { min: 0, max: 100, title: { display: true, text: 'Densidad (%)' }, grid: { color: '#eceff2' }, ticks: { callback: v => v + ' %' } },
+        y: { min: 0, max: 100, title: { display: true, text: 'Densidad (%)' }, grid: { color: '#E7E9F6' }, ticks: { callback: v => v + ' %' } },
         x: { title: { display: true, text: 'Día' }, grid: { display: false }, ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 15 } }
       },
       plugins: {
@@ -1567,7 +1570,7 @@ document.getElementById('m1-reproducir').addEventListener('click', (e) => {
   }, 250);
 });
 /* ---------- MÓDULO 2 · DWELL TIME (Leslie West) ---------- */
-const COLOR_CAT = { IMP: '#2a78d6', EXP: '#eb6834', TRB: '#1baf7a', VAC: '#eda100' };   // paleta categórica validada, orden fijo
+const COLOR_CAT = { IMP: '#077BED', EXP: '#8D39D0', TRB: '#F3909F', VAC: '#161B8E' };   // paleta Digital Artist, orden fijo
 let graficoM2 = null;
 
 function renderModulo2() {
@@ -1652,7 +1655,7 @@ function renderModulo2() {
         interaction: { mode: 'index', intersect: false },
         scales: {
           x: { stacked: true, title: { display: true, text: 'Días en patio' }, grid: { display: false }, ticks: { maxRotation: 0, autoSkip: true } },
-          y: { stacked: true, title: { display: true, text: 'Contenedores' }, grid: { color: '#eceff2' } }
+          y: { stacked: true, title: { display: true, text: 'Contenedores' }, grid: { color: '#E7E9F6' } }
         },
         plugins: {
           legend: { position: 'bottom', labels: { boxWidth: 12, boxHeight: 12 } },
@@ -1667,9 +1670,9 @@ function renderModulo2() {
           const esc = chart.scales.x, ancho = esc.getPixelForValue(1) - esc.getPixelForValue(0);
           const tramo = tramos[o.indice], frac = tramo[1] === Infinity ? 0 : (o.x - tramo[0]) / (tramo[1] - tramo[0]);
           const x = esc.getPixelForValue(o.indice) - ancho / 2 + frac * ancho, { top, bottom } = chart.chartArea, ctx = chart.ctx;
-          ctx.save(); ctx.strokeStyle = '#1d2733'; ctx.lineWidth = 1.5; ctx.setLineDash([5, 3]);
+          ctx.save(); ctx.strokeStyle = '#161B8E'; ctx.lineWidth = 1.5; ctx.setLineDash([5, 3]);
           ctx.beginPath(); ctx.moveTo(x, top); ctx.lineTo(x, bottom); ctx.stroke();
-          ctx.setLineDash([]); ctx.fillStyle = '#1d2733'; ctx.font = '12px Segoe UI, Arial'; ctx.fillText(`X = ${o.x} días →`, x + 4, top + 12);
+          ctx.setLineDash([]); ctx.fillStyle = '#161B8E'; ctx.font = '12px Segoe UI, Arial'; ctx.fillText(`X = ${o.x} días →`, x + 4, top + 12);
           ctx.restore();
         }
       }]
@@ -1767,10 +1770,10 @@ function renderModulo3() {
     type: 'bar',
     data: { labels: PATIO.bloques.map(b => 'Bloque ' + b), datasets: [{
       label: 'Remanejos (%)', data: porBloque.map(x => x.ratio === null ? 0 : +x.ratio.toFixed(1)),
-      backgroundColor: porBloque.map(x => f.bloque === 'todos' || f.bloque === x.b ? '#2a78d6' : '#2a78d640'),
+      backgroundColor: porBloque.map(x => f.bloque === 'todos' || f.bloque === x.b ? '#223CCC' : '#2a78d640'),
       borderRadius: { topLeft: 4, topRight: 4 }, borderSkipped: 'bottom', maxBarThickness: 56 }] },
     options: { responsive: true, maintainAspectRatio: false, animation: false,
-      scales: { y: { min: 0, suggestedMax: 60, title: { display: true, text: 'Remanejos (%)' }, grid: { color: '#eceff2' }, ticks: { callback: v => v + ' %' } },
+      scales: { y: { min: 0, suggestedMax: 60, title: { display: true, text: 'Remanejos (%)' }, grid: { color: '#E7E9F6' }, ticks: { callback: v => v + ' %' } },
                 x: { grid: { display: false } } },
       plugins: { legend: { display: false }, lineasMeta: { lineas: lineasRemanejo() },
         tooltip: { callbacks: { label: it => { const x = porBloque[it.dataIndex]; return [` Remanejos: ${fmt(x.ratio)} %`, ` ${x.improd} improductivos / ${x.prod} productivos`, ` Densidad media: ${fmt(x.dens, 1)} %`]; } } } } },
@@ -1796,7 +1799,7 @@ function renderModulo3() {
   graficoM3('m3-graf-dia', {
     type: 'line', data: { labels: dias, datasets: series },
     options: { responsive: true, maintainAspectRatio: false, animation: false, interaction: { mode: 'index', intersect: false },
-      scales: { y: { min: 0, suggestedMax: 70, title: { display: true, text: 'Remanejos (%)' }, grid: { color: '#eceff2' }, ticks: { callback: v => v + ' %' } },
+      scales: { y: { min: 0, suggestedMax: 70, title: { display: true, text: 'Remanejos (%)' }, grid: { color: '#E7E9F6' }, ticks: { callback: v => v + ' %' } },
                 x: { title: { display: true, text: 'Día' }, grid: { display: false }, ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 15 } } },
       plugins: { legend: { display: series.length > 1, position: 'bottom', labels: { boxWidth: 18, boxHeight: 2 } }, lineasMeta: { lineas: lineasRemanejo() },
         tooltip: { callbacks: { title: it => `Día ${it[0].label} · ${fechaDe(+it[0].label)}`, label: it => ` ${it.dataset.label}: ${fmt(it.parsed.y)} %` } } } },
@@ -1813,7 +1816,7 @@ function renderModulo3() {
   if (rel.pendiente !== null) {
     const xs = rel.tramo.map(p => p.x), x0 = rel.densidadMin, x1 = Math.max(...xs);
     ptsSerie.push({ type: 'line', label: `Recta de tendencia (densidad ≥ ${rel.densidadMin} %)`, data: [{ x: x0, y: rel.intercepto + rel.pendiente * x0 }, { x: x1, y: rel.intercepto + rel.pendiente * x1 }],
-      borderColor: '#1d2733', backgroundColor: '#1d2733', borderWidth: 2, pointRadius: 0, pointHoverRadius: 0 });
+      borderColor: '#161B8E', backgroundColor: '#161B8E', borderWidth: 2, pointRadius: 0, pointHoverRadius: 0 });
     const bajo = rel.puntos.filter(p => p.x <= UMBRALES.amarillo), alto = rel.puntos.filter(p => p.x > UMBRALES.rojo);
     const prom = (arr) => arr.length ? arr.reduce((a, p) => a + p.y, 0) / arr.length : null;
     document.getElementById('m3-relacion-txt').innerHTML = `<table class="tabla-m2">
@@ -1830,8 +1833,8 @@ function renderModulo3() {
   graficoM3('m3-graf-relacion', {
     type: 'scatter', data: { datasets: ptsSerie },
     options: { responsive: true, maintainAspectRatio: false, animation: false,
-      scales: { x: { min: 0, max: 100, title: { display: true, text: 'Densidad del bloque al inicio del día (%)' }, grid: { color: '#f1f3f5' }, ticks: { callback: v => v + ' %' } },
-                y: { min: 0, suggestedMax: 70, title: { display: true, text: 'Remanejos del día (%)' }, grid: { color: '#eceff2' }, ticks: { callback: v => v + ' %' } } },
+      scales: { x: { min: 0, max: 100, title: { display: true, text: 'Densidad del bloque al inicio del día (%)' }, grid: { color: '#EEF0FB' }, ticks: { callback: v => v + ' %' } },
+                y: { min: 0, suggestedMax: 70, title: { display: true, text: 'Remanejos del día (%)' }, grid: { color: '#E7E9F6' }, ticks: { callback: v => v + ' %' } } },
       plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, boxHeight: 10 } }, lineasMeta: { lineas: lineasRemanejo() },
         tooltip: { callbacks: { label: it => it.dataset.type === 'line' ? ' Recta de tendencia' : ` ${it.dataset.label} · día ${it.raw.dia}: densidad ${fmt(it.parsed.x)} %, remanejos ${fmt(it.parsed.y)} %` } } } },
     plugins: [pluginLineasMeta]
@@ -1844,9 +1847,9 @@ function renderModulo3() {
     type: 'bar',
     data: { labels: porHora.map((_, h) => String(h).padStart(2, '0') + ' h'), datasets: [{
       label: 'Minutos promedio', data: porHora.map(x => x.promedio === null ? null : +x.promedio.toFixed(1)),
-      backgroundColor: '#2a78d6', borderRadius: { topLeft: 4, topRight: 4 }, borderSkipped: 'bottom' }] },
+      backgroundColor: '#223CCC', borderRadius: { topLeft: 4, topRight: 4 }, borderSkipped: 'bottom' }] },
     options: { responsive: true, maintainAspectRatio: false, animation: false,
-      scales: { y: { min: 0, suggestedMax: 35, title: { display: true, text: 'Minutos en el bloque' }, grid: { color: '#eceff2' } },
+      scales: { y: { min: 0, suggestedMax: 35, title: { display: true, text: 'Minutos en el bloque' }, grid: { color: '#E7E9F6' } },
                 x: { grid: { display: false }, ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 12 } } },
       plugins: { legend: { display: false }, lineasMeta: { lineas: [{ valor: METAS.servicio, texto: `meta ${METAS.servicio} min`, color: '#3d3c39', dash: [6, 4] }] },
         tooltip: { callbacks: { label: it => { const x = porHora[it.dataIndex]; return [` Promedio: ${fmt(x.promedio)} min`, ` Visitas: ${x.n.toLocaleString('es-PA')}`, ` ${fmt(x.pctSobreMeta, 0)} % supera la meta`]; } } } } },
@@ -1949,13 +1952,13 @@ function renderModulo4() {
     graficoM4 = new Chart(document.getElementById('m4-grafico'), {
       type: 'line',
       data: { labels: etiquetas, datasets: [
-        { label: 'Real', data: real, borderColor: '#2a78d6', backgroundColor: '#2a78d6', borderWidth: 2, pointRadius: 0, pointHoverRadius: 5, tension: 0.2 },
-        { label: 'Proyección sin cambios', data: proy(base), borderColor: '#2a78d6', backgroundColor: '#2a78d6', borderWidth: 2, borderDash: [5, 4], pointRadius: 0, pointHoverRadius: 5 },
+        { label: 'Real', data: real, borderColor: '#223CCC', backgroundColor: '#223CCC', borderWidth: 2, pointRadius: 0, pointHoverRadius: 5, tension: 0.2 },
+        { label: 'Proyección sin cambios', data: proy(base), borderColor: '#223CCC', backgroundColor: '#223CCC', borderWidth: 2, borderDash: [5, 4], pointRadius: 0, pointHoverRadius: 5 },
         { label: 'Proyección con el escenario', data: proy(esc), borderColor: '#eb6834', backgroundColor: '#eb6834', borderWidth: 2.5, pointRadius: 0, pointHoverRadius: 5 },
         umbral('Umbral amarillo', UMBRALES.amarillo, ESTILO_UMBRAL.amarillo), umbral('Umbral rojo', UMBRALES.rojo, ESTILO_UMBRAL.rojo)
       ] },
       options: { responsive: true, maintainAspectRatio: false, animation: false, interaction: { mode: 'index', intersect: false },
-        scales: { y: { suggestedMin: 40, suggestedMax: 100, title: { display: true, text: 'Densidad (%)' }, grid: { color: '#eceff2' }, ticks: { callback: v => v + ' %' } },
+        scales: { y: { suggestedMin: 40, suggestedMax: 100, title: { display: true, text: 'Densidad (%)' }, grid: { color: '#E7E9F6' }, ticks: { callback: v => v + ' %' } },
                   x: { title: { display: true, text: 'Día' }, grid: { display: false }, ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 15 } } },
         plugins: { legend: { position: 'bottom', labels: { boxWidth: 18, boxHeight: 2,
             generateLabels: (chart) => Chart.defaults.plugins.legend.labels.generateLabels(chart).map(l => { const ds = chart.data.datasets[l.datasetIndex]; return { ...l, lineDash: ds.borderDash || [] }; }) } },
@@ -2235,11 +2238,11 @@ function renderModulo6() {
     type: 'bar',
     data: { labels: etiquetas, datasets: [
       { type: 'bar', label: 'Hoy (sin citas)', data: esc.act.map(x => +(x.n / esc.D).toFixed(2)),
-        backgroundColor: etiquetas.map((_, h) => enVentana(h) ? '#9fb3c8' : '#c9d3de'), borderRadius: { topLeft: 3, topRight: 3 }, borderSkipped: 'bottom' },
+        backgroundColor: etiquetas.map((_, h) => enVentana(h) ? '#9AA5E6' : '#C3C8EF'), borderRadius: { topLeft: 3, topRight: 3 }, borderSkipped: 'bottom' },
       { type: 'line', label: `Con citas (${opc.pct} %)`, data: esc.nue.map(x => +(x.n / esc.D).toFixed(2)),
-        borderColor: '#2a78d6', backgroundColor: '#2a78d6', borderWidth: 2.5, pointRadius: 2, pointHoverRadius: 5, tension: 0.25 }] },
+        borderColor: '#223CCC', backgroundColor: '#223CCC', borderWidth: 2.5, pointRadius: 2, pointHoverRadius: 5, tension: 0.25 }] },
     options: { responsive: true, maintainAspectRatio: false, animation: false, interaction: { mode: 'index', intersect: false },
-      scales: { y: { min: 0, title: { display: true, text: 'Camiones por hora' }, grid: { color: '#eceff2' } },
+      scales: { y: { min: 0, title: { display: true, text: 'Camiones por hora' }, grid: { color: '#E7E9F6' } },
                 x: { grid: { display: false }, ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 12 } } },
       plugins: { legend: { position: 'bottom', labels: { boxWidth: 14, boxHeight: 8 } },
         tooltip: { callbacks: { label: it => ` ${it.dataset.label}: ${fmt(it.parsed.y)} camiones/h` } } } }
@@ -2252,11 +2255,11 @@ function renderModulo6() {
     type: 'bar',
     data: { labels: etiquetas, datasets: [
       { type: 'bar', label: 'Hoy (medido)', data: esc.act.map(c => promH(c) === null ? null : +promH(c).toFixed(1)),
-        backgroundColor: '#c9d3de', borderRadius: { topLeft: 3, topRight: 3 }, borderSkipped: 'bottom' },
+        backgroundColor: '#C3C8EF', borderRadius: { topLeft: 3, topRight: 3 }, borderSkipped: 'bottom' },
       { type: 'line', label: 'Con citas (estimado)', data: esc.nue.map(c => promH(c) === null ? null : +promH(c).toFixed(1)),
-        borderColor: '#2a78d6', backgroundColor: '#2a78d6', borderWidth: 2.5, pointRadius: 2, pointHoverRadius: 5, tension: 0.25, spanGaps: true }] },
+        borderColor: '#223CCC', backgroundColor: '#223CCC', borderWidth: 2.5, pointRadius: 2, pointHoverRadius: 5, tension: 0.25, spanGaps: true }] },
     options: { responsive: true, maintainAspectRatio: false, animation: false, interaction: { mode: 'index', intersect: false },
-      scales: { y: { min: 0, suggestedMax: 35, title: { display: true, text: 'Minutos en el bloque' }, grid: { color: '#eceff2' } },
+      scales: { y: { min: 0, suggestedMax: 35, title: { display: true, text: 'Minutos en el bloque' }, grid: { color: '#E7E9F6' } },
                 x: { grid: { display: false }, ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 12 } } },
       plugins: { legend: { position: 'bottom', labels: { boxWidth: 14, boxHeight: 8 } },
         lineasMeta: { lineas: [{ valor: METAS.servicio, texto: `meta ${METAS.servicio} min`, color: '#3d3c39', dash: [6, 4] }] },
