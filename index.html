@@ -84,7 +84,7 @@
   .m1-vistas { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 8px; }
   .m1-vistas label { font-size: .8rem; color: var(--suave); display: flex; flex-direction: column; gap: 4px; }
   .m1-vistas select { padding: 5px 8px; border: 1px solid var(--borde); border-radius: 6px; font-size: .85rem; }
-  .patio3d { border-radius: 10px; overflow: hidden; background: radial-gradient(ellipse at 40% 30%, #2A3FD0 0%, #161B8E 55%, #0D1166 100%); border: 2px solid rgba(255, 255, 255, .85); box-shadow: 0 6px 18px rgba(0, 0, 0, .25); }
+  .patio3d { border-radius: 10px; overflow: hidden; background: radial-gradient(ellipse at 40% 30%, #3A3D52 0%, #24263A 55%, #16172A 100%); border: 2px solid rgba(255, 255, 255, .85); box-shadow: 0 6px 18px rgba(0, 0, 0, .25); }
   .patio3d svg { display: block; width: 100%; height: auto; }
   /* en pantallas angostas (celular) el patio no se encoge más de 900 px: se desplaza de lado para que el texto siga legible */
   @media (max-width: 900px) { .patio3d { overflow-x: auto; } .patio3d svg { min-width: 900px; } }
@@ -1239,11 +1239,11 @@ function renderPatio3D(dia, f) {
   let suelo = '', bloques = '', etiquetas = '';
 
   // Suelo: patio, calle del gate, muelle y agua
-  suelo += `<polygon points="${pts([[-6, -7, 0], [X1 + 6, -7, 0], [X1 + 6, QY0, 0], [-6, QY0, 0]])}" fill="#121A7A" fill-opacity=".85" stroke="#2C3BB5" stroke-width="1"/>`;
-  for (let x = 0; x <= X1; x += 6) suelo += linea3D([x, -7, 0], [x, QY0, 0], 'rgba(90,140,210,.07)', 0.8);
-  for (let y = -6; y <= QY0; y += 3) suelo += linea3D([-6, y, 0], [X1 + 6, y, 0], 'rgba(90,140,210,.07)', 0.8);
-  suelo += `<polygon points="${pts([[-6, -6.5, 0], [X1 + 6, -6.5, 0], [X1 + 6, -3.5, 0], [-6, -3.5, 0]])}" fill="#1A2390" stroke="#3A4CCF" stroke-width=".8"/>`;
-  suelo += `<polygon points="${pts([[-6, QY0, 0], [X1 + 6, QY0, 0], [X1 + 6, QY1, 0], [-6, QY1, 0]])}" fill="#1E2A9E" stroke="#4A5FD8" stroke-width="1"/>`;
+  suelo += `<polygon points="${pts([[-6, -7, 0], [X1 + 6, -7, 0], [X1 + 6, QY0, 0], [-6, QY0, 0]])}" fill="#2E3045" fill-opacity=".95" stroke="#5A5E7E" stroke-width="1"/>`;
+  for (let x = 0; x <= X1; x += 6) suelo += linea3D([x, -7, 0], [x, QY0, 0], 'rgba(255,255,255,.06)', 0.8);
+  for (let y = -6; y <= QY0; y += 3) suelo += linea3D([-6, y, 0], [X1 + 6, y, 0], 'rgba(255,255,255,.06)', 0.8);
+  suelo += `<polygon points="${pts([[-6, -6.5, 0], [X1 + 6, -6.5, 0], [X1 + 6, -3.5, 0], [-6, -3.5, 0]])}" fill="#3A3C52" stroke="#62668A" stroke-width=".8"/>`;
+  suelo += `<polygon points="${pts([[-6, QY0, 0], [X1 + 6, QY0, 0], [X1 + 6, QY1, 0], [-6, QY1, 0]])}" fill="#45485F" stroke="#7A7FA3" stroke-width="1"/>`;
   suelo += `<polygon points="${pts([[-6, QY1, -0.3], [X1 + 6, QY1, -0.3], [X1 + 6, QY1 + 11, -0.3], [-6, QY1 + 11, -0.3]])}" fill="#0B0F5C"/>`;
 
   // Bloques (de atrás hacia adelante para que lo cercano tape a lo lejano)
@@ -1291,7 +1291,7 @@ function renderPatio3D(dia, f) {
     const [lx, ly] = iso(bx + L * 0.5, by + DEP * 0.5, zMax + 4.2);
     etiquetas += `<g pointer-events="none" transform="translate(${lx.toFixed(1)},${ly.toFixed(1)})">
       <line x1="0" y1="22" x2="0" y2="${(zMax + 4.2 - h) * P3D.k - 4}" stroke="${cEst}" stroke-opacity=".6" stroke-width="1"/>
-      <rect x="-58" y="-22" width="116" height="44" rx="7" fill="#0E1260" fill-opacity=".88" stroke="${cEst}" stroke-width="1.4"/>
+      <rect x="-58" y="-22" width="116" height="44" rx="7" fill="#1A1B2B" fill-opacity=".9" stroke="${cEst}" stroke-width="1.4"/>
       <text x="0" y="-5" text-anchor="middle" font-size="13" fill="#cfe0ff">Bloque ${b}</text>
       <text x="0" y="14" text-anchor="middle" font-size="16" font-weight="700" fill="${cEst}">${ESTADO[est].split(' ')[0]} ${fmt(d)} %</text></g>`;
   }
@@ -1310,7 +1310,7 @@ function renderPatio3D(dia, f) {
     muelle += caja3D(xs + 1.5, yb0 + 1.2, 1.6, xs + 5, yb1 - 1.2, 4.2, '#d9e6ff', 0.9);   // puente
     const [cx, cy] = iso(xs + 14, yb1 + 1, 0);
     etiquetas += `<g pointer-events="none" transform="translate(${cx.toFixed(1)},${cy.toFixed(1)})">
-      <rect x="-60" y="6" width="230" height="64" rx="7" fill="#0E1260" fill-opacity=".9" stroke="#62A8F3" stroke-width="1.2"/>
+      <rect x="-60" y="6" width="230" height="64" rx="7" fill="#1A1B2B" fill-opacity=".92" stroke="#62A8F3" stroke-width="1.2"/>
       <text x="-50" y="25" font-size="14" font-weight="700" fill="#e6f0ff">${bq.nombre}</text>
       <text x="-50" y="43" font-size="12" fill="#9fc3ff">Atraque ${bq.atraque.slice(11)} h · ${bq.id}</text>
       <text x="-50" y="60" font-size="12" fill="#9fc3ff">Descarga ${bq.descarga_imp_teu + bq.descarga_trb_teu} · carga ${bq.carga_exp_teu + bq.carga_trb_teu + bq.carga_vac_teu} TEU</text></g>`;
@@ -1348,10 +1348,10 @@ function renderPatio3D(dia, f) {
   const PW = 8 + COLS * CW + 4, px = maxX - PW - 14, py = minY + 12;
   const colorKPI = (clase) => COLOR_ESTADO_3D[clase] || '#8a96a3';
   const panelKPI = `<g pointer-events="none" transform="translate(${px.toFixed(1)},${py.toFixed(1)})">
-    <rect width="${PW}" height="${28 + FILAS * CH + 6}" rx="9" fill="#0E1260" fill-opacity=".84" stroke="#4A5BD6" stroke-width="1"/>
+    <rect width="${PW}" height="${28 + FILAS * CH + 6}" rx="9" fill="#1A1B2B" fill-opacity=".9" stroke="#62668A" stroke-width="1"/>
     <text x="12" y="19" font-size="13" font-weight="700" fill="#8fb2e6" letter-spacing="1">KPI · ${f.bloque === 'todos' ? 'PATIO' : 'BLOQUE ' + f.bloque} · DÍAS ${f.desde}–${f.hasta}</text>
     ${kpis.map((k, n) => `<g transform="translate(${8 + (n % COLS) * CW},${28 + Math.floor(n / COLS) * CH})">
-      <rect width="${CW - 6}" height="${CH - 6}" rx="6" fill="#1A2390" stroke="${colorKPI(k.clase)}" stroke-opacity=".5" stroke-width="1"/>
+      <rect width="${CW - 6}" height="${CH - 6}" rx="6" fill="#26283C" stroke="${colorKPI(k.clase)}" stroke-opacity=".5" stroke-width="1"/>
       <rect width="4" height="${CH - 6}" rx="2" fill="${colorKPI(k.clase)}"/>
       <text x="12" y="18" font-size="13" fill="#C9CDF7" letter-spacing=".5">${k.nombre.toUpperCase()}</text>
       <text x="12" y="45" font-size="23" font-weight="700" fill="${colorKPI(k.clase)}">${k.valor}</text>
