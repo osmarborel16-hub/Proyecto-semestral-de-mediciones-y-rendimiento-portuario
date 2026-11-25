@@ -327,6 +327,31 @@
   #m6 .m4-salidas { grid-template-columns: repeat(auto-fit, minmax(min(100%, 165px), 1fr)); }
   #m6 .m4-salidas .lbl { font-size: .875rem; }
   #m6 .panel-grafico h3 { margin: 0 0 10px; }
+  .patio-con-acciones { position: relative; min-width: 0; }
+  .boton-remanejos, .dialogo-cabecera button {
+    padding: 10px 16px;
+    border: 1px solid #73c8cc;
+    border-radius: 9px;
+    background: #13546a;
+    color: white;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .boton-remanejos { position: absolute; left: 12px; bottom: 12px; box-shadow: 0 4px 14px #07122266; }
+  .boton-remanejos:hover, .dialogo-cabecera button:hover { background: #0b6880; }
+  .dialogo-remanejos {
+    width: min(1080px, calc(100% - 24px));
+    max-height: 90dvh;
+    padding: clamp(14px, 3vw, 28px);
+    border: 1px solid var(--borde);
+    border-radius: 14px;
+    background: var(--tarjeta);
+    color: var(--texto);
+  }
+  .dialogo-remanejos::backdrop { background: #09182bbb; }
+  .dialogo-cabecera { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .dialogo-cabecera h2, .dialogo-cabecera form { margin: 0; }
 </style>
 </head>
 <body>
@@ -362,7 +387,6 @@
 <nav class="pestanas" id="pestanas" aria-label="Módulos del dashboard">
   <button data-mod="m1" class="activa">Mapa del patio</button>
   <button data-mod="m2">Dwell time</button>
-  <button data-mod="m3">Remanejos</button>
   <button data-mod="m4">Simulador</button>
   <button data-mod="m5">Mejora (A3)</button>
   <button data-mod="m6">Camiones y citas</button>
@@ -407,13 +431,16 @@
           </select>
         </label>
       </div>
-      <div class="patio3d" id="m1-patio3d" aria-label="Vista 3D del patio por bloque"></div>
-      <p class="nota" id="m1-patio3d-nota"></p>
-      <div class="patio" id="m1-patio-tarjetas" hidden>
-        <div class="muelle">MUELLE · GRÚAS STS</div>
-        <div class="bloques" id="m1-bloques"></div>
-        <div class="gate">GATE · CAMIONES</div>
+      <div class="patio-con-acciones">
+        <div class="patio3d" id="m1-patio3d" aria-label="Vista 3D del patio por bloque"></div>
+        <div class="patio" id="m1-patio-tarjetas" hidden>
+          <div class="muelle">MUELLE · GRÚAS STS</div>
+          <div class="bloques" id="m1-bloques"></div>
+          <div class="gate">GATE · CAMIONES</div>
+        </div>
+        <button type="button" class="boton-remanejos" id="m1-remanejos" aria-haspopup="dialog" aria-controls="m3">Remanejos</button>
       </div>
+      <p class="nota" id="m1-patio3d-nota"></p>
     </div>
     <details class="m1-lateral desplegable" id="m1-alertas-det">
       <summary>
@@ -480,8 +507,11 @@
 </section>
 
 <!-- ===== MÓDULO 3 · REMANEJOS ===== Responsable: Adriana Garibaldi -->
-<section class="modulo" id="m3">
-  <h2>Remanejos</h2>
+<dialog id="m3" class="dialogo-remanejos" aria-labelledby="m3-titulo">
+  <div class="dialogo-cabecera">
+    <h2 id="m3-titulo">Remanejos</h2>
+    <form method="dialog"><button type="submit" autofocus>Cerrar</button></form>
+  </div>
   <p class="nota">Remanejos (rehandle ratio) = Movimientos improductivos ÷ movimientos productivos × 100 · Tiempo de servicio en patio = tiempo del camión desde que entra al bloque hasta que sale ·
      usa los filtros de días, turno y bloque; la categoría solo aplica al tiempo de servicio (los movimientos se registran por bloque y turno)</p>
 
@@ -548,7 +578,7 @@
       </div>
     </div>
   </div>
-</section>
+</dialog>
 
 <!-- ===== MÓDULO 4 · SIMULADOR DE ESCENARIOS ===== Responsable: Osmar Chiari -->
 <section class="modulo" id="m4">
@@ -2035,7 +2065,7 @@ function renderModulo3() {
 // Sub-pestañas: muestran un panel dentro del mismo módulo y redibujan sus gráficos con el tamaño correcto
 document.querySelectorAll('.subpestanas').forEach(nav => nav.addEventListener('click', (e) => {
   const boton = e.target.closest('button'); if (!boton) return;
-  const modulo = nav.closest('section.modulo');
+  const modulo = nav.closest('section.modulo, dialog');
   nav.querySelectorAll('button').forEach(b => b.classList.toggle('activa', b === boton));
   modulo.querySelectorAll('.subpanel').forEach(p => p.classList.toggle('activo', p.id === boton.dataset.sub));
   if (modulo.id === 'm3') renderModulo3();
@@ -2488,6 +2518,14 @@ function activarOpcionesEscenario(grupoId, campoId, evento) {
 activarOpcionesEscenario('m5-acciones', 'm5-propuesta', 'change');
 const sincronizarCitas = activarOpcionesEscenario('m6-acciones', 'm6-pct', 'input');
 document.getElementById('m6-restablecer').addEventListener('click', sincronizarCitas);
+
+const botonRemanejos = document.getElementById('m1-remanejos');
+const dialogoRemanejos = document.getElementById('m3');
+botonRemanejos.addEventListener('click', () => {
+  dialogoRemanejos.showModal();
+  renderModulo3();
+});
+dialogoRemanejos.addEventListener('close', () => botonRemanejos.focus());
 
 document.getElementById('pestanas').addEventListener('click', (e) => {
   const boton = e.target.closest('button');
