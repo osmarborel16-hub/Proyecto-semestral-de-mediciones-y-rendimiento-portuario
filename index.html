@@ -14,11 +14,12 @@
        Fondo en degradado marino → real → violeta, con detalles en blanco; los módulos siguen en tarjetas blancas para que se lean bien.
        Verde y amarillo de estado se conservan: significan "cumple" y "vigilancia" y la paleta no los tiene. */
     --coral: #ED4563; --real: #223CCC; --marino: #161B8E; --violeta: #8D39D0; --celeste: #077BED;
-    --pagina: #161B8E; --pagina-2: #223CCC; --linea-clara: rgba(255, 255, 255, .32); --texto-claro: #ffffff; --texto-claro-suave: #d6d9ff;
+    --pagina: #2B1466; --pagina-2: #5A2A9E; --linea-clara: rgba(255, 255, 255, .32); --texto-claro: #ffffff; --texto-claro-suave: #d6d9ff;
   }
   * { box-sizing: border-box; }
   body { margin: 0; font-family: "Segoe UI", Arial, sans-serif; color: var(--texto);
-         background: var(--marino) linear-gradient(180deg, var(--marino) 0%, var(--real) 45%, var(--violeta) 100%) fixed; min-height: 100vh; }
+         /* fondo en violeta (no azul) para que no se confunda con el patio en 3D, que es azul marino */
+         background: var(--pagina) linear-gradient(180deg, var(--pagina) 0%, var(--pagina-2) 50%, var(--violeta) 100%) fixed; min-height: 100vh; }
   .aviso { background: var(--amarillo); color: #161B8E; text-align: center; font-weight: 700; padding: 6px; letter-spacing: .5px; }
   header { background: transparent; color: #fff; padding: 18px 24px 14px; border-bottom: 1px solid var(--linea-clara); }
   header h1 { margin: 0; font-size: 1.45rem; letter-spacing: .3px; }
@@ -83,7 +84,7 @@
   .m1-vistas { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 8px; }
   .m1-vistas label { font-size: .8rem; color: var(--suave); display: flex; flex-direction: column; gap: 4px; }
   .m1-vistas select { padding: 5px 8px; border: 1px solid var(--borde); border-radius: 6px; font-size: .85rem; }
-  .patio3d { border-radius: 10px; overflow: hidden; background: radial-gradient(ellipse at 40% 30%, #2A3FD0 0%, #161B8E 55%, #0D1166 100%); border: 1px solid #2A2FA0; }
+  .patio3d { border-radius: 10px; overflow: hidden; background: radial-gradient(ellipse at 40% 30%, #2A3FD0 0%, #161B8E 55%, #0D1166 100%); border: 2px solid rgba(255, 255, 255, .85); box-shadow: 0 6px 18px rgba(0, 0, 0, .25); }
   .patio3d svg { display: block; width: 100%; height: auto; }
   /* en pantallas angostas (celular) el patio no se encoge más de 900 px: se desplaza de lado para que el texto siga legible */
   @media (max-width: 900px) { .patio3d { overflow-x: auto; } .patio3d svg { min-width: 900px; } }
