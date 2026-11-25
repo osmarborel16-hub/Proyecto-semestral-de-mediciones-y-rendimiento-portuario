@@ -338,8 +338,25 @@
     font-weight: 700;
     cursor: pointer;
   }
-  .boton-remanejos { position: absolute; left: 12px; bottom: 12px; box-shadow: 0 4px 14px #07122266; }
-  .boton-remanejos:hover, .dialogo-cabecera button:hover { background: #0b6880; }
+  .boton-remanejos {
+    position: absolute;
+    left: 38%;
+    bottom: clamp(14px, 2vw, 24px);
+    transform: translateX(-50%);
+    min-height: 44px;
+    padding: 10px 26px;
+    border: 1px solid #9ce9de;
+    border-radius: 999px;
+    background: #ccf5ee;
+    color: #0a3040;
+    box-shadow: 0 4px 14px #07122280;
+    font-size: 1rem;
+    line-height: 1.25;
+  }
+  .boton-remanejos:hover { background: #a7eee1; }
+  .boton-remanejos:active { transform: translate(-50%, 1px); }
+  .dialogo-cabecera button:hover { background: #0b6880; }
+  @media (max-width: 550px) { .boton-remanejos { left: 50%; } }
   .dialogo-remanejos {
     width: min(1080px, calc(100% - 24px));
     max-height: 90dvh;
