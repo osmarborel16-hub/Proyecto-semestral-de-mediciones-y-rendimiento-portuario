@@ -7,19 +7,47 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
   :root {
-    --fondo: #f4f6f8; --tarjeta: #ffffff; --texto: #1d2733; --suave: #5b6b7c;
-    --borde: #dde3ea; --primario: #1f4e79;
+    --fondo: #eef3f8; --tarjeta: #ffffff; --texto: #15263a; --suave: #455c72;
+    --borde: #d6e1eb; --primario: #13546a;
     --verde: #0ca30c; --amarillo: #fab219; --rojo: #d03b3b; --gris: #8a96a3;
   }
   * { box-sizing: border-box; }
   body { margin: 0; font-family: "Segoe UI", Arial, sans-serif; background: var(--fondo); color: var(--texto); }
-  .aviso { background: var(--amarillo); color: #1d2733; text-align: center; font-weight: 700; padding: 6px; letter-spacing: .5px; }
-  header { background: var(--primario); color: #fff; padding: 14px 24px; }
-  header h1 { margin: 0; font-size: 1.35rem; }
-  header p { margin: 4px 0 0; opacity: .85; font-size: .9rem; }
-  .filtros { display: flex; flex-wrap: wrap; gap: 12px; padding: 12px 24px; background: var(--tarjeta); border-bottom: 1px solid var(--borde); }
-  .filtros label { font-size: .8rem; color: var(--suave); display: flex; flex-direction: column; gap: 4px; }
-  .filtros select, .filtros input { padding: 5px 8px; border: 1px solid var(--borde); border-radius: 6px; font-size: .9rem; }
+  .cabecera {
+    color: white;
+    background: linear-gradient(112deg, #09182b 20%, #102c43 68%, #145669);
+    border-bottom: 4px solid #36bdaf;
+  }
+  .cabecera-contenido {
+    max-width: 1480px;
+    margin: auto;
+    padding: clamp(28px, 5vw, 65px) clamp(16px, 4vw, 50px);
+  }
+  .cabecera-contexto { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 22px; }
+  .cabecera-contexto p { margin: 0; color: #c2d7e6; font-size: .9rem; }
+  .aviso {
+    padding: 5px 11px;
+    border: 1px solid #e3bc64;
+    border-radius: 999px;
+    color: #ffe2a1;
+    font-size: .875rem;
+    font-weight: 700;
+  }
+  header h1 { margin: 16px 0 8px; font-size: clamp(2rem, 5vw, 3.5rem); letter-spacing: -.045em; line-height: 1.05; }
+  .cabecera-descripcion { margin: 0; color: #d1e3ee; max-width: 65ch; line-height: 1.55; }
+  .contenido { max-width: 1480px; margin: auto; padding: 20px clamp(12px, 4vw, 50px) 0; }
+  .filtros {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 14px;
+    background: var(--tarjeta);
+    border: 1px solid var(--borde);
+    border-radius: 12px;
+  }
+  .filtros label { flex: 1 1 120px; min-width: 0; display: grid; gap: 5px; }
+  .filtros label, .m1-controles label, .m1-vistas label { color: var(--suave); font-weight: 600; }
+  .filtros select, .filtros input { width: 100%; min-width: 0; }
   .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; padding: 16px 24px; }
   .kpi { background: var(--tarjeta); border: 1px solid var(--borde); border-left: 6px solid var(--gris); border-radius: 8px; padding: 10px 12px; }
   .kpi .nombre { font-size: .75rem; color: var(--suave); text-transform: uppercase; }
@@ -28,13 +56,41 @@
   .kpi.verde { border-left-color: var(--verde); }
   .kpi.amarillo { border-left-color: var(--amarillo); }
   .kpi.rojo { border-left-color: var(--rojo); }
-  nav.pestanas { display: flex; flex-wrap: wrap; gap: 4px; padding: 0 24px; }
-  nav.pestanas button { border: 1px solid var(--borde); border-bottom: none; background: #e9eef3; padding: 9px 16px; border-radius: 8px 8px 0 0; cursor: pointer; font-size: .9rem; }
-  nav.pestanas button.activa { background: var(--tarjeta); font-weight: 700; color: var(--primario); }
-  section.modulo { display: none; background: var(--tarjeta); margin: 0 24px 24px; border: 1px solid var(--borde); border-radius: 0 8px 8px 8px; padding: 18px; min-height: 320px; }
+  nav.pestanas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 16px 0 12px;
+    padding: 6px;
+    background: #dfe9f1;
+    border: 1px solid var(--borde);
+    border-radius: 12px;
+  }
+  nav.pestanas button {
+    flex: 1 1 auto;
+    padding: 10px 13px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    background: transparent;
+    color: #304e64;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  nav.pestanas button:hover { background: #f5f9fc; }
+  nav.pestanas button.activa { background: #13546a; color: white; }
+  section.modulo {
+    display: none;
+    min-width: 0;
+    padding: clamp(14px, 2.5vw, 30px);
+    background: var(--tarjeta);
+    border: 1px solid var(--borde);
+    border-radius: 14px;
+    box-shadow: 0 8px 24px #15263a0c;
+  }
+  section.modulo > h2 { margin: 0 0 8px; font-size: clamp(1.5rem, 3vw, 2rem); letter-spacing: -.025em; }
   section.modulo.activo { display: block; }
   .pendiente { color: var(--suave); font-style: italic; }
-  .panel-datos { margin: 12px 24px 0; background: var(--tarjeta); border: 1px solid var(--borde); border-radius: 8px; padding: 8px 14px; font-size: .85rem; }
+  .panel-datos { margin: 16px 0 0; background: var(--tarjeta); border: 1px solid var(--borde); border-radius: 8px; padding: 8px 14px; font-size: .85rem; }
   .panel-datos summary { cursor: pointer; font-weight: 600; color: var(--primario); }
   .panel-datos table { border-collapse: collapse; margin: 10px 0; }
   .panel-datos td, .panel-datos th { border: 1px solid var(--borde); padding: 4px 10px; text-align: left; }
@@ -45,7 +101,7 @@
   .m1-controles { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 18px; margin: 10px 0 14px; }
   .m1-controles label { font-size: .8rem; color: var(--suave); display: flex; flex-direction: column; gap: 4px; }
   .m1-controles input[type=number] { width: 80px; padding: 5px 8px; border: 1px solid var(--borde); border-radius: 6px; }
-  .m1-controles input[type=range] { width: 260px; }
+  .m1-controles input[type=range] { width: min(260px, 44vw); }
   .m1-controles button, .m1-grafico-cab select { border: 1px solid var(--primario); background: #fff; color: var(--primario); border-radius: 6px; padding: 6px 12px; cursor: pointer; }
   .m1-cuerpo { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; }   /* el patio usa todo el ancho; las alertas van debajo */
   .patio { border: 1px solid var(--borde); border-radius: 8px; overflow: hidden; background: #f7f8f9; }
@@ -75,7 +131,7 @@
   .m1-vistas { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 8px; }
   .m1-vistas label { font-size: .8rem; color: var(--suave); display: flex; flex-direction: column; gap: 4px; }
   .m1-vistas select { padding: 5px 8px; border: 1px solid var(--borde); border-radius: 6px; font-size: .85rem; }
-  .patio3d { border-radius: 10px; overflow: hidden; background: radial-gradient(ellipse at 40% 30%, #16305a 0%, #0a1830 55%, #050c19 100%); border: 1px solid #0f2340; }
+  .patio3d { min-width: 0; border-radius: 12px; overflow: hidden; background: radial-gradient(ellipse at 40% 30%, #16305a 0%, #0a1830 55%, #050c19 100%); border: 1px solid #0f2340; }
   .patio3d svg { display: block; width: 100%; height: auto; }
   /* en pantallas angostas (celular) el patio no se encoge más de 900 px: se desplaza de lado para que el texto siga legible */
   @media (max-width: 900px) { .patio3d { overflow-x: auto; } .patio3d svg { min-width: 900px; } }
@@ -181,17 +237,44 @@
   @media (max-width: 900px) { .a3 { grid-template-columns: 1fr; } .a3 > div { border-right: none; } }
   @media (max-width: 900px) { .bloques { grid-template-columns: repeat(2, 1fr); } }
   footer { text-align: center; font-size: .8rem; color: var(--suave); padding: 12px; }
+  :focus-visible { outline: 3px solid #158b96; outline-offset: 3px; }
+  .patio3d .blq:focus-visible .pad { stroke: #7ef5ed; stroke-width: 3; }
+  button, input, select, summary { font-family: inherit; }
+  .filtros select, .filtros input, .m1-vistas select, .m1-controles input[type=number] {
+    min-height: 38px;
+    padding: 6px 9px;
+    border: 1px solid var(--borde);
+    border-radius: 7px;
+    background: #f8fbfd;
+    color: var(--texto);
+    font-size: .9rem;
+  }
+  .filtros label, .m1-controles label, .m1-vistas label { font-size: .875rem; }
+  .m1-vistas select { max-width: 100%; }
+  .m1-vistas label { min-width: 0; }
+  .m1-controles { padding: 12px; border-radius: 10px; background: #eef5f9; }
+  .m1-controles .control-dia { display: grid; gap: 4px; color: var(--suave); font-size: .875rem; font-weight: 600; }
+  .nota { font-size: .875rem; line-height: 1.55; }
+  @media (max-width: 550px) {
+    nav.pestanas button { flex-basis: calc(50% - 6px); }
+    .filtros { gap: 10px; }
+  }
 </style>
 </head>
 <body>
 
-<div class="aviso">⚠ DATOS SIMULADOS · Proyecto académico UMIP · no son datos reales de ninguna terminal</div>
-
-<header>
-  <h1>Dashboard de KPI portuarios · Un patio que se llena</h1>
-  <p>Densidad, dwell time y remanejos del patio de contenedores · 60 días simulados · 6 bloques (A–F)</p>
+<header class="cabecera">
+  <div class="cabecera-contenido">
+    <div class="cabecera-contexto">
+      <p>UMIP · Medición y Rendimiento de Terminales Portuarias</p>
+      <span class="aviso">Datos simulados</span>
+    </div>
+    <h1>Un patio que se llena</h1>
+    <p class="cabecera-descripcion">Dashboard de KPI portuarios · 60 días de operación simulada en los bloques A–F.</p>
+  </div>
 </header>
 
+<main class="contenido">
 <!-- ===== FILTROS GLOBALES ===== -->
 <div class="filtros">
   <label>Día desde <input type="number" id="f-desde" min="1" max="60" value="1"></label>
@@ -207,43 +290,30 @@
   </label>
 </div>
 
-<!-- ===== DATOS SIMULADOS: resumen y descarga ===== -->
-<details class="panel-datos">
-  <summary>Datos simulados (semilla 2026) · resumen y descarga en CSV</summary>
-  <div id="resumen-datos"></div>
-  <div class="botones-csv">
-    <button type="button" onclick="descargarCSV('contenedores')">contenedores.csv</button>
-    <button type="button" onclick="descargarCSV('inventarioDiario')">inventarioDiario.csv</button>
-    <button type="button" onclick="descargarCSV('movimientos')">movimientos.csv</button>
-    <button type="button" onclick="descargarCSV('visitasCamion')">visitasCamion.csv</button>
-    <button type="button" onclick="descargarCSV('buques')">buques.csv</button>
-  </div>
-</details>
-
-
 <!-- ===== PESTAÑAS ===== -->
-<nav class="pestanas" id="pestanas">
-  <button data-mod="m1" class="activa">1 · Mapa del patio</button>
-  <button data-mod="m2">2 · Dwell time</button>
-  <button data-mod="m3">3 · Remanejos</button>
-  <button data-mod="m4">4 · Simulador</button>
-  <button data-mod="m5">5 · Mejora (A3)</button>
-  <button data-mod="m6">6 · Camiones y citas</button>
+<nav class="pestanas" id="pestanas" aria-label="Módulos del dashboard">
+  <button data-mod="m1" class="activa">Mapa del patio</button>
+  <button data-mod="m2">Dwell time</button>
+  <button data-mod="m3">Remanejos</button>
+  <button data-mod="m4">Simulador</button>
+  <button data-mod="m5">Mejora (A3)</button>
+  <button data-mod="m6">Camiones y citas</button>
 </nav>
 
 <!-- ===== MÓDULO 1 · MAPA DEL PATIO ===== Responsable: Leslie West -->
 <section class="modulo activo" id="m1">
-  <h2>1 · Mapa del patio</h2>
+  <h2>Mapa del patio</h2>
   <p class="nota">Yard Density = Inventario ÷ capacidad operativa × 100 · inventario en TEU al cierre del día · clic en un bloque para filtrar todo el dashboard</p>
 
   <div class="m1-controles">
-    <label>Día del mapa: <strong id="m1-dia-txt"></strong>
+    <div class="control-dia">
+      <label for="m1-dia">Día del mapa <strong id="m1-dia-txt"></strong></label>
       <span class="dia-nav">
         <button type="button" id="m1-dia-ant" aria-label="Día anterior" title="Día anterior (←)">◀</button>
         <input type="range" id="m1-dia" min="1" max="60" value="60" aria-label="Día del mapa">
         <button type="button" id="m1-dia-sig" aria-label="Día siguiente" title="Día siguiente (→)">▶</button>
       </span>
-    </label>
+    </div>
     <button type="button" id="m1-reproducir">▶ Reproducir los 60 días</button>
     <label>Umbral amarillo (%)
       <input type="number" id="m1-umbral-amarillo" min="0" max="100" step="1" value="70">
@@ -286,7 +356,6 @@
       <ul class="alertas" id="m1-alertas"></ul>
       <p class="nota" id="m1-leyenda"></p>
     </details>
-    </div>
   </div>
 
   <div class="m1-grafico">
@@ -309,7 +378,7 @@
 
 <!-- ===== MÓDULO 2 · DWELL TIME ===== Responsable: Leslie West -->
 <section class="modulo" id="m2">
-  <h2>2 · Dwell time</h2>
+  <h2>Dwell time</h2>
   <p class="nota">Dwell time por categoría = Σ días en patio ÷ contenedores de la categoría · se cuentan los contenedores que <strong>salieron</strong> en el rango de días filtrado ·
      Antigüedad = contenedores con más de X días en patio al cierre del día de corte · el filtro de turno no aplica a este módulo</p>
 
@@ -344,7 +413,7 @@
 
 <!-- ===== MÓDULO 3 · REMANEJOS ===== Responsable: Adriana Garibaldi -->
 <section class="modulo" id="m3">
-  <h2>3 · Remanejos</h2>
+  <h2>Remanejos</h2>
   <p class="nota">Remanejos (rehandle ratio) = Movimientos improductivos ÷ movimientos productivos × 100 · Tiempo de servicio en patio = tiempo del camión desde que entra al bloque hasta que sale ·
      usa los filtros de días, turno y bloque; la categoría solo aplica al tiempo de servicio (los movimientos se registran por bloque y turno)</p>
 
@@ -415,7 +484,7 @@
 
 <!-- ===== MÓDULO 4 · SIMULADOR DE ESCENARIOS ===== Responsable: Osmar Chiari -->
 <section class="modulo" id="m4">
-  <h2>4 · Simulador de escenarios</h2>
+  <h2>Simulador de escenarios</h2>
   <p class="nota">Proyecta la densidad del patio completo para los próximos 14 días desde el día de corte ("Día hasta"). El régimen actual se mide en los <strong>últimos 28 días</strong>:
      crecimiento diario (pendiente de mínimos cuadrados del inventario), llegadas (TEU/día) y dwell de los contenedores que salieron.
      Días hasta alerta roja = TEU de margen ÷ crecimiento diario del inventario. Se usan 28 días porque las ventanas más cortas quedan sesgadas por el ciclo semanal de buques.</p>
@@ -457,9 +526,9 @@
 
 <!-- ===== MÓDULO 5 · MEJORA (A3) ===== Responsable: Osmar Chiari -->
 <section class="modulo" id="m5">
-  <h2>5 · Mejora (A3)</h2>
-  <p class="nota">Compara la situación actual con la propuesta. Usa el régimen de los últimos 28 días hasta el día de corte y la misma proyección del Módulo 4.
-     Por eso la categoría crítica y los TEU de más pueden diferir un poco de los del Módulo 2, que usa el rango de días filtrado.</p>
+  <h2>Mejora (A3)</h2>
+  <p class="nota">Compara la situación actual con la propuesta. Usa el régimen de los últimos 28 días hasta el día de corte y la misma proyección del simulador.
+     Por eso la categoría crítica y los TEU de más pueden diferir un poco de los de Dwell time, que usa el rango de días filtrado.</p>
 
   <div class="m5-selector">
     <label>Propuesta a evaluar
@@ -484,7 +553,7 @@
 
 <!-- ===== MÓDULO 6 · CAMIONES Y CITAS (EXTRA) ===== Responsable: Adriana Garibaldi -->
 <section class="modulo" id="m6">
-  <h2>6 · Camiones y citas (módulo extra)</h2>
+  <h2>Camiones y citas (módulo extra)</h2>
   <p class="nota">Tiempo de servicio en patio = tiempo del camión desde que entra al bloque hasta que sale (KPI 6) · usa los filtros de días, bloque y categoría.
      El filtro de turno no aplica: las citas mueven camiones de una hora a otra del día.</p>
 
@@ -540,6 +609,20 @@
   <p class="nota">Las citas no cambian cuántos camiones llegan en el día, solo a qué hora. Lo que baja es la cola en las horas pico
     y, si el contenedor se pre-ubica, los remanejos del retiro. La estimación usa una regresión sobre las visitas simuladas; no es un KPI medido, es un escenario.</p>
 </section>
+
+<!-- ===== DATOS SIMULADOS: resumen y descarga ===== -->
+<details class="panel-datos">
+  <summary>Datos simulados (semilla 2026) · resumen y descarga en CSV</summary>
+  <div id="resumen-datos"></div>
+  <div class="botones-csv">
+    <button type="button" onclick="descargarCSV('contenedores')">contenedores.csv</button>
+    <button type="button" onclick="descargarCSV('inventarioDiario')">inventarioDiario.csv</button>
+    <button type="button" onclick="descargarCSV('movimientos')">movimientos.csv</button>
+    <button type="button" onclick="descargarCSV('visitasCamion')">visitasCamion.csv</button>
+    <button type="button" onclick="descargarCSV('buques')">buques.csv</button>
+  </div>
+</details>
+</main>
 
 <footer>Medición y Rendimiento de Terminales Portuarias · UMIP · Datos simulados con semilla fija 2026</footer>
 
