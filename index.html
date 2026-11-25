@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif&display=swap">
 <title>Dashboard KPI · Un patio que se llena</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
@@ -369,6 +370,77 @@
   .dialogo-remanejos::backdrop { background: #09182bbb; }
   .dialogo-cabecera { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
   .dialogo-cabecera h2, .dialogo-cabecera form { margin: 0; }
+  :root {
+    --fondo: #f2efe9; --tarjeta: #fbf9f3; --texto: #222a27;
+    --suave: #505650; --borde: #d8d1c6; --primario: #344e46;
+  }
+  body { font-family: system-ui, sans-serif; }
+  .cabecera { background: none; border: 0; color: var(--texto); }
+  .cabecera-contenido { padding-block: clamp(20px, 3vw, 42px) 6px; }
+  .cabecera-contexto { justify-content: space-between; }
+  .cabecera-contexto p, .cabecera-descripcion { color: var(--suave); }
+  .aviso { color: #4b4437; border-color: #ab9d83; font-weight: 600; }
+  .cabecera h1 {
+    font-family: "Instrument Serif", Georgia, serif;
+    font-size: clamp(2.8rem, 6vw, 6.25rem);
+    font-weight: 400;
+    line-height: .92;
+    letter-spacing: -.025em;
+  }
+  nav.pestanas { background: transparent; border: 0; border-top: 1px solid var(--borde); border-radius: 0; margin-top: 0; padding: 8px 0; }
+  nav.pestanas button { color: var(--texto); }
+  nav.pestanas button.activa { background: #344e46; box-shadow: none; }
+  .filtros-panel { margin-bottom: 12px; }
+  .filtros-panel > summary { width: fit-content; cursor: pointer; color: var(--primario); padding: 6px 0; font-weight: 650; }
+  .filtros-panel .filtros { margin-top: 6px; }
+  #m1 { padding: 0; background: transparent; border: 0; box-shadow: none; }
+  #m1 > h2 { font-family: "Instrument Serif", Georgia, serif; font-weight: 400; }
+  #m1 > .nota { margin-bottom: 10px; }
+  .patio3d {
+    background: radial-gradient(ellipse at 50% 38%, #e7dfd2, #b6a99a);
+    border: 1px solid #b5aa9a;
+    border-radius: 18px;
+    box-shadow: 0 14px 34px #352b211c;
+  }
+  .patio3d svg { max-width: 1220px; margin-inline: auto; }
+  .boton-remanejos {
+    left: 46%;
+    bottom: 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 17px 7px 8px;
+    background: #f9f5eb;
+    border-color: #f9f5eb;
+    color: #26372f;
+    box-shadow: 0 6px 20px #30271f45;
+  }
+  .boton-remanejos span {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #344e46;
+    color: white;
+    font-size: 1.2rem;
+    line-height: 1;
+  }
+  .boton-remanejos:hover { background: #e7efdf; }
+  .patio-con-acciones:has(#m1-patio3d[hidden]) .boton-remanejos {
+    position: relative;
+    left: auto;
+    bottom: auto;
+    transform: none;
+    margin-top: 10px;
+  }
+  .dialogo-remanejos::backdrop { background: #22292370; backdrop-filter: blur(5px); }
+  .dialogo-cabecera h2 { font: 400 clamp(2rem, 4vw, 3.5rem)/1 "Instrument Serif", Georgia, serif; }
+  .dialogo-cabecera button { background: #344e46; border-color: #344e46; }
+  .kpis-patio { padding: 12px 0 0; grid-template-columns: repeat(auto-fit, minmax(min(100%, 145px), 1fr)); }
+  .kpis-patio .kpi { border-radius: 10px; }
+  .m1-controles { background: #ebe6dd; }
+  @media (max-width: 550px) { .boton-remanejos { left: 50%; } }
 </style>
 </head>
 <body>
@@ -386,6 +458,16 @@
 
 <main class="contenido">
 <!-- ===== FILTROS GLOBALES ===== -->
+<!-- ===== PESTAÑAS ===== -->
+<nav class="pestanas" id="pestanas" aria-label="Módulos del dashboard">
+  <button data-mod="m1" class="activa">Mapa del patio</button>
+  <button data-mod="m2">Dwell time</button>
+  <button data-mod="m4">Simulador</button>
+  <button data-mod="m5">Mejora (A3)</button>
+  <button data-mod="m6">Camiones y citas</button>
+</nav>
+<details class="filtros-panel">
+<summary>Filtros del dashboard</summary>
 <div class="filtros">
   <label>Día desde <input type="number" id="f-desde" min="1" max="60" value="1"></label>
   <label>Día hasta <input type="number" id="f-hasta" min="1" max="60" value="60"></label>
@@ -399,41 +481,46 @@
     <select id="f-categoria"><option value="todas">Todas</option><option value="IMP">Importación</option><option value="EXP">Exportación</option><option value="TRB">Transbordo</option><option value="VAC">Vacíos</option></select>
   </label>
 </div>
+</details>
 
-<!-- ===== PESTAÑAS ===== -->
-<nav class="pestanas" id="pestanas" aria-label="Módulos del dashboard">
-  <button data-mod="m1" class="activa">Mapa del patio</button>
-  <button data-mod="m2">Dwell time</button>
-  <button data-mod="m4">Simulador</button>
-  <button data-mod="m5">Mejora (A3)</button>
-  <button data-mod="m6">Camiones y citas</button>
-</nav>
+
 
 <!-- ===== MÓDULO 1 · MAPA DEL PATIO ===== Responsable: Leslie West -->
 <section class="modulo activo" id="m1">
   <h2>Mapa del patio</h2>
   <p class="nota">Yard Density = Inventario ÷ capacidad operativa × 100 · inventario en TEU al cierre del día · clic en un bloque para filtrar todo el dashboard</p>
 
-  <div class="m1-controles">
-    <div class="control-dia">
-      <label for="m1-dia">Día del mapa <strong id="m1-dia-txt"></strong></label>
-      <span class="dia-nav">
-        <button type="button" id="m1-dia-ant" aria-label="Día anterior" title="Día anterior (←)">◀</button>
-        <input type="range" id="m1-dia" min="1" max="60" value="60" aria-label="Día del mapa">
-        <button type="button" id="m1-dia-sig" aria-label="Día siguiente" title="Día siguiente (→)">▶</button>
-      </span>
-    </div>
-    <button type="button" id="m1-reproducir">▶ Reproducir los 60 días</button>
-    <label>Umbral amarillo (%)
-      <input type="number" id="m1-umbral-amarillo" min="0" max="100" step="1" value="70">
-    </label>
-    <label>Umbral rojo (%)
-      <input type="number" id="m1-umbral-rojo" min="0" max="100" step="1" value="85">
-    </label>
-  </div>
-
   <div class="m1-cuerpo">
     <div>
+      <div class="patio-con-acciones">
+        <div class="patio3d" id="m1-patio3d" aria-label="Vista 3D del patio por bloque"></div>
+        <div class="patio" id="m1-patio-tarjetas" hidden>
+          <div class="muelle">MUELLE · GRÚAS STS</div>
+          <div class="bloques" id="m1-bloques"></div>
+          <div class="gate">GATE · CAMIONES</div>
+        </div>
+        <button type="button" class="boton-remanejos" id="m1-remanejos" aria-haspopup="dialog" aria-controls="m3"><span aria-hidden="true">+</span> Remanejos</button>
+      </div>
+      <p class="nota" id="m1-patio3d-nota"></p>
+      <div class="kpis kpis-patio" id="m1-kpis" aria-label="Indicadores del patio"></div>
+      <div class="m1-controles">
+        <div class="control-dia">
+          <label for="m1-dia">Día del mapa <strong id="m1-dia-txt"></strong></label>
+          <span class="dia-nav">
+            <button type="button" id="m1-dia-ant" aria-label="Día anterior" title="Día anterior (←)">◀</button>
+            <input type="range" id="m1-dia" min="1" max="60" value="60" aria-label="Día del mapa">
+            <button type="button" id="m1-dia-sig" aria-label="Día siguiente" title="Día siguiente (→)">▶</button>
+          </span>
+        </div>
+        <button type="button" id="m1-reproducir">▶ Reproducir los 60 días</button>
+        <label>Umbral amarillo (%)
+          <input type="number" id="m1-umbral-amarillo" min="0" max="100" step="1" value="70">
+        </label>
+        <label>Umbral rojo (%)
+          <input type="number" id="m1-umbral-rojo" min="0" max="100" step="1" value="85">
+        </label>
+      </div>
+
       <div class="m1-vistas">
         <label>Vista del patio
           <select id="m1-modo" aria-label="Vista del patio">
@@ -448,16 +535,6 @@
           </select>
         </label>
       </div>
-      <div class="patio-con-acciones">
-        <div class="patio3d" id="m1-patio3d" aria-label="Vista 3D del patio por bloque"></div>
-        <div class="patio" id="m1-patio-tarjetas" hidden>
-          <div class="muelle">MUELLE · GRÚAS STS</div>
-          <div class="bloques" id="m1-bloques"></div>
-          <div class="gate">GATE · CAMIONES</div>
-        </div>
-        <button type="button" class="boton-remanejos" id="m1-remanejos" aria-haspopup="dialog" aria-controls="m3">Remanejos</button>
-      </div>
-      <p class="nota" id="m1-patio3d-nota"></p>
     </div>
     <details class="m1-lateral desplegable" id="m1-alertas-det">
       <summary>
@@ -1449,12 +1526,12 @@ function renderPatio3D(dia, f) {
   let suelo = '', bloques = '', etiquetas = '';
 
   // Suelo: patio, calle del gate, muelle y agua
-  suelo += `<polygon points="${pts([[-6, -7, 0], [X1 + 6, -7, 0], [X1 + 6, QY0, 0], [-6, QY0, 0]])}" fill="#0d1f3b" fill-opacity=".85" stroke="#1d3b66" stroke-width="1"/>`;
-  for (let x = 0; x <= X1; x += 6) suelo += linea3D([x, -7, 0], [x, QY0, 0], 'rgba(90,140,210,.07)', 0.8);
-  for (let y = -6; y <= QY0; y += 3) suelo += linea3D([-6, y, 0], [X1 + 6, y, 0], 'rgba(90,140,210,.07)', 0.8);
-  suelo += `<polygon points="${pts([[-6, -6.5, 0], [X1 + 6, -6.5, 0], [X1 + 6, -3.5, 0], [-6, -3.5, 0]])}" fill="#16294a" stroke="#28497a" stroke-width=".8"/>`;
-  suelo += `<polygon points="${pts([[-6, QY0, 0], [X1 + 6, QY0, 0], [X1 + 6, QY1, 0], [-6, QY1, 0]])}" fill="#1c2f4f" stroke="#3a5d8f" stroke-width="1"/>`;
-  suelo += `<polygon points="${pts([[-6, QY1, -0.3], [X1 + 6, QY1, -0.3], [X1 + 6, QY1 + 11, -0.3], [-6, QY1 + 11, -0.3]])}" fill="#06152b"/>`;
+  suelo += `<polygon points="${pts([[-6, -7, 0], [X1 + 6, -7, 0], [X1 + 6, QY0, 0], [-6, QY0, 0]])}" fill="#625c52" fill-opacity=".85" stroke="#514940" stroke-width="1"/>`;
+  for (let x = 0; x <= X1; x += 6) suelo += linea3D([x, -7, 0], [x, QY0, 0], 'rgba(245,237,219,.13)', 0.8);
+  for (let y = -6; y <= QY0; y += 3) suelo += linea3D([-6, y, 0], [X1 + 6, y, 0], 'rgba(245,237,219,.13)', 0.8);
+  suelo += `<polygon points="${pts([[-6, -6.5, 0], [X1 + 6, -6.5, 0], [X1 + 6, -3.5, 0], [-6, -3.5, 0]])}" fill="#766d60" stroke="#514940" stroke-width=".8"/>`;
+  suelo += `<polygon points="${pts([[-6, QY0, 0], [X1 + 6, QY0, 0], [X1 + 6, QY1, 0], [-6, QY1, 0]])}" fill="#82766a" stroke="#53483e" stroke-width="1"/>`;
+  suelo += `<polygon points="${pts([[-6, QY1, -0.3], [X1 + 6, QY1, -0.3], [X1 + 6, QY1 + 11, -0.3], [-6, QY1 + 11, -0.3]])}" fill="#677c7d"/>`;
 
   // Bloques (de atrás hacia adelante para que lo cercano tape a lo lejano)
   const orden = ['D', 'E', 'F', 'A', 'B', 'C'];
@@ -1549,28 +1626,14 @@ function renderPatio3D(dia, f) {
   // Rótulo del día
   const dT = yardDensity(dia), eT = estadoDensidad(dT);
   const hud = `<g pointer-events="none" transform="translate(${(minX + 18).toFixed(1)},${(minY + 30).toFixed(1)})">
-    <text font-size="22" font-weight="700" fill="#e6f0ff">Día ${dia} · ${fechaDe(dia)}</text>
-    <text y="24" font-size="15" fill="${COLOR_ESTADO_3D[eT]}">Patio ${fmt(dT)} % · ${ESTADO[eT]} · ${inventarioTEU(dia).toLocaleString('es-PA')} de ${capacidadOperativa().toLocaleString('es-PA')} TEU</text>
-    ${modoCat ? Object.keys(CATEGORIAS).map((c, n) => `<g transform="translate(${n * 120},42)"><rect width="13" height="13" rx="2" fill="${COLOR_CAT_3D[c]}"/><text x="19" y="11.5" font-size="13" fill="#cfe0ff">${CATEGORIAS[c]}</text></g>`).join('') : ''}</g>`;
-
-  // Panel con los 7 KPI del dashboard, en la esquina libre superior derecha
-  const kpis = datosKPIs(), CW = 262, CH = 62, COLS = 2, FILAS = Math.ceil(kpis.length / COLS);
-  const PW = 8 + COLS * CW + 4, px = maxX - PW - 14, py = minY + 12;
-  const colorKPI = (clase) => COLOR_ESTADO_3D[clase] || '#8a96a3';
-  const panelKPI = `<g pointer-events="none" transform="translate(${px.toFixed(1)},${py.toFixed(1)})">
-    <rect width="${PW}" height="${28 + FILAS * CH + 6}" rx="9" fill="#061022" fill-opacity=".84" stroke="#2b4f80" stroke-width="1"/>
-    <text x="12" y="19" font-size="13" font-weight="700" fill="#8fb2e6" letter-spacing="1">KPI · ${f.bloque === 'todos' ? 'PATIO' : 'BLOQUE ' + f.bloque} · DÍAS ${f.desde}–${f.hasta}</text>
-    ${kpis.map((k, n) => `<g transform="translate(${8 + (n % COLS) * CW},${28 + Math.floor(n / COLS) * CH})">
-      <rect width="${CW - 6}" height="${CH - 6}" rx="6" fill="#0b1a33" stroke="${colorKPI(k.clase)}" stroke-opacity=".5" stroke-width="1"/>
-      <rect width="4" height="${CH - 6}" rx="2" fill="${colorKPI(k.clase)}"/>
-      <text x="12" y="18" font-size="13" fill="#9fb6d6" letter-spacing=".5">${k.nombre.toUpperCase()}</text>
-      <text x="12" y="45" font-size="23" font-weight="700" fill="${colorKPI(k.clase)}">${k.valor}</text>
-      <text x="${CW - 14}" y="45" font-size="12" fill="#8aa3c4" text-anchor="end">${k.meta.split(' · ')[0]}</text></g>`).join('')}</g>`;
+    <text font-size="22" font-weight="700" fill="#292620">Día ${dia} · ${fechaDe(dia)}</text>
+    <text y="24" font-size="15" fill="#3c3329">Patio ${fmt(dT)} % · ${ESTADO[eT]} · ${inventarioTEU(dia).toLocaleString('es-PA')} de ${capacidadOperativa().toLocaleString('es-PA')} TEU</text>
+    ${modoCat ? Object.keys(CATEGORIAS).map((c, n) => `<g transform="translate(${n * 120},42)"><rect width="13" height="13" rx="2" fill="${COLOR_CAT_3D[c]}"/><text x="19" y="11.5" font-size="13" fill="#302b24">${CATEGORIAS[c]}</text></g>`).join('') : ''}</g>`;
 
   document.getElementById('m1-patio3d').innerHTML =
     `<svg viewBox="${minX.toFixed(0)} ${minY.toFixed(0)} ${(maxX - minX).toFixed(0)} ${(maxY - minY).toFixed(0)}" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Arial, sans-serif" role="img" aria-label="Patio en 3D, día ${dia}">
       <defs><filter id="p3d-brillo" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="1.6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-      ${suelo}${bloques}${muelle}<g filter="url(#p3d-brillo)">${gruas}</g>${etiquetas}${hud}${panelKPI}</svg>`;
+      ${suelo}${bloques}${muelle}<g filter="url(#p3d-brillo)">${gruas}</g>${etiquetas}${hud}</svg>`;
   document.getElementById('m1-patio3d-nota').textContent =
     `La altura de las pilas es la densidad del bloque (Yard Density) y el marco punteado, la altura máxima (${PATIO.tiers} tiers). ` +
     `Los datos son por bloque: el reparto por fila es ilustrativo. Gris: slots inoperativos. La grúa y la etiqueta llevan el estado (✔ ⚠ ⛔). Clic en un bloque para filtrar.`;
@@ -1585,6 +1648,10 @@ function renderModulo1() {
   document.getElementById('m1-patio3d-nota').hidden = modo !== '3d';
   document.getElementById('m1-color-lbl').hidden = modo !== '3d';
   document.getElementById('m1-patio-tarjetas').hidden = modo === '3d';
+  document.getElementById('m1-kpis').innerHTML = datosKPIs().map(k =>
+    `<div class="kpi ${k.clase}"><div class="nombre">${k.nombre}</div><div class="valor">${k.valor}</div><div class="meta">${k.meta}</div></div>`
+  ).join('');
+
   if (modo === '3d') renderPatio3D(dia, f);
   document.getElementById('m1-dia').value = dia;
   document.getElementById('m1-dia-txt').textContent = `día ${dia} (${fechaDe(dia)})`;
