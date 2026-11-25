@@ -259,6 +259,74 @@
     nav.pestanas button { flex-basis: calc(50% - 6px); }
     .filtros { gap: 10px; }
   }
+  .cabecera {
+    background: radial-gradient(ellipse at 85% 5%, #15636d 0%, transparent 47%), #0c2137;
+  }
+  .cabecera h1 { max-width: 22ch; font-weight: 780; }
+  .contenido { scroll-margin-top: 1rem; }
+  nav.pestanas button { transition: background-color .16s, color .16s; }
+  nav.pestanas button.activa { box-shadow: 0 3px 8px #13546a30; }
+  input[type="range"] { accent-color: #147c80; }
+  .patio3d { box-shadow: 0 7px 24px #0b203223; }
+  .escenario-intro { max-width: 78ch; margin-bottom: 16px; }
+  .acciones-escenario { display: flex; flex-wrap: wrap; gap: 8px; margin: 9px 0 14px; }
+  .acciones-escenario button, .detalle-escenario > summary {
+    font: inherit;
+    font-size: .9rem;
+    font-weight: 650;
+    color: #144d61;
+    border: 1px solid #bdd4e2;
+    background: #f2f8fc;
+    border-radius: 9px;
+    padding: 9px 12px;
+    cursor: pointer;
+  }
+  .acciones-escenario button:hover, .detalle-escenario > summary:hover { background: #e4f1f7; }
+  .acciones-escenario button[aria-pressed="true"] {
+    color: white;
+    background: #13546a;
+    border-color: #13546a;
+  }
+  .detalle-escenario {
+    margin-top: 12px;
+    border: 1px solid var(--borde);
+    border-radius: 12px;
+    padding: 4px;
+    min-width: 0;
+  }
+  .detalle-escenario > summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    list-style: none;
+    border: 0;
+  }
+  .detalle-escenario > summary::-webkit-details-marker { display: none; }
+  .detalle-escenario > summary::after { content: "+" / ""; font-size: 1.25rem; }
+  .detalle-escenario[open] > summary::after { content: "−" / ""; }
+  .detalle-contenido { padding: 12px; overflow-x: auto; }
+  .detalle-contenido > :first-child { margin-top: 0; }
+  #m5 .m5-preguntas { grid-template-columns: repeat(auto-fit, minmax(min(100%, 235px), 1fr)); }
+  #m5 .m5-preguntas > div {
+    border-left: 1px solid var(--borde);
+    border-top: 3px solid #168786;
+    border-radius: 12px;
+    background: #f2f8fb;
+    padding: 14px;
+    line-height: 1.5;
+  }
+  #m5 .pregunta { text-transform: none; font-size: .875rem; font-weight: 650; }
+  .panel-grafico, #m6 .m4-controles {
+    min-width: 0;
+    padding: clamp(12px, 2vw, 20px);
+    border: 1px solid var(--borde);
+    border-radius: 12px;
+    background: #f8fbfd;
+  }
+  #m6 .m4-salidas { grid-template-columns: repeat(auto-fit, minmax(min(100%, 165px), 1fr)); }
+  #m6 .m4-salidas .lbl { font-size: .875rem; }
+  #m6 .panel-grafico h3 { margin: 0 0 10px; }
 </style>
 </head>
 <body>
@@ -527,10 +595,15 @@
 <!-- ===== MÓDULO 5 · MEJORA (A3) ===== Responsable: Osmar Chiari -->
 <section class="modulo" id="m5">
   <h2>Mejora (A3)</h2>
-  <p class="nota">Compara la situación actual con la propuesta. Usa el régimen de los últimos 28 días hasta el día de corte y la misma proyección del simulador.
-     Por eso la categoría crítica y los TEU de más pueden diferir un poco de los de Dwell time, que usa el rango de días filtrado.</p>
+  <p class="nota escenario-intro">Elige una medida para ver su efecto proyectado en la ocupación del patio y los remanejos.</p>
+  <div class="acciones-escenario" id="m5-acciones" role="group" aria-label="Propuestas de mejora">
+    <button type="button" data-valor="vacios" aria-pressed="false">Evacuar vacíos</button>
+    <button type="button" data-valor="tiempoLibre" aria-pressed="false">Reducir tiempo libre</button>
+    <button type="button" data-valor="combinada" aria-pressed="true">Combinar medidas</button>
+    <button type="button" data-valor="simulador" aria-pressed="false">Usar mi simulación</button>
+  </div>
 
-  <div class="m5-selector">
+  <div class="m5-selector" hidden>
     <label>Propuesta a evaluar
       <select id="m5-propuesta">
         <option value="vacios">Evacuar vacíos hasta su meta de dwell (7 días)</option>
@@ -543,25 +616,39 @@
 
   <div class="m5-preguntas" id="m5-preguntas"></div>
 
-  <div class="a3" id="m5-a3"></div>
-
-  <h3 style="margin-top:18px">Situación actual vs propuesta</h3>
-  <div id="m5-comparacion"></div>
-  <p class="nota">Remanejos esperados: se toma lo medido en los últimos 28 días y se le suma el cambio que predice la relación densidad–remanejos del Módulo 3
-    al pasar de la densidad actual a la nueva. Es una aproximación a nivel de patio (la relación se midió por bloque).</p>
+  <details class="detalle-escenario" open>
+    <summary>Comparar situación actual y propuesta</summary>
+    <div class="detalle-contenido" id="m5-comparacion"></div>
+  </details>
+  <details class="detalle-escenario">
+    <summary>Ver análisis A3 completo</summary>
+    <div class="detalle-contenido"><div class="a3" id="m5-a3"></div></div>
+  </details>
+  <details class="detalle-escenario">
+    <summary>Cómo se calculan las proyecciones</summary>
+    <div class="detalle-contenido">
+      <p class="nota">La proyección usa los 28 días hasta el día de corte. El módulo Dwell time usa el rango de días filtrado, por lo que la categoría crítica y los TEU de más pueden diferir.</p>
+      <p class="nota">Los remanejos esperados se estiman ajustando el valor medido en esos 28 días según la relación entre densidad y remanejos por bloque. El resultado es una aproximación para todo el patio.</p>
+    </div>
+  </details>
 </section>
 
 <!-- ===== MÓDULO 6 · CAMIONES Y CITAS (EXTRA) ===== Responsable: Adriana Garibaldi -->
 <section class="modulo" id="m6">
-  <h2>Camiones y citas (módulo extra)</h2>
-  <p class="nota">Tiempo de servicio en patio = tiempo del camión desde que entra al bloque hasta que sale (KPI 6) · usa los filtros de días, bloque y categoría.
-     El filtro de turno no aplica: las citas mueven camiones de una hora a otra del día.</p>
+  <h2>Camiones y citas</h2>
+  <p class="nota escenario-intro">Prueba distintos niveles de adopción de citas y compara las llegadas y los tiempos de servicio por hora.</p>
+  <div class="acciones-escenario" id="m6-acciones" role="group" aria-label="Porcentaje de camiones con cita">
+    <button type="button" data-valor="0" aria-pressed="false">Sin citas</button>
+    <button type="button" data-valor="25" aria-pressed="false">25 % con cita</button>
+    <button type="button" data-valor="50" aria-pressed="true">50 % con cita</button>
+    <button type="button" data-valor="75" aria-pressed="false">75 % con cita</button>
+  </div>
 
   <div class="m4-cuerpo">
     <div class="m4-controles">
-      <h3>Sistema de citas</h3>
+      <h3>Ajustar escenario</h3>
       <div class="control-slider">
-        <div class="fila"><span>% de camiones con cita</span><strong id="m6-pct-txt"></strong></div>
+        <div class="fila"><label for="m6-pct">% de camiones con cita</label><strong id="m6-pct-txt"></strong></div>
         <input type="range" id="m6-pct" min="0" max="100" step="5" value="50">
         <div class="ref">Hoy: 0 % (todos llegan sin cita).</div>
       </div>
@@ -580,34 +667,36 @@
         <div class="ref">Las citas se dan primero en las horas con menos camiones de la ventana, hasta nivelarlas.</div>
       </div>
       <div class="control-slider">
-        <div class="fila"><span>Remanejos evitados en retiros con cita</span><strong id="m6-pre-txt"></strong></div>
+        <div class="fila"><label for="m6-pre">Remanejos evitados en retiros con cita</label><strong id="m6-pre-txt"></strong></div>
         <input type="range" id="m6-pre" min="0" max="60" step="5" value="20">
         <div class="ref">Supuesto: con la cita conocida, el contenedor se pre-ubica de noche arriba de la pila.</div>
       </div>
       <button type="button" id="m6-restablecer">↺ Valores iniciales</button>
     </div>
 
-    <div>
+    <div class="panel-grafico">
       <div class="m4-salidas" id="m6-salidas"></div>
       <h3 style="margin:0 0 8px; font-size:1rem" id="m6-titulo-llegadas">Camiones por hora (promedio por día)</h3>
       <div class="lienzo"><canvas id="m6-graf-llegadas" aria-label="Camiones por hora, actual y con citas"></canvas></div>
     </div>
   </div>
 
-  <div class="m3-dos" style="margin-top:18px">
-    <div>
-      <h3 id="m6-titulo-servicio">Tiempo de servicio por hora: actual y con citas</h3>
-      <div class="lienzo"><canvas id="m6-graf-servicio" aria-label="Tiempo de servicio por hora, actual y con citas"></canvas></div>
-    </div>
-    <div>
-      <h3>Cómo se estima</h3>
-      <div id="m6-modelo"></div>
-    </div>
+  <div class="panel-grafico" style="margin-top: 16px">
+    <h3 id="m6-titulo-servicio">Tiempo de servicio por hora</h3>
+    <div class="lienzo"><canvas id="m6-graf-servicio" aria-label="Tiempo de servicio por hora, actual y con citas"></canvas></div>
   </div>
-
-  <details class="tabla-datos" style="margin-top:10px"><summary>Ver el detalle por hora en tabla</summary><div class="scroll" id="m6-tabla"></div></details>
-  <p class="nota">Las citas no cambian cuántos camiones llegan en el día, solo a qué hora. Lo que baja es la cola en las horas pico
-    y, si el contenedor se pre-ubica, los remanejos del retiro. La estimación usa una regresión sobre las visitas simuladas; no es un KPI medido, es un escenario.</p>
+  <details class="detalle-escenario">
+    <summary>Ver el detalle por hora en tabla</summary>
+    <div class="detalle-contenido" id="m6-tabla"></div>
+  </details>
+  <details class="detalle-escenario">
+    <summary>Cómo se estima el efecto de las citas</summary>
+    <div class="detalle-contenido">
+      <p class="nota">El KPI 6 mide el tiempo entre la entrada del camión al bloque y su salida. Se aplican los filtros de días, bloque y categoría. La comparación abarca todo el día porque las citas redistribuyen las llegadas entre horas.</p>
+      <div id="m6-modelo"></div>
+      <p class="nota">La proyección usa una regresión sobre las visitas simuladas. El total diario de camiones permanece constante. Cambian la distribución de las llegadas y los remanejos estimados para retiros con preubicación.</p>
+    </div>
+  </details>
 </section>
 
 <!-- ===== DATOS SIMULADOS: resumen y descarga ===== -->
@@ -2377,6 +2466,29 @@ document.getElementById('m6-restablecer').addEventListener('click', () => {
 /* =====================================================================
    7. NAVEGACIÓN Y ARRANQUE
    ===================================================================== */
+function activarOpcionesEscenario(grupoId, campoId, evento) {
+  const grupo = document.getElementById(grupoId);
+  const campo = document.getElementById(campoId);
+  const botones = grupo.querySelectorAll('button[data-valor]');
+  const sincronizar = () => {
+    botones.forEach(boton => boton.setAttribute('aria-pressed', String(boton.dataset.valor === campo.value)));
+  };
+
+  grupo.addEventListener('click', e => {
+    const boton = e.target.closest('button[data-valor]');
+    if (!boton) return;
+    campo.value = boton.dataset.valor;
+    campo.dispatchEvent(new Event(evento, { bubbles: true }));
+  });
+  campo.addEventListener(evento, sincronizar);
+  sincronizar();
+  return sincronizar;
+}
+
+activarOpcionesEscenario('m5-acciones', 'm5-propuesta', 'change');
+const sincronizarCitas = activarOpcionesEscenario('m6-acciones', 'm6-pct', 'input');
+document.getElementById('m6-restablecer').addEventListener('click', sincronizarCitas);
+
 document.getElementById('pestanas').addEventListener('click', (e) => {
   const boton = e.target.closest('button');
   if (!boton) return;
