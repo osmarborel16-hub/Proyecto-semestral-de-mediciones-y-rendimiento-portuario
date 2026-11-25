@@ -84,7 +84,7 @@
   .m1-vistas { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 8px; }
   .m1-vistas label { font-size: .8rem; color: var(--suave); display: flex; flex-direction: column; gap: 4px; }
   .m1-vistas select { padding: 5px 8px; border: 1px solid var(--borde); border-radius: 6px; font-size: .85rem; }
-  .patio3d { border-radius: 10px; overflow: hidden; background: radial-gradient(ellipse at 40% 30%, #3A3D52 0%, #24263A 55%, #16172A 100%); border: 2px solid rgba(255, 255, 255, .85); box-shadow: 0 6px 18px rgba(0, 0, 0, .25); }
+  .patio3d { border-radius: 10px; overflow: hidden; background: radial-gradient(ellipse at 40% 25%, #F4F9FF 0%, #CFE5FF 50%, #9CCBFA 100%); border: 2px solid rgba(255, 255, 255, .85); box-shadow: 0 6px 18px rgba(0, 0, 0, .25); }
   .patio3d svg { display: block; width: 100%; height: auto; }
   /* en pantallas angostas (celular) el patio no se encoge más de 900 px: se desplaza de lado para que el texto siga legible */
   @media (max-width: 900px) { .patio3d { overflow-x: auto; } .patio3d svg { min-width: 900px; } }
@@ -1239,12 +1239,12 @@ function renderPatio3D(dia, f) {
   let suelo = '', bloques = '', etiquetas = '';
 
   // Suelo: patio, calle del gate, muelle y agua
-  suelo += `<polygon points="${pts([[-6, -7, 0], [X1 + 6, -7, 0], [X1 + 6, QY0, 0], [-6, QY0, 0]])}" fill="#2E3045" fill-opacity=".95" stroke="#5A5E7E" stroke-width="1"/>`;
-  for (let x = 0; x <= X1; x += 6) suelo += linea3D([x, -7, 0], [x, QY0, 0], 'rgba(255,255,255,.06)', 0.8);
-  for (let y = -6; y <= QY0; y += 3) suelo += linea3D([-6, y, 0], [X1 + 6, y, 0], 'rgba(255,255,255,.06)', 0.8);
-  suelo += `<polygon points="${pts([[-6, -6.5, 0], [X1 + 6, -6.5, 0], [X1 + 6, -3.5, 0], [-6, -3.5, 0]])}" fill="#3A3C52" stroke="#62668A" stroke-width=".8"/>`;
-  suelo += `<polygon points="${pts([[-6, QY0, 0], [X1 + 6, QY0, 0], [X1 + 6, QY1, 0], [-6, QY1, 0]])}" fill="#45485F" stroke="#7A7FA3" stroke-width="1"/>`;
-  suelo += `<polygon points="${pts([[-6, QY1, -0.3], [X1 + 6, QY1, -0.3], [X1 + 6, QY1 + 11, -0.3], [-6, QY1 + 11, -0.3]])}" fill="#0B0F5C"/>`;
+  suelo += `<polygon points="${pts([[-6, -7, 0], [X1 + 6, -7, 0], [X1 + 6, QY0, 0], [-6, QY0, 0]])}" fill="#3B4272" fill-opacity=".97" stroke="#161B8E" stroke-width="1"/>`;
+  for (let x = 0; x <= X1; x += 6) suelo += linea3D([x, -7, 0], [x, QY0, 0], 'rgba(255,255,255,.08)', 0.8);
+  for (let y = -6; y <= QY0; y += 3) suelo += linea3D([-6, y, 0], [X1 + 6, y, 0], 'rgba(255,255,255,.08)', 0.8);
+  suelo += `<polygon points="${pts([[-6, -6.5, 0], [X1 + 6, -6.5, 0], [X1 + 6, -3.5, 0], [-6, -3.5, 0]])}" fill="#4C548A" stroke="#161B8E" stroke-width=".8"/>`;
+  suelo += `<polygon points="${pts([[-6, QY0, 0], [X1 + 6, QY0, 0], [X1 + 6, QY1, 0], [-6, QY1, 0]])}" fill="#5D669E" stroke="#161B8E" stroke-width="1"/>`;
+  suelo += `<polygon points="${pts([[-6, QY1, -0.3], [X1 + 6, QY1, -0.3], [X1 + 6, QY1 + 11, -0.3], [-6, QY1 + 11, -0.3]])}" fill="#2F8DF0"/>`;
 
   // Bloques (de atrás hacia adelante para que lo cercano tape a lo lejano)
   const orden = ['D', 'E', 'F', 'A', 'B', 'C'];
@@ -1327,9 +1327,9 @@ function renderPatio3D(dia, f) {
   const camiones = DATOS.visitasCamion.filter(v => v.dia === dia).length;
   const [gx, gy] = iso(X1 * 0.55, -5, 0);
   etiquetas += `<g pointer-events="none" transform="translate(${gx.toFixed(1)},${gy.toFixed(1)})">
-    <text x="0" y="0" font-size="13" fill="#8fb2e6" letter-spacing="1">GATE · ${camiones.toLocaleString('es-PA')} camiones en el día</text></g>`;
+    <text x="0" y="0" font-size="13" font-weight="700" fill="#161B8E" stroke="#ffffff" stroke-width="3" paint-order="stroke" letter-spacing="1">GATE · ${camiones.toLocaleString('es-PA')} camiones en el día</text></g>`;
   const [mx, my] = iso(X1 + 5, QY0 + 1.6, 0);
-  etiquetas += `<text x="${mx.toFixed(1)}" y="${(my + 18).toFixed(1)}" font-size="13" fill="#8fb2e6" letter-spacing="1" text-anchor="end" pointer-events="none">MUELLE · GRÚAS STS${hayBuque ? '' : ' · sin buque este día'}</text>`;
+  etiquetas += `<text x="${mx.toFixed(1)}" y="${(my + 18).toFixed(1)}" font-size="13" font-weight="700" fill="#161B8E" stroke="#ffffff" stroke-width="3" paint-order="stroke" letter-spacing="1" text-anchor="end" pointer-events="none">MUELLE · GRÚAS STS${hayBuque ? '' : ' · sin buque este día'}</text>`;
 
   // Encuadre: proyecta las esquinas del patio y del muelle (el agua se recorta)
   const esq = []; for (const x of [-7, X1 + 7]) for (const y of [-8, QY1 + 9]) for (const z of [-0.5, 9]) esq.push(iso(x, y, z));
@@ -1339,6 +1339,7 @@ function renderPatio3D(dia, f) {
   // Rótulo del día
   const dT = yardDensity(dia), eT = estadoDensidad(dT);
   const hud = `<g pointer-events="none" transform="translate(${(minX + 18).toFixed(1)},${(minY + 30).toFixed(1)})">
+    <rect x="-12" y="-24" width="${modoCat ? 500 : 470}" height="${modoCat ? 74 : 56}" rx="8" fill="#1A1B2B" fill-opacity=".9"/>
     <text font-size="22" font-weight="700" fill="#e6f0ff">Día ${dia} · ${fechaDe(dia)}</text>
     <text y="24" font-size="15" fill="${COLOR_ESTADO_3D[eT]}">Patio ${fmt(dT)} % · ${ESTADO[eT]} · ${inventarioTEU(dia).toLocaleString('es-PA')} de ${capacidadOperativa().toLocaleString('es-PA')} TEU</text>
     ${modoCat ? Object.keys(CATEGORIAS).map((c, n) => `<g transform="translate(${n * 120},42)"><rect width="13" height="13" rx="2" fill="${COLOR_CAT_3D[c]}"/><text x="19" y="11.5" font-size="13" fill="#cfe0ff">${CATEGORIAS[c]}</text></g>`).join('') : ''}</g>`;
