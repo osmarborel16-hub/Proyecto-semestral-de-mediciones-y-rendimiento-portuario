@@ -566,7 +566,7 @@
     #m4 .m4-salidas > .m4-kpi-hero { grid-column: auto; }
   }
   #m4 .m4-salidas .lbl, #m4 .control-slider .ref { font-size: .875rem; line-height: 1.45; }
-  #m4 .m4-cuerpo { gap: 12px; }
+  #m4 .m4-cuerpo { grid-template-columns: minmax(0, 1fr); gap: 12px; }
   #m4 .m4-controles, #m4 .m4-panel {
     min-width: 0;
     border: 1px solid var(--borde);
@@ -592,7 +592,16 @@
   }
   #m4 .m4-panel-grafica summary, #m4 .m4-panel-grafica .pendiente { color: #c1dbf4; }
   #m4 .m4-panel-grafica th, #m4 .m4-panel-grafica td { border-color: #42617d; }
-  #m4-sliders-dwell { display: grid; gap: 10px; margin-block: 12px; }
+  #m4-sliders-dwell, #m4 .m4-buques-controles { display: grid; gap: 10px; }
+  #m4-sliders-dwell { grid-template-columns: repeat(4, minmax(0, 1fr)); margin-block: 12px; }
+  #m4 .m4-buques-controles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  #m4 .m4-panel-grafica .lienzo { height: clamp(300px, 36vw, 480px); }
+  @media (max-width: 850px) {
+    #m4-sliders-dwell { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 480px) {
+    #m4-sliders-dwell, #m4 .m4-buques-controles { grid-template-columns: minmax(0, 1fr); }
+  }
   #m4 .m4-categoria {
     margin: 0;
     padding: 10px;
@@ -876,22 +885,24 @@
       <p class="nota">Dwell time por categoría (días). La marca "actual" es lo medido en los últimos 28 días.</p>
       <div id="m4-sliders-dwell"></div>
       <h3 style="margin-top:14px">Llegada de buques</h3>
-      <div class="control-slider">
-        <div class="fila"><label for="m4-buques">Buques extra por semana</label><strong id="m4-buques-txt"></strong></div>
-        <input type="range" id="m4-buques" min="-2" max="3" step="0.5" value="0">
-        <div class="ref">Hoy llegan 3.5 buques por semana. Valores negativos = menos buques.</div>
-      </div>
-      <div class="control-slider">
-        <div class="fila"><label for="m4-teu">TEU por buque extra (descarga + carga)</label><strong id="m4-teu-txt"></strong></div>
-        <input type="range" id="m4-teu" min="300" max="1500" step="10" value="900">
-        <div class="ref" id="m4-teu-ref"></div>
+      <div class="m4-buques-controles">
+        <div class="control-slider">
+          <div class="fila"><label for="m4-buques">Buques extra por semana</label><strong id="m4-buques-txt"></strong></div>
+          <input type="range" id="m4-buques" min="-2" max="3" step="0.5" value="0">
+          <div class="ref">Hoy llegan 3.5 buques por semana. Valores negativos = menos buques.</div>
+        </div>
+        <div class="control-slider">
+          <div class="fila"><label for="m4-teu">TEU por buque extra (descarga + carga)</label><strong id="m4-teu-txt"></strong></div>
+          <input type="range" id="m4-teu" min="300" max="1500" step="10" value="900">
+          <div class="ref" id="m4-teu-ref"></div>
+        </div>
       </div>
       <button type="button" id="m4-restablecer">↺ Restablecer a la situación actual</button>
     </div>
 
     <div class="m4-panel m4-panel-grafica">
       <h3 id="m4-titulo-graf">Densidad del patio: real y proyectada</h3>
-      <div class="lienzo" style="height:320px"><canvas id="m4-grafico" aria-label="Proyección de densidad a 14 días"></canvas></div>
+      <div class="lienzo"><canvas id="m4-grafico" aria-label="Proyección de densidad a 14 días"></canvas></div>
       <details class="tabla-datos"><summary>Ver la proyección en tabla</summary><div class="scroll" id="m4-tabla-proy"></div></details>
     </div>
   </div>
