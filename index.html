@@ -104,7 +104,7 @@
   .m1-controles input[type=number] { width: 80px; padding: 5px 8px; border: 1px solid var(--borde); border-radius: 6px; }
   .m1-controles input[type=range] { width: min(260px, 44vw); }
   .m1-controles button, .m1-grafico-cab select { border: 1px solid var(--primario); background: #fff; color: var(--primario); border-radius: 6px; padding: 6px 12px; cursor: pointer; }
-  .m1-cuerpo { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; }   /* el patio usa todo el ancho; las alertas van debajo */
+  .m1-cuerpo { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; }
   .patio { border: 1px solid var(--borde); border-radius: 8px; overflow: hidden; background: #f7f8f9; }
   .muelle, .gate { text-align: center; font-size: .75rem; letter-spacing: 1px; color: #fff; padding: 5px; }
   .muelle { background: #34495e; }
@@ -498,6 +498,16 @@
   <h2>Mapa del patio</h2>
   <p class="nota">El mapa muestra la ocupación del patio al cierre del día. Selecciona un bloque para filtrar el dashboard.</p>
 
+  <details class="m1-lateral desplegable" id="m1-alertas-det">
+    <summary>
+      <span class="flecha" aria-hidden="true">▸</span>
+      <span><strong id="m1-alertas-titulo">Alertas del día</strong> <span id="m1-alertas-resumen" class="resumen"></span></span>
+      <span class="accion" id="m1-alertas-accion">Haz clic para ver más</span>
+    </summary>
+    <ul class="alertas" id="m1-alertas"></ul>
+    <p class="nota" id="m1-leyenda"></p>
+  </details>
+
   <div class="m1-cuerpo">
     <div>
       <div class="m1-controles">
@@ -544,15 +554,6 @@
         </label>
       </div>
     </div>
-    <details class="m1-lateral desplegable" id="m1-alertas-det">
-      <summary>
-        <span class="flecha" aria-hidden="true">▸</span>
-        <span><strong id="m1-alertas-titulo">Alertas del día</strong> <span id="m1-alertas-resumen" class="resumen"></span></span>
-        <span class="accion" id="m1-alertas-accion">Haz clic para ver más</span>
-      </summary>
-      <ul class="alertas" id="m1-alertas"></ul>
-      <p class="nota" id="m1-leyenda"></p>
-    </details>
   </div>
 
   <div class="m1-grafico">
