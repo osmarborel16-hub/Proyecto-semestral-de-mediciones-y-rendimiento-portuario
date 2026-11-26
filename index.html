@@ -380,6 +380,20 @@
   }
   .dialogo-remanejos[open] { display: flex; flex-direction: column; gap: 8px; }
   .dialogo-cerrar { align-self: flex-end; margin: 0; }
+  .dialogo-cerrar button {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    background: #09182b80;
+    font: 800 40px/1 system-ui, sans-serif;
+    text-shadow: 0 1px 5px #000;
+  }
+  @media (min-width: 1080px) {
+    .dialogo-cerrar { transform: translate(100%, 14px); }
+  }
   .dialogo-panel {
     min-height: 0;
     overflow: auto;
@@ -932,7 +946,7 @@
 
 <!-- ===== MÓDULO 3 · REMANEJOS ===== Responsable: Adriana Garibaldi -->
 <dialog id="m3" class="dialogo-remanejos" aria-labelledby="m3-titulo">
-  <form class="dialogo-cerrar" method="dialog"><button type="submit" autofocus>Cerrar</button></form>
+  <form class="dialogo-cerrar" method="dialog"><button type="submit" aria-label="Cerrar Remanejos" autofocus><span aria-hidden="true">×</span></button></form>
   <div class="dialogo-panel">
     <div class="dialogo-cabecera">
       <h2 id="m3-titulo">Remanejos</h2>
