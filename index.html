@@ -663,6 +663,41 @@
     #m4 .m4-buques-controles input[type="range"] { appearance: auto; background: none; }
     #m4 .m4-buques-controles input::-webkit-slider-thumb { appearance: auto; }
   }
+  #m4 .m4-controles {
+    display: grid;
+    gap: 12px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+  }
+  #m4 .m4-ajustes {
+    --acento: #65bdff;
+    min-width: 0;
+    padding: clamp(12px, 2vw, 20px);
+    border: 1px solid #54728c;
+    border-left: 4px solid var(--acento);
+    border-radius: 14px;
+    background: #294b68;
+    color: #f4f9ff;
+    box-shadow: 0 5px 16px #09192c38;
+  }
+  #m4 .m4-ajustes-buques { --acento: #6ddbc7; }
+  #m4 .m4-ajustes :is(.nota, .ref) { color: #dceaf6; }
+  #m4 .m4-ajustes .control-slider { border-bottom-color: #68839a; }
+  #m4 .m4-ajustes .m4-categoria {
+    background: #345771;
+    border-color: #68839a;
+    border-top-color: var(--color-categoria);
+  }
+  #m4 .m4-ajustes :focus-visible { outline-color: #a6d7ff; }
+  #m4 .m4-ajustes #m4-restablecer { border-color: #82a7bf; }
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    #m4 .m4-ajustes { transition: transform 180ms ease, box-shadow 180ms ease; }
+    #m4 .m4-ajustes:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 22px #09192c55;
+    }
+  }
 </style>
 </head>
 <body>
@@ -919,23 +954,27 @@
 
   <div class="m4-cuerpo">
     <div class="m4-controles">
-      <h3>Supuestos del escenario</h3>
-      <p class="nota">Dwell time por categoría (días). La marca "actual" es lo medido en los últimos 28 días.</p>
-      <div id="m4-sliders-dwell"></div>
-      <h3 style="margin-top:14px">Llegada de buques</h3>
-      <div class="m4-buques-controles">
-        <div class="control-slider">
-          <div class="fila"><label for="m4-buques">Buques extra por semana</label><strong id="m4-buques-txt"></strong></div>
-          <input type="range" id="m4-buques" min="-2" max="3" step="0.5" value="0">
-          <div class="ref">Hoy llegan 3.5 buques por semana. Valores negativos = menos buques.</div>
-        </div>
-        <div class="control-slider">
-          <div class="fila"><label for="m4-teu">TEU por buque extra (descarga + carga)</label><strong id="m4-teu-txt"></strong></div>
-          <input type="range" id="m4-teu" min="300" max="1500" step="10" value="900">
-          <div class="ref" id="m4-teu-ref"></div>
-        </div>
+      <div class="m4-ajustes m4-ajustes-dwell">
+        <h3>Supuestos del escenario</h3>
+        <p class="nota">Dwell time por categoría (días). La marca "actual" es lo medido en los últimos 28 días.</p>
+        <div id="m4-sliders-dwell"></div>
       </div>
-      <button type="button" id="m4-restablecer">↺ Restablecer a la situación actual</button>
+      <div class="m4-ajustes m4-ajustes-buques">
+        <h3>Llegada de buques</h3>
+        <div class="m4-buques-controles">
+          <div class="control-slider">
+            <div class="fila"><label for="m4-buques">Buques extra por semana</label><strong id="m4-buques-txt"></strong></div>
+            <input type="range" id="m4-buques" min="-2" max="3" step="0.5" value="0">
+            <div class="ref">Hoy llegan 3.5 buques por semana. Valores negativos = menos buques.</div>
+          </div>
+          <div class="control-slider">
+            <div class="fila"><label for="m4-teu">TEU por buque extra (descarga + carga)</label><strong id="m4-teu-txt"></strong></div>
+            <input type="range" id="m4-teu" min="300" max="1500" step="10" value="900">
+            <div class="ref" id="m4-teu-ref"></div>
+          </div>
+        </div>
+        <button type="button" id="m4-restablecer">↺ Restablecer a la situación actual</button>
+      </div>
     </div>
 
     <div class="m4-panel m4-panel-grafica">
