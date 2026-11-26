@@ -670,14 +670,14 @@
     border: 0;
     background: transparent;
   }
-  #m4 .m4-ajustes {
+  #m4 :is(.m4-ajustes, .m4-panel.m4-resultados) {
     --acento: #65bdff;
     min-width: 0;
     padding: clamp(12px, 2vw, 20px);
     border: 1px solid #54728c;
     border-left: 4px solid var(--acento);
     border-radius: 14px;
-    background: #294b68;
+    background: #365e80;
     color: #f4f9ff;
     box-shadow: 0 5px 16px #09192c38;
   }
@@ -685,19 +685,28 @@
   #m4 .m4-ajustes :is(.nota, .ref) { color: #dceaf6; }
   #m4 .m4-ajustes .control-slider { border-bottom-color: #68839a; }
   #m4 .m4-ajustes .m4-categoria {
-    background: #345771;
+    background: #41698a;
     border-color: #68839a;
     border-top-color: var(--color-categoria);
   }
   #m4 .m4-ajustes :focus-visible { outline-color: #a6d7ff; }
   #m4 .m4-ajustes #m4-restablecer { border-color: #82a7bf; }
   @media (hover: hover) and (prefers-reduced-motion: no-preference) {
-    #m4 .m4-ajustes { transition: transform 180ms ease, box-shadow 180ms ease; }
-    #m4 .m4-ajustes:hover {
+    #m4 :is(.m4-ajustes, .m4-panel.m4-resultados) { transition: transform 300ms ease, box-shadow 300ms ease; }
+    #m4 :is(.m4-ajustes, .m4-panel.m4-resultados):hover {
       transform: translateY(-3px);
       box-shadow: 0 10px 22px #09192c55;
     }
   }
+  #m4 .m4-panel.m4-resultados {
+    --acento: #9dcaff;
+    background: #365e80;
+    color: #f4f9ff;
+    border-left: 4px solid var(--acento);
+  }
+  #m4 .m4-resultados .nota { color: #e3eff8; }
+  #m4 .m4-resultados table { color: var(--texto); background: #f5faff; }
+  #m4 .m4-resultados th { background: #e1eef9; }
 </style>
 </head>
 <body>
