@@ -707,13 +707,11 @@
   #m4 .m4-resultados .nota { color: #e3eff8; }
   #m4 .m4-resultados table { color: var(--texto); background: #f5faff; }
   #m4 .m4-resultados th { background: #e1eef9; }
-  #m6 .m4-cuerpo { grid-template-columns: minmax(0, 1fr); }
   #m6 .m4-controles {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 4px 20px;
   }
-  #m6 .m4-controles h3 { grid-column: 1 / -1; }
   #m6 .m4-controles button { justify-self: start; }
   .m6-escena {
     margin-top: 16px;
@@ -1094,9 +1092,9 @@
     <button type="button" data-valor="75" aria-pressed="false">75 % con cita</button>
   </div>
 
-  <div class="m4-cuerpo">
+  <details class="detalle-escenario">
+    <summary>Ajustar escenario</summary>
     <div class="m4-controles">
-      <h3>Ajustar escenario</h3>
       <div class="control-slider">
         <div class="fila"><label for="m6-pct">% de camiones con cita</label><strong id="m6-pct-txt"></strong></div>
         <input type="range" id="m6-pct" min="0" max="100" step="5" value="50">
@@ -1124,7 +1122,7 @@
       <button type="button" id="m6-restablecer">↺ Valores iniciales</button>
     </div>
 
-  </div>
+  </details>
 
   <div class="m6-escena" id="m6-escena">
     <div class="m4-salidas" id="m6-salidas"></div>
