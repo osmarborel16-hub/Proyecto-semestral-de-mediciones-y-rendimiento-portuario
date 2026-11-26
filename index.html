@@ -805,6 +805,72 @@
     nav.pestanas { width: 100%; }
     nav.pestanas button { flex: 1 1 calc(50% - 8px); }
   }
+  body:has(#m1.activo) {
+    background: radial-gradient(ellipse at 55% 6%, #163f56, #0b2235 55%, #071523 100%);
+    background-attachment: fixed;
+  }
+  .contenido:has(#m1.activo) { max-width: none; }
+  #m1 { padding: 0; border: 0; background: transparent; box-shadow: none; color: #ecf7ff; }
+  #m1 > .nota, #m1-patio3d-nota, #m1 .m1-vistas label { color: #c2deed; }
+  #m1 .m1-vistas { margin-top: 14px; }
+  #m1 .m1-lateral, #m1 .m1-controles, #m1 .patio { color: var(--texto); }
+  #m1 .m1-grafico {
+    padding: clamp(12px, 2vw, 22px);
+    border-radius: 14px;
+    background: var(--tarjeta);
+    color: var(--texto);
+  }
+  #m1 .m1-grafico-cab { flex-wrap: wrap; }
+  #m1 .patio-con-acciones { margin-inline: calc(-1 * clamp(12px, 4vw, 50px)); }
+  #m1 .patio3d { border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+  #m1 .kpis-patio { color: var(--texto); }
+  .patio-avisos {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 12px;
+  }
+  .patio-aviso { --nivel: #ff9a9f; position: relative; color: #f4faff; }
+  .patio-aviso-amarillo { --nivel: #ffda83; }
+  .patio-aviso summary {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 12px;
+    border: 1px solid var(--nivel);
+    border-radius: 999px;
+    background: #12283cc4;
+    backdrop-filter: blur(9px);
+    cursor: pointer;
+    font-weight: 650;
+  }
+  .patio-aviso summary span { color: var(--nivel); }
+  .patio-aviso-panel {
+    position: absolute;
+    inset-block-start: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(19rem, calc(100vw - 32px));
+    max-height: 55dvh;
+    overflow: auto;
+    padding: 14px;
+    border: 1px solid var(--nivel);
+    border-radius: 12px;
+    background: #0a1c30e6;
+    backdrop-filter: blur(14px);
+    box-shadow: 0 12px 30px #0005;
+  }
+  .patio-aviso-panel ul { list-style: none; padding: 0; margin: 8px 0 0; }
+  .patio-aviso-panel li { padding: 8px 0; border-top: 1px solid #ffffff30; }
+  .patio-aviso-panel small { display: block; color: #c2deed; }
+  .patio-aviso-panel p { margin: 8px 0 0; }
+  @media (max-width: 700px) {
+    .patio-aviso { position: static; }
+    .patio-aviso-panel { inset-block-start: 100%; }
+  }
 </style>
 </head>
 <body>
@@ -892,6 +958,16 @@
       </div>
 
       <div class="patio-con-acciones">
+        <div class="patio-avisos" aria-label="Alertas por nivel">
+          <details class="patio-aviso patio-aviso-rojo" name="alertas-patio">
+            <summary><span aria-hidden="true">⚠</span> Alerta roja <span id="m1-roja-cuenta"></span></summary>
+            <div class="patio-aviso-panel" id="m1-roja-panel"></div>
+          </details>
+          <details class="patio-aviso patio-aviso-amarillo" name="alertas-patio">
+            <summary><span aria-hidden="true">⚠</span> Alerta amarilla <span id="m1-amarilla-cuenta"></span></summary>
+            <div class="patio-aviso-panel" id="m1-amarilla-panel"></div>
+          </details>
+        </div>
         <div class="patio3d" id="m1-patio3d" aria-label="Vista 3D del patio por bloque"></div>
         <div class="patio" id="m1-patio-tarjetas" hidden>
           <div class="muelle">MUELLE · GRÚAS STS</div>
@@ -2102,6 +2178,15 @@ function renderModulo1() {
              ` · ${seguidos} ${seguidos === 1 ? 'día' : 'días seguidos'} en este estado`
       });
     });
+  for (const [estado, nivel] of [['rojo', 'roja'], ['amarillo', 'amarilla']]) {
+    const bloques = alertas.slice(1).filter(alerta => alerta.est === estado);
+    document.getElementById(`m1-${nivel}-cuenta`).textContent = bloques.length;
+    const contenido = bloques.length
+      ? `<ul>${bloques.map(a => `<li>${a.txt}<small>${a.det}</small></li>`).join('')}</ul>`
+      : `<p>Ningún bloque en alerta ${nivel}.</p>`;
+    document.getElementById(`m1-${nivel}-panel`).innerHTML =
+      `<strong>Bloques en alerta ${nivel} · día ${dia}</strong>${contenido}`;
+  }
   if (alertas.length === 1) alertas.push({ est: 'verde', txt: '✔ Ningún bloque en alerta', det: '' });
   document.getElementById('m1-alertas-titulo').textContent = `Alertas del día ${dia}`;
   const enAlerta = alertas.filter(a => a.est !== 'verde' && !a.txt.includes('Patio completo')).length;
