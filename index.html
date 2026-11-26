@@ -2004,10 +2004,20 @@ const pluginLineasMeta = {
     const y = chart.scales.y, { left, right } = chart.chartArea, ctx = chart.ctx;
     for (const l of o.lineas) {
       const py = y.getPixelForValue(l.valor);
-      ctx.save(); ctx.strokeStyle = l.color || '#3d3c39'; ctx.lineWidth = 1.5; ctx.setLineDash(l.dash || [6, 4]);
+      ctx.save(); ctx.strokeStyle = l.color || '#3d3c39'; ctx.lineWidth = o.destacar ? 2.5 : 1.5; ctx.setLineDash(l.dash || [6, 4]);
       ctx.beginPath(); ctx.moveTo(left, py); ctx.lineTo(right, py); ctx.stroke();
       ctx.setLineDash([]); ctx.fillStyle = l.color || '#3d3c39'; ctx.font = '11px Segoe UI, Arial'; ctx.textAlign = 'right';
-      ctx.fillText(l.texto, right - 4, py - 4); ctx.restore();
+      if (o.destacar) {
+        ctx.font = '700 13px Segoe UI, Arial';
+        const ancho = ctx.measureText(l.texto).width + 14;
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(right - ancho - 4, py - 22, ancho, 20);
+        ctx.fillStyle = l.color;
+        ctx.fillText(l.texto, right - 11, py - 7);
+      } else {
+        ctx.fillText(l.texto, right - 4, py - 4);
+      }
+      ctx.restore();
     }
   }
 };
@@ -2061,12 +2071,15 @@ function renderModulo3() {
     type: 'bar',
     data: { labels: PATIO.bloques.map(b => 'Bloque ' + b), datasets: [{
       label: 'Remanejos (%)', data: porBloque.map(x => x.ratio === null ? 0 : +x.ratio.toFixed(1)),
-      backgroundColor: porBloque.map(x => f.bloque === 'todos' || f.bloque === x.b ? '#2a78d6' : '#2a78d640'),
+      backgroundColor: porBloque.map((x, i) => COLOR_SERIE[i] + (f.bloque === 'todos' || f.bloque === x.b ? '' : '40')),
       borderRadius: { topLeft: 4, topRight: 4 }, borderSkipped: 'bottom', maxBarThickness: 56 }] },
     options: { responsive: true, maintainAspectRatio: false, animation: false,
       scales: { y: { min: 0, suggestedMax: 60, title: { display: true, text: 'Remanejos (%)' }, grid: { color: '#eceff2' }, ticks: { callback: v => v + ' %' } },
                 x: { grid: { display: false } } },
-      plugins: { legend: { display: false }, lineasMeta: { lineas: lineasRemanejo() },
+      plugins: { legend: { display: false }, lineasMeta: { destacar: true, lineas: [
+        { valor: METAS.remanejoAmarillo, texto: `Rojo > ${METAS.remanejoAmarillo} %`, color: '#a01d35', dash: [10, 3, 2, 3] },
+        { valor: METAS.remanejo, texto: `Meta ≤ ${METAS.remanejo} %`, color: '#23456a', dash: [6, 4] }
+      ] },
         tooltip: { callbacks: { label: it => { const x = porBloque[it.dataIndex]; return [` Remanejos: ${fmt(x.ratio)} %`, ` ${x.improd} improductivos / ${x.prod} productivos`, ` Densidad media: ${fmt(x.dens, 1)} %`]; } } } } },
     plugins: [pluginLineasMeta]
   });
