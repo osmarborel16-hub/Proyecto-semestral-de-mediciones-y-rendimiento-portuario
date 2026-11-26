@@ -486,7 +486,7 @@
 <!-- ===== MÓDULO 1 · MAPA DEL PATIO ===== Responsable: Leslie West -->
 <section class="modulo activo" id="m1">
   <h2>Mapa del patio</h2>
-  <p class="nota">Yard Density = Inventario ÷ capacidad operativa × 100 · inventario en TEU al cierre del día · clic en un bloque para filtrar todo el dashboard</p>
+  <p class="nota">El mapa muestra la ocupación del patio al cierre del día. Selecciona un bloque para filtrar el dashboard.</p>
 
   <div class="m1-cuerpo">
     <div>
@@ -566,8 +566,7 @@
 <!-- ===== MÓDULO 2 · DWELL TIME ===== Responsable: Leslie West -->
 <section class="modulo" id="m2">
   <h2>Dwell time</h2>
-  <p class="nota">Dwell time por categoría = Σ días en patio ÷ contenedores de la categoría · se cuentan los contenedores que <strong>salieron</strong> en el rango de días filtrado ·
-     Antigüedad = contenedores con más de X días en patio al cierre del día de corte · el filtro de turno no aplica a este módulo</p>
+  <p class="nota">El tiempo de permanencia se muestra para los contenedores que <strong>salieron</strong> en el periodo filtrado. La antigüedad corresponde al inventario al cierre del día de corte. El filtro de turno no aplica a este módulo.</p>
 
   <div class="m2-controles">
     <label>X días para la antigüedad (aging)
@@ -593,9 +592,9 @@
     </div>
   </div>
 
-  <h3 style="margin-top:18px">Detalle del cálculo</h3>
+  <h3 style="margin-top:18px">Detalle por categoría</h3>
   <div id="m2-tabla"></div>
-  <p class="nota">TEU de más = llegadas diarias (TEU/día) × (dwell actual − dwell meta), por la Ley de Little (inventario = llegadas × tiempo de permanencia), la misma de la ficha de ejemplo del curso. Es el inventario que se liberaría si la categoría cumpliera su meta de dwell.</p>
+  <p class="nota">Los TEU de más representan el espacio que podría liberarse si la categoría alcanzara su meta de permanencia.</p>
 </section>
 
 <!-- ===== MÓDULO 3 · REMANEJOS ===== Responsable: Adriana Garibaldi -->
@@ -604,8 +603,7 @@
     <h2 id="m3-titulo">Remanejos</h2>
     <form method="dialog"><button type="submit" autofocus>Cerrar</button></form>
   </div>
-  <p class="nota">Remanejos (rehandle ratio) = Movimientos improductivos ÷ movimientos productivos × 100 · Tiempo de servicio en patio = tiempo del camión desde que entra al bloque hasta que sale ·
-     usa los filtros de días, turno y bloque; la categoría solo aplica al tiempo de servicio (los movimientos se registran por bloque y turno)</p>
+  <p class="nota">Consulta los remanejos por día, turno y bloque. El filtro de categoría se aplica al tiempo de servicio en patio.</p>
 
   <div class="m3-resumen" id="m3-resumen"></div>
 
@@ -675,9 +673,7 @@
 <!-- ===== MÓDULO 4 · SIMULADOR DE ESCENARIOS ===== Responsable: Osmar Chiari -->
 <section class="modulo" id="m4">
   <h2>Simulador de escenarios</h2>
-  <p class="nota">Proyecta la densidad del patio completo para los próximos 14 días desde el día de corte ("Día hasta"). El régimen actual se mide en los <strong>últimos 28 días</strong>:
-     crecimiento diario (pendiente de mínimos cuadrados del inventario), llegadas (TEU/día) y dwell de los contenedores que salieron.
-     Días hasta alerta roja = TEU de margen ÷ crecimiento diario del inventario. Se usan 28 días porque las ventanas más cortas quedan sesgadas por el ciclo semanal de buques.</p>
+  <p class="nota">Proyecta la densidad del patio para los 14 días siguientes a «Día hasta». El escenario base usa los últimos 28 días de operación.</p>
 
   <div class="m4-cuerpo">
     <div class="m4-controles">
@@ -706,12 +702,9 @@
     </div>
   </div>
 
-  <h3 style="margin-top:18px">Cálculo por categoría</h3>
+  <h3 style="margin-top:18px">Resultados por categoría</h3>
   <div id="m4-tabla"></div>
-  <p class="nota">Cómo proyecta: inventario(t) = inventario de hoy + crecimiento diario × t + cambio por el escenario. El cambio sale de la Ley de Little (inventario = llegadas × dwell):
-    si el dwell de una categoría pasa de W a W', su inventario cambia en llegadas × (W' − W); si llegan más buques, cambia en (llegadas extra) × W'.
-    Ese cambio se aplica de forma gradual durante un ciclo de dwell (W' días). Supuesto conservador: la tendencia de crecimiento actual se mantiene.
-    La proyección sigue la tendencia; los días de buque la densidad real sube 5–8 puntos por encima, así que algunos días podrían tocar el rojo antes de lo que indica el KPI.</p>
+  <p class="nota">La proyección aplica los cambios de forma gradual y mantiene la tendencia de crecimiento actual. En días de llegada de buques, la ocupación puede alcanzar la alerta roja antes de lo previsto.</p>
 </section>
 
 <!-- ===== MÓDULO 5 · MEJORA (A3) ===== Responsable: Osmar Chiari -->
@@ -747,7 +740,7 @@
     <div class="detalle-contenido"><div class="a3" id="m5-a3"></div></div>
   </details>
   <details class="detalle-escenario">
-    <summary>Cómo se calculan las proyecciones</summary>
+    <summary>Supuestos de la proyección</summary>
     <div class="detalle-contenido">
       <p class="nota">La proyección usa los 28 días hasta el día de corte. El módulo Dwell time usa el rango de días filtrado, por lo que la categoría crítica y los TEU de más pueden diferir.</p>
       <p class="nota">Los remanejos esperados se estiman ajustando el valor medido en esos 28 días según la relación entre densidad y remanejos por bloque. El resultado es una aproximación para todo el patio.</p>
@@ -1724,11 +1717,8 @@ function renderModulo1() {
     `Los bloques llevan ícono y texto de estado, no solo color.`;
 
   /* 3) Capacidad operativa (KPI 1) */
-  const bruta = PATIO.bloques.length * PATIO.stacks * (PATIO.tiers * PATIO.lanes - PATIO.shuffleSlots);
-  const inop = Object.values(PATIO.inoperativos).reduce((a, x) => a + x, 0);
   document.getElementById('m1-capacidad').textContent =
-    `Capacidad operativa = [${PATIO.bloques.length} bloques × ${PATIO.stacks} stacks × (${PATIO.tiers} tiers × ${PATIO.lanes} lanes − ${PATIO.shuffleSlots} shuffle slots)] − ${inop} slots inoperativos = ` +
-    `${bruta.toLocaleString('es-PA')} − ${inop} = ${capacidadOperativa().toLocaleString('es-PA')} TEU. Capacidad por bloque: ` +
+    `Capacidad operativa del patio: ${capacidadOperativa().toLocaleString('es-PA')} TEU. Capacidad por bloque: ` +
     PATIO.bloques.map(b => `${b} ${capacidadBloque(b)}`).join(' · ') + ' TEU.';
 
   /* 4) Gráfico de evolución */
@@ -1911,7 +1901,7 @@ function renderModulo2() {
   }).join('');
 
   document.getElementById('m2-global').innerHTML = dw.global === null ? '' :
-    `<div><div class="num">${fmt(dw.global, 2)} días</div><div class="lbl">Dwell global <strong>ponderado</strong> por contenedores (fórmula del curso) · meta ≤ ${METAS.dwellGlobal} · ${dw.global <= METAS.dwellGlobal ? '✔ cumple' : '⛔ no cumple'}</div></div>
+    `<div><div class="num">${fmt(dw.global, 2)} días</div><div class="lbl">Dwell global <strong>ponderado</strong> por contenedores · meta ≤ ${METAS.dwellGlobal} · ${dw.global <= METAS.dwellGlobal ? '✔ cumple' : '⛔ no cumple'}</div></div>
      <div class="incorrecto"><div class="num">${fmt(dw.simple, 2)} días</div><div class="lbl">Promedio <strong>simple</strong> de las 4 categorías: NO es el KPI. Exagera el peso de los vacíos, que son pocos contenedores pero con dwell alto</div></div>`;
 
   /* 3) Antigüedad del inventario (aging) */
@@ -1979,7 +1969,7 @@ function renderModulo2() {
       <td>${fmt(lam[c], 1)}</td><td>${exceso[c] > 0 ? Math.round(exceso[c]).toLocaleString('es-PA') : '0'}</td></tr>`;
   };
   document.getElementById('m2-tabla').innerHTML = `<table class="tabla-m2">
-    <tr><th>Categoría</th><th>Contenedores que salieron</th><th>Σ días en patio</th><th>Dwell (días)</th><th>Meta (días)</th><th>Estado</th><th>Llegadas (TEU/día)</th><th>TEU de más</th></tr>
+    <tr><th>Categoría</th><th>Contenedores que salieron</th><th>Días acumulados en patio</th><th>Dwell (días)</th><th>Meta (días)</th><th>Estado</th><th>Llegadas (TEU/día)</th><th>TEU de más</th></tr>
     ${cats.map(fila).join('')}
     <tr class="total"><td>Global ponderado</td><td>${dw.n.toLocaleString('es-PA')}</td><td>${fmt(dw.sumaDias, 2)}</td><td>${dw.global === null ? '—' : fmt(dw.global, 2)}</td>
       <td>${METAS.dwellGlobal}</td><td>${dw.global === null ? '' : (dw.global <= METAS.dwellGlobal ? '✔' : '⛔')}</td><td></td>
@@ -2128,7 +2118,7 @@ function renderModulo3() {
       <tr><td>✔ Verde (≤ ${UMBRALES.amarillo} %)</td><td>${bajo.length}</td><td>${prom(bajo) === null ? '—' : fmt(prom(bajo)) + ' %'}</td></tr>
       <tr><td>⚠ Amarilla</td><td>${rel.puntos.length - bajo.length - alto.length}</td><td>${(() => { const m = rel.puntos.filter(p => p.x > UMBRALES.amarillo && p.x <= UMBRALES.rojo); return m.length ? fmt(prom(m)) + ' %' : '—'; })()}</td></tr>
       <tr><td>⛔ Roja (> ${UMBRALES.rojo} %)</td><td>${alto.length}</td><td>${prom(alto) === null ? '—' : fmt(prom(alto)) + ' %'}</td></tr></table>
-      <p style="margin:10px 0 4px">Desde ${rel.densidadMin} % de densidad: <strong>remanejos ≈ ${fmt(rel.intercepto)} + ${fmt(rel.pendiente, 2)} × densidad</strong> (r = ${fmt(rel.r, 2)}, ${rel.tramo.length} puntos).</p>
+      <p style="margin:10px 0 4px">La tendencia se observa desde el ${rel.densidadMin} % de densidad.</p>
       <p style="margin:0 0 4px">En ese tramo, cada <strong>10 puntos más de densidad</strong> se asocian con unos <strong>${fmt(rel.pendiente * 10)} puntos más de remanejos</strong>.</p>
       <p style="margin:0">Por debajo de ${rel.densidadMin} %, los remanejos se mantienen en torno a ${rel.base === null ? '—' : fmt(rel.base) + ' %'} (${rel.puntos.length - rel.tramo.length} puntos).</p>`;
   } else {
@@ -2233,7 +2223,7 @@ function renderModulo4() {
   const estDias = (d) => d === Infinity || d >= METAS.diasAlerta ? 'verde' : (d >= METAS.diasAlertaAmarillo ? 'amarillo' : 'rojo');
   document.getElementById('m4-salidas').innerHTML =
     `<div class="${cal.estadoAlerta}"><div class="num">${cal.diasAlertaTxt}</div>
-       <div class="lbl">Días hasta alerta roja si nada cambia = ${Math.round(cal.margen).toLocaleString('es-PA')} TEU de margen ÷ ${fmt(cal.g)} TEU/día</div></div>
+       <div class="lbl">Días hasta la alerta roja si se mantiene la tendencia actual</div></div>
      <div class="${estadoDensidad(dB)}"><div class="num">${fmt(dB)} %</div><div class="lbl">Densidad en el día ${cal.corte + HORIZONTE} sin cambios (hoy ${fmt(cal.I0 / cal.cap * 100)} %)</div></div>
      <div class="${estadoDensidad(dE)}"><div class="num">${fmt(dE)} %</div><div class="lbl">Densidad en el día ${cal.corte + HORIZONTE} con el escenario · ${ESTADO[estadoDensidad(dE)]}</div></div>
      <div class="${estDias(esc.diasRojo)}"><div class="num">${txtDias(esc.diasRojo)}</div>
@@ -2340,7 +2330,7 @@ function renderModulo5() {
     `<div><div class="pregunta">1 · ¿Qué categoría presiona más y cuántos TEU ocupa de más?</div>
        <strong>${CATEGORIAS[critica]}</strong>: ${Math.round(exceso[critica]).toLocaleString('es-PA')} TEU de más (dwell ${fmt(cal.cat[critica].W)} días vs meta ${METAS.dwell[critica]}).</div>
      <div><div class="pregunta">2 · ¿Cuántos días faltan para la alerta roja si nada cambia?</div>
-       <strong>${cal.diasAlertaTxt}</strong> (${Math.round(cal.margen).toLocaleString('es-PA')} TEU de margen ÷ ${fmt(cal.g)} TEU/día de crecimiento).</div>
+       <strong>${cal.diasAlertaTxt}</strong> (escenario sin cambios).</div>
      <div><div class="pregunta">3 · ¿Cuánto bajan la densidad y los remanejos con la propuesta?</div>
        Densidad <strong>${fmt(dBase)} % → ${fmt(dProp)} %</strong> (${fmt(dBase - dProp)} puntos) y remanejos
        <strong>${remBase === null ? '—' : fmt(remBase)} % → ${remProp === null ? '—' : fmt(remProp)} %</strong> en el día ${cal.corte + HORIZONTE}, frente a no hacer nada.</div>`;
@@ -2574,7 +2564,6 @@ function renderModulo6() {
   // Modelo
   document.getElementById('m6-modelo').innerHTML = `
     <p style="margin:0 0 6px">Regresión sobre las ${mod.n.toLocaleString('es-PA')} visitas de camión de los días ${f.desde}–${f.hasta}:</p>
-    <p style="margin:0 0 6px"><strong>minutos ≈ ${fmt(mod.a)} + ${fmt(mod.b, 2)} × remanejos + ${fmt(mod.c, 2)} × camiones en el patio en esa hora</strong> (R² = ${mod.r2 === null ? '—' : fmt(mod.r2, 2)})</p>
     <table class="tabla-m2">
       <tr><th>Qué dice</th><th>Valor</th></tr>
       <tr><td>Cada remanejo agrega</td><td>${fmt(mod.b, 1)} min</td></tr>
@@ -2582,9 +2571,7 @@ function renderModulo6() {
       <tr><td>Camiones con cita (por día)</td><td>${fmt(esc.movidos, 0)}</td></tr>
       <tr><td>Nivel al que se llenan las horas de la ventana</td><td>${esc.nivel === null ? '—' : fmt(esc.nivel, 0) + ' camiones/h'}</td></tr>
     </table>
-    <p class="nota">Con cita, cada camión pasa a una hora de la ventana con menos carga. Su servicio cambia en ${fmt(mod.c, 2)} min por cada camión de diferencia
-      entre la hora nueva y la anterior. En los retiros con cita se restan además los remanejos evitados × ${fmt(mod.b, 1)} min. Los camiones sin cita se quedan a su hora,
-      pero también cambia la carga que encuentran.</p>`;
+    <p class="nota">Las citas trasladan llegadas a horas con menor carga. La preubicación puede reducir los remanejos en los retiros con cita.</p>`;
 
   // Tabla por hora
   document.getElementById('m6-tabla').innerHTML = `<table><tr><th>Hora</th><th>Camiones/h patio hoy</th><th>Camiones/h patio con citas</th>
