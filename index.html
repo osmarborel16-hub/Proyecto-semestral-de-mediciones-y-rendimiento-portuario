@@ -623,6 +623,46 @@
     line-height: 1;
   }
   #m4 .m4-categoria input { accent-color: var(--color-categoria); margin-inline: 0; }
+  #m4 .m4-buques-controles input[type="range"] {
+    --relleno: 0%;
+    --inicio: #2355ae;
+    --fin: #00869a;
+    appearance: none;
+    display: block;
+    height: 28px;
+    margin: 4px 0;
+    background:
+      linear-gradient(90deg, var(--inicio), var(--fin)) left center / var(--relleno) 8px no-repeat,
+      linear-gradient(#dbe8f2, #dbe8f2) center / 100% 8px no-repeat;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  #m4 .m4-buques-controles #m4-teu {
+    --inicio: #13546a;
+    --fin: #008365;
+  }
+  #m4 .m4-buques-controles input::-webkit-slider-thumb {
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border: 3px solid #fff;
+    border-radius: 50%;
+    background: var(--fin);
+    box-shadow: 0 0 0 1px var(--inicio);
+  }
+  #m4 .m4-buques-controles input::-moz-range-thumb {
+    box-sizing: border-box;
+    width: 20px;
+    height: 20px;
+    border: 3px solid #fff;
+    border-radius: 50%;
+    background: var(--fin);
+    box-shadow: 0 0 0 1px var(--inicio);
+  }
+  @media (forced-colors: active) {
+    #m4 .m4-buques-controles input[type="range"] { appearance: auto; background: none; }
+    #m4 .m4-buques-controles input::-webkit-slider-thumb { appearance: auto; }
+  }
 </style>
 </head>
 <body>
@@ -2434,6 +2474,12 @@ function renderModulo4() {
   document.getElementById('m4-buques').value = ESCENARIO.buquesExtra;
   document.getElementById('m4-buques-txt').textContent = (ESCENARIO.buquesExtra > 0 ? '+' : '') + fmt(ESCENARIO.buquesExtra) + ' / semana';
   document.getElementById('m4-teu').value = ESCENARIO.teuBuque;
+  for (const id of ['m4-buques', 'm4-teu']) {
+    const deslizador = document.getElementById(id);
+    const progreso = (deslizador.valueAsNumber - Number(deslizador.min)) /
+      (Number(deslizador.max) - Number(deslizador.min));
+    deslizador.style.setProperty('--relleno', `calc(${progreso * 100}% + ${10 - progreso * 20}px)`);
+  }
   document.getElementById('m4-teu-txt').textContent = ESCENARIO.teuBuque.toLocaleString('es-PA') + ' TEU';
   document.getElementById('m4-teu-ref').textContent = `Promedio actual por buque: ${Math.round(cal.teuBuque)} TEU (importación ${Math.round(cal.porBuque.IMP)}, transbordo ${Math.round(cal.porBuque.TRB)}, exportación ${Math.round(cal.porBuque.EXP)})`;
 
