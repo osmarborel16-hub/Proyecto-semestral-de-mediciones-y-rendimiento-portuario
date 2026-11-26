@@ -355,14 +355,13 @@
     text-shadow: 0 1px 4px #050c19;
   }
   .boton-remanejos span {
-    display: grid;
-    place-items: center;
-    width: 28px;
+    flex: 0 0 28px;
     height: 28px;
     border: 1px solid currentColor;
     border-radius: 50%;
-    font-size: 1.25rem;
-    line-height: 1;
+    background:
+      linear-gradient(currentColor, currentColor) center / 12px 2px no-repeat,
+      linear-gradient(currentColor, currentColor) center / 2px 12px no-repeat;
   }
   .boton-remanejos:hover { text-decoration: underline; }
   .dialogo-cabecera button:hover { background: #0b6880; }
@@ -486,7 +485,7 @@
           <div class="bloques" id="m1-bloques"></div>
           <div class="gate">GATE · CAMIONES</div>
         </div>
-        <button type="button" class="boton-remanejos" id="m1-remanejos" aria-haspopup="dialog" aria-controls="m3"><span aria-hidden="true">+</span> Remanejos</button>
+        <button type="button" class="boton-remanejos" id="m1-remanejos" aria-haspopup="dialog" aria-controls="m3"><span aria-hidden="true"></span> Remanejos</button>
       </div>
       <p class="nota" id="m1-patio3d-nota"></p>
       <div class="kpis kpis-patio" id="m1-kpis" aria-label="Indicadores del patio"></div>
