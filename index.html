@@ -557,6 +557,13 @@
   @media (max-width: 600px) {
     #m4 th, #m4 td { padding-inline: 3px; }
   }
+  #m4 .m4-panel-grafica {
+    background: linear-gradient(155deg, #142d49, #09192c);
+    border-color: #375777;
+    color: #edf6ff;
+  }
+  #m4 .m4-panel-grafica summary, #m4 .m4-panel-grafica .pendiente { color: #c1dbf4; }
+  #m4 .m4-panel-grafica th, #m4 .m4-panel-grafica td { border-color: #42617d; }
 </style>
 </head>
 <body>
@@ -830,7 +837,7 @@
       <button type="button" id="m4-restablecer">↺ Restablecer a la situación actual</button>
     </div>
 
-    <div class="m4-panel">
+    <div class="m4-panel m4-panel-grafica">
       <h3 id="m4-titulo-graf">Densidad del patio: real y proyectada</h3>
       <div class="lienzo" style="height:320px"><canvas id="m4-grafico" aria-label="Proyección de densidad a 14 días"></canvas></div>
       <details class="tabla-datos"><summary>Ver la proyección en tabla</summary><div class="scroll" id="m4-tabla-proy"></div></details>
@@ -2387,30 +2394,49 @@ function renderModulo4() {
   if (typeof Chart === 'undefined') {
     document.querySelector('#m4 .lienzo').innerHTML = '<p class="pendiente">No se pudo cargar Chart.js (¿sin internet?). La proyección está en la tabla de abajo.</p>';
   } else {
+    const degradado = (color) => ({ chart }) => {
+      const area = chart.chartArea;
+      if (!area) return 'transparent';
+      const relleno = chart.ctx.createLinearGradient(0, area.top, 0, area.bottom);
+      relleno.addColorStop(0, color);
+      relleno.addColorStop(1, 'transparent');
+      return relleno;
+    };
     const umbral = (nombre, valor, estilo) => ({ label: `${nombre} (${valor} %)`, data: etiquetas.map(() => valor), borderColor: estilo.color, backgroundColor: estilo.color,
       borderWidth: 1.5, borderDash: estilo.dash, pointRadius: 0, pointHoverRadius: 0 });
     if (graficoM4) graficoM4.destroy();
     graficoM4 = new Chart(document.getElementById('m4-grafico'), {
       type: 'line',
       data: { labels: etiquetas, datasets: [
-        { label: 'Real', data: real, borderColor: '#2a78d6', backgroundColor: '#2a78d6', borderWidth: 2, pointRadius: 0, pointHoverRadius: 5, tension: 0.2 },
-        { label: 'Proyección sin cambios', data: proy(base), borderColor: '#2a78d6', backgroundColor: '#2a78d6', borderWidth: 2, borderDash: [5, 4], pointRadius: 0, pointHoverRadius: 5 },
-        { label: 'Proyección con el escenario', data: proy(esc), borderColor: '#eb6834', backgroundColor: '#eb6834', borderWidth: 2.5, pointRadius: 0, pointHoverRadius: 5 },
-        umbral('Umbral amarillo', UMBRALES.amarillo, ESTILO_UMBRAL.amarillo), umbral('Umbral rojo', UMBRALES.rojo, ESTILO_UMBRAL.rojo)
+        { label: 'Real', data: real, borderColor: '#65bdff', backgroundColor: degradado('#399cff70'), fill: 'start', borderWidth: 2.5, pointRadius: 0, pointHoverRadius: 5, tension: 0.2 },
+        { label: 'Proyección sin cambios', data: proy(base), borderColor: '#a6d7ff', backgroundColor: '#a6d7ff', borderWidth: 2, borderDash: [5, 4], pointRadius: 0, pointHoverRadius: 5 },
+        { label: 'Proyección con el escenario', data: proy(esc), borderColor: '#ffab75', backgroundColor: degradado('#ff8f535c'), fill: 'start', borderWidth: 3, pointRadius: 0, pointHoverRadius: 5 },
+        umbral('Umbral amarillo', UMBRALES.amarillo, { ...ESTILO_UMBRAL.amarillo, color: '#f7cf6a' }), umbral('Umbral rojo', UMBRALES.rojo, { ...ESTILO_UMBRAL.rojo, color: '#ff7d96' })
       ] },
       options: { responsive: true, maintainAspectRatio: false, animation: false, interaction: { mode: 'index', intersect: false },
-        scales: { y: { suggestedMin: 40, suggestedMax: 100, title: { display: true, text: 'Densidad (%)' }, grid: { color: '#eceff2' }, ticks: { callback: v => v + ' %' } },
-                  x: { title: { display: true, text: 'Día' }, grid: { display: false }, ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 15 } } },
-        plugins: { legend: { position: 'bottom', labels: { boxWidth: 18, boxHeight: 2,
-            generateLabels: (chart) => Chart.defaults.plugins.legend.labels.generateLabels(chart).map(l => { const ds = chart.data.datasets[l.datasetIndex]; return { ...l, lineDash: ds.borderDash || [] }; }) } },
+        scales: { y: { suggestedMin: 40, suggestedMax: 100, title: { display: true, text: 'Densidad (%)', color: '#c1d7ec' }, grid: { color: '#ffffff20' }, ticks: { color: '#c1d7ec', callback: v => v + ' %' } },
+                  x: { title: { display: true, text: 'Día', color: '#c1d7ec' }, grid: { display: false }, ticks: { color: '#c1d7ec', maxRotation: 0, autoSkip: true, maxTicksLimit: 15 } } },
+        plugins: { legend: { position: 'bottom', labels: { color: '#e1effc', boxWidth: 18, boxHeight: 2,
+            generateLabels: (chart) => Chart.defaults.plugins.legend.labels.generateLabels(chart).map(l => { const ds = chart.data.datasets[l.datasetIndex]; return { ...l, fillStyle: ds.borderColor, lineDash: ds.borderDash || [] }; }) } },
           tooltip: { filter: it => !it.dataset.label.startsWith('Umbral') && it.parsed.y !== null,
             callbacks: { title: it => `Día ${it[0].label}${+it[0].label > cal.corte ? ' (proyectado)' : ''}`, label: it => ` ${it.dataset.label}: ${fmt(it.parsed.y)} %` } },
           marcaDia: { dia: cal.corte } } },
-      plugins: [{ id: 'marcaDia', afterDatasetsDraw(chart, _a, o) {
+      plugins: [{ id: 'marcaDia', beforeDatasetsDraw(chart, _args, opts) {
+        const indice = chart.data.labels.indexOf(opts.dia);
+        if (indice < 0) return;
+        const { top, bottom, left, right } = chart.chartArea;
+        const inicio = Math.max(left, chart.scales.x.getPixelForValue(indice));
+        if (inicio >= right) return;
+        const ctx = chart.ctx;
+        ctx.save();
+        ctx.fillStyle = '#020b1890';
+        ctx.fillRect(inicio, top, right - inicio, bottom - top);
+        ctx.restore();
+      }, afterDatasetsDraw(chart, _a, o) {
         const i = chart.data.labels.indexOf(o.dia); if (i < 0) return;
         const x = chart.scales.x.getPixelForValue(i), { top, bottom } = chart.chartArea, ctx = chart.ctx;
-        ctx.save(); ctx.strokeStyle = '#52514e'; ctx.setLineDash([2, 3]); ctx.beginPath(); ctx.moveTo(x, top); ctx.lineTo(x, bottom); ctx.stroke();
-        ctx.setLineDash([]); ctx.fillStyle = '#52514e'; ctx.font = '11px Segoe UI, Arial'; ctx.fillText('hoy (día de corte)', x + 4, top + 12); ctx.restore(); } }]
+        ctx.save(); ctx.strokeStyle = '#abc9e4'; ctx.setLineDash([2, 3]); ctx.beginPath(); ctx.moveTo(x, top); ctx.lineTo(x, bottom); ctx.stroke();
+        ctx.setLineDash([]); ctx.fillStyle = '#d6e7f9'; ctx.font = '11px Segoe UI, Arial'; ctx.fillText('hoy (día de corte)', x + 4, top + 12); ctx.restore(); } }]
     });
   }
 
