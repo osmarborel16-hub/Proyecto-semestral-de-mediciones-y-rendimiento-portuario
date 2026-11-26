@@ -530,11 +530,11 @@
   }
   #m4 > h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); }
   #m4 > .nota { color: #dfedf6; margin-bottom: 18px; }
-  #m4 .m4-salidas { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+  #m4 .m4-salidas { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
   #m4 .m4-salidas > div {
     color: var(--texto);
     border-radius: 14px;
-    padding: 14px 16px;
+    padding: 9px 11px;
   }
   #m4 .m4-salidas > div {
     min-width: 0;
@@ -545,25 +545,23 @@
   #m4 .m4-salidas > .amarillo { border-top-color: var(--amarillo); }
   #m4 .m4-salidas > .rojo { border-top-color: var(--rojo); }
   #m4 .m4-salidas .num {
-    font-size: clamp(40px, 4vw, 50px);
+    font-size: clamp(1.5rem, 3vw, 2.15rem);
     line-height: 1.06;
-    margin-bottom: 8px;
+    margin-bottom: 5px;
     overflow-wrap: anywhere;
     font-variant-numeric: tabular-nums;
   }
   #m4 .m4-salidas > .m4-kpi-hero {
-    grid-column: span 2;
     background: linear-gradient(145deg, #193c60, #10253f);
     color: #fff;
   }
-  #m4 .m4-kpi-hero .num { font-size: clamp(52px, 5.5vw, 72px); }
+  #m4 .m4-kpi-hero .num { font-size: clamp(1.65rem, 3.2vw, 2.4rem); }
   #m4 .m4-kpi-hero .lbl { color: #dfedf6; }
-  @media (max-width: 850px) {
+  @media (max-width: 680px) {
     #m4 .m4-salidas { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   }
-  @media (max-width: 520px) {
+  @media (max-width: 400px) {
     #m4 .m4-salidas { grid-template-columns: minmax(0, 1fr); }
-    #m4 .m4-salidas > .m4-kpi-hero { grid-column: auto; }
   }
   #m4 .m4-salidas .lbl, #m4 .control-slider .ref { font-size: .875rem; line-height: 1.45; }
   #m4 .m4-cuerpo { grid-template-columns: minmax(0, 1fr); gap: 12px; }
