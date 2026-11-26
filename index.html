@@ -329,7 +329,7 @@
   #m6 .m4-salidas .lbl { font-size: .875rem; }
   #m6 .panel-grafico h3 { margin: 0 0 10px; }
   .patio-con-acciones { position: relative; min-width: 0; }
-  .boton-remanejos, .dialogo-cabecera button {
+  .boton-remanejos, .dialogo-cerrar button {
     padding: 10px 16px;
     border: 1px solid #73c8cc;
     border-radius: 9px;
@@ -365,18 +365,28 @@
       linear-gradient(currentColor, currentColor) center / 2px 12px no-repeat;
   }
   .boton-remanejos:hover { text-decoration: underline; }
-  .dialogo-cabecera button:hover { background: #0b6880; }
+  .dialogo-cerrar button:hover { background: #0b6880; }
   @media (max-width: 550px) {
     .boton-remanejos { left: 8px; transform: translateY(50%); }
   }
   .dialogo-remanejos {
     width: min(960px, calc(100% - 32px));
-    max-height: 86dvh;
+    max-height: calc(100dvh - 24px);
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #0d2239;
+    overflow: visible;
+  }
+  .dialogo-remanejos[open] { display: flex; flex-direction: column; gap: 8px; }
+  .dialogo-cerrar { align-self: flex-end; margin: 0; }
+  .dialogo-panel {
+    min-height: 0;
+    overflow: auto;
     padding: clamp(14px, 3vw, 28px);
     border: 1px solid var(--borde);
     border-radius: 18px;
     background: #fff;
-    color: #0d2239;
     box-shadow: 0 24px 72px #06132566;
   }
   .dialogo-remanejos::backdrop {
@@ -395,8 +405,7 @@
     from { background: transparent; backdrop-filter: blur(0); }
     to { background: #09182b38; backdrop-filter: blur(14px) saturate(.85); }
   }
-  .dialogo-cabecera { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-  .dialogo-cabecera h2, .dialogo-cabecera form { margin: 0; }
+  .dialogo-cabecera h2 { margin: 0; }
   .dialogo-cabecera h2 {
     font-size: clamp(1.65rem, 4vw, 2.6rem);
     line-height: 1.1;
@@ -923,72 +932,74 @@
 
 <!-- ===== MÓDULO 3 · REMANEJOS ===== Responsable: Adriana Garibaldi -->
 <dialog id="m3" class="dialogo-remanejos" aria-labelledby="m3-titulo">
-  <div class="dialogo-cabecera">
-    <h2 id="m3-titulo">Remanejos</h2>
-    <form method="dialog"><button type="submit" autofocus>Cerrar</button></form>
-  </div>
-  <p class="nota">Consulta los remanejos por día, turno y bloque. El filtro de categoría se aplica al tiempo de servicio en patio.</p>
+  <form class="dialogo-cerrar" method="dialog"><button type="submit" autofocus>Cerrar</button></form>
+  <div class="dialogo-panel">
+    <div class="dialogo-cabecera">
+      <h2 id="m3-titulo">Remanejos</h2>
+    </div>
+    <p class="nota">Consulta los remanejos por día, turno y bloque. El filtro de categoría se aplica al tiempo de servicio en patio.</p>
 
-  <div class="m3-resumen" id="m3-resumen"></div>
+    <div class="m3-resumen" id="m3-resumen"></div>
 
-  <nav class="subpestanas" aria-label="Vistas del módulo 3">
-    <button type="button" data-sub="m3-bloque" class="activa">Por bloque</button>
-    <button type="button" data-sub="m3-dia">Por día</button>
-    <button type="button" data-sub="m3-relacion">Densidad vs remanejos</button>
-    <button type="button" data-sub="m3-servicio">Servicio en patio</button>
-  </nav>
+    <nav class="subpestanas" aria-label="Vistas del módulo 3">
+      <button type="button" data-sub="m3-bloque" class="activa">Por bloque</button>
+      <button type="button" data-sub="m3-dia">Por día</button>
+      <button type="button" data-sub="m3-relacion">Densidad vs remanejos</button>
+      <button type="button" data-sub="m3-servicio">Servicio en patio</button>
+    </nav>
 
-  <div class="subpanel activo" id="m3-bloque">
-    <div class="m3-dos">
-      <div>
-        <h3 id="m3-titulo-bloque">Remanejos por bloque</h3>
-        <div class="lienzo"><canvas id="m3-graf-bloque" aria-label="Remanejos por bloque"></canvas></div>
-      </div>
-      <div>
-        <h3>Detalle por bloque</h3>
-        <div id="m3-tabla-bloque"></div>
-        <p class="nota">El bloque con más remanejos coincide con el más lleno: a más altura de estiba, más contenedores quedan encima del que se busca.</p>
+    <div class="subpanel activo" id="m3-bloque">
+      <div class="m3-dos">
+        <div>
+          <h3 id="m3-titulo-bloque">Remanejos por bloque</h3>
+          <div class="lienzo"><canvas id="m3-graf-bloque" aria-label="Remanejos por bloque"></canvas></div>
+        </div>
+        <div>
+          <h3>Detalle por bloque</h3>
+          <div id="m3-tabla-bloque"></div>
+          <p class="nota">El bloque con más remanejos coincide con el más lleno: a más altura de estiba, más contenedores quedan encima del que se busca.</p>
+        </div>
       </div>
     </div>
-  </div>
 
-  <div class="subpanel" id="m3-dia">
-    <div class="m1-grafico-cab">
-      <h3 id="m3-titulo-dia">Remanejos por día</h3>
-      <select id="m3-vista" aria-label="Vista del gráfico por día">
-        <option value="total">Total (o bloque filtrado)</option>
-        <option value="bloques">Por bloque</option>
-      </select>
+    <div class="subpanel" id="m3-dia">
+      <div class="m1-grafico-cab">
+        <h3 id="m3-titulo-dia">Remanejos por día</h3>
+        <select id="m3-vista" aria-label="Vista del gráfico por día">
+          <option value="total">Total (o bloque filtrado)</option>
+          <option value="bloques">Por bloque</option>
+        </select>
+      </div>
+      <div class="lienzo"><canvas id="m3-graf-dia" aria-label="Remanejos por día"></canvas></div>
+      <details class="tabla-datos"><summary>Ver los datos del gráfico en tabla</summary><div class="scroll" id="m3-tabla-dia"></div></details>
     </div>
-    <div class="lienzo"><canvas id="m3-graf-dia" aria-label="Remanejos por día"></canvas></div>
-    <details class="tabla-datos"><summary>Ver los datos del gráfico en tabla</summary><div class="scroll" id="m3-tabla-dia"></div></details>
-  </div>
 
-  <div class="subpanel" id="m3-relacion">
-    <div class="m3-dos">
-      <div>
-        <h3>Densidad del bloque vs remanejos (un punto por bloque y día)</h3>
-        <div class="lienzo" style="height:340px"><canvas id="m3-graf-relacion" aria-label="Relación entre densidad y remanejos"></canvas></div>
-      </div>
-      <div>
-        <h3>Qué muestra</h3>
-        <div id="m3-relacion-txt"></div>
-        <p class="nota">Densidad al <strong>inicio</strong> del día (cierre del día anterior), porque es la altura de estiba con la que trabajan los equipos ese día.
-          La recta es de mínimos cuadrados; no es un KPI, solo describe la relación. El Módulo 5 la usa para estimar los remanejos esperados con la propuesta.</p>
+    <div class="subpanel" id="m3-relacion">
+      <div class="m3-dos">
+        <div>
+          <h3>Densidad del bloque vs remanejos (un punto por bloque y día)</h3>
+          <div class="lienzo" style="height:340px"><canvas id="m3-graf-relacion" aria-label="Relación entre densidad y remanejos"></canvas></div>
+        </div>
+        <div>
+          <h3>Qué muestra</h3>
+          <div id="m3-relacion-txt"></div>
+          <p class="nota">Densidad al <strong>inicio</strong> del día (cierre del día anterior), porque es la altura de estiba con la que trabajan los equipos ese día.
+            La recta es de mínimos cuadrados; no es un KPI, solo describe la relación. El Módulo 5 la usa para estimar los remanejos esperados con la propuesta.</p>
+        </div>
       </div>
     </div>
-  </div>
 
-  <div class="subpanel" id="m3-servicio">
-    <div class="m3-dos">
-      <div>
-        <h3 id="m3-titulo-servicio">Tiempo de servicio del camión por hora de entrada al bloque</h3>
-        <div class="lienzo"><canvas id="m3-graf-servicio" aria-label="Tiempo de servicio por hora"></canvas></div>
-      </div>
-      <div>
-        <h3>Por turno y por bloque</h3>
-        <div id="m3-tabla-servicio"></div>
-        <p class="nota" id="m3-servicio-txt"></p>
+    <div class="subpanel" id="m3-servicio">
+      <div class="m3-dos">
+        <div>
+          <h3 id="m3-titulo-servicio">Tiempo de servicio del camión por hora de entrada al bloque</h3>
+          <div class="lienzo"><canvas id="m3-graf-servicio" aria-label="Tiempo de servicio por hora"></canvas></div>
+        </div>
+        <div>
+          <h3>Por turno y por bloque</h3>
+          <div id="m3-tabla-servicio"></div>
+          <p class="nota" id="m3-servicio-txt"></p>
+        </div>
       </div>
     </div>
   </div>
