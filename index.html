@@ -422,6 +422,23 @@
     text-shadow: none;
   }
   .kpis-patio[hidden] { display: none; }
+  .dialogo-remanejos .m3-resumen {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  }
+  .dialogo-remanejos .m3-dos { grid-template-columns: minmax(0, 1fr); }
+  .dialogo-remanejos .lienzo { min-width: 0; }
+  .dialogo-remanejos .m1-grafico-cab { flex-wrap: wrap; }
+  .dialogo-remanejos select { max-width: 100%; }
+  .dialogo-remanejos table { width: 100%; table-layout: fixed; }
+  .dialogo-remanejos th, .dialogo-remanejos td {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  @media (max-width: 600px) {
+    .dialogo-remanejos th, .dialogo-remanejos td { padding-inline: 3px; }
+    #m3-tabla-dia th:nth-child(2) { width: 24%; }
+    #m3-tabla-servicio th:first-child { width: 30%; }
+  }
 </style>
 </head>
 <body>
