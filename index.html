@@ -343,6 +343,9 @@
     left: 12%;
     bottom: 21%;
     transform: translate(-50%, 50%);
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
     min-height: 44px;
     padding: 8px 12px;
     border: 0;
@@ -350,6 +353,16 @@
     color: #fff;
     font-size: 1rem;
     text-shadow: 0 1px 4px #050c19;
+  }
+  .boton-remanejos span {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border: 1px solid currentColor;
+    border-radius: 50%;
+    font-size: 1.25rem;
+    line-height: 1;
   }
   .boton-remanejos:hover { text-decoration: underline; }
   .dialogo-cabecera button:hover { background: #0b6880; }
@@ -365,7 +378,22 @@
     background: var(--tarjeta);
     color: var(--texto);
   }
-  .dialogo-remanejos::backdrop { background: #09182bbb; }
+  .dialogo-remanejos::backdrop {
+    background: #09182b80;
+    backdrop-filter: blur(6px);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .dialogo-remanejos[open] { animation: entrada-remanejos 320ms cubic-bezier(.2, .75, .3, 1) both; }
+    .dialogo-remanejos[open]::backdrop { animation: fondo-remanejos 320ms ease-out both; }
+  }
+  @keyframes entrada-remanejos {
+    from { opacity: 0; transform: translateY(18px) scale(.97); }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes fondo-remanejos {
+    from { background: transparent; backdrop-filter: blur(0); }
+    to { background: #09182b80; backdrop-filter: blur(6px); }
+  }
   .dialogo-cabecera { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
   .dialogo-cabecera h2, .dialogo-cabecera form { margin: 0; }
   .filtros-panel { margin-bottom: 12px; }
@@ -458,7 +486,7 @@
           <div class="bloques" id="m1-bloques"></div>
           <div class="gate">GATE · CAMIONES</div>
         </div>
-        <button type="button" class="boton-remanejos" id="m1-remanejos" aria-haspopup="dialog" aria-controls="m3">Remanejos</button>
+        <button type="button" class="boton-remanejos" id="m1-remanejos" aria-haspopup="dialog" aria-controls="m3"><span aria-hidden="true">+</span> Remanejos</button>
       </div>
       <p class="nota" id="m1-patio3d-nota"></p>
       <div class="kpis kpis-patio" id="m1-kpis" aria-label="Indicadores del patio"></div>
