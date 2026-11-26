@@ -515,7 +515,7 @@
   .m2-panel h3 { margin: 0 0 10px; }
   .m2-panel .m2-respuesta { margin: 0; }
   .m2-panel .m2-global { grid-template-columns: minmax(0, 1fr); }
-  .m2-panel:last-child { grid-column: 1 / -1; }
+  .m2-panel-ancho { grid-column: 1 / -1; }
   #m2-tabla table { table-layout: fixed; overflow-wrap: anywhere; }
   @media (max-width: 1000px) { .m2-paneles { grid-template-columns: minmax(0, 1fr); } }
   @media (max-width: 670px) {
@@ -685,12 +685,12 @@
   </div>
       <div class="m2-global" id="m2-global"></div>
     </div>
-    <div class="m2-panel">
+    <div class="m2-panel m2-panel-ancho">
       <h3 id="m2-titulo-aging">Antigüedad del inventario</h3>
       <div class="lienzo"><canvas id="m2-grafico" aria-label="Antigüedad del inventario por categoría"></canvas></div>
       <p class="nota" id="m2-aging-txt"></p>
     </div>
-    <div class="m2-panel">
+    <div class="m2-panel m2-panel-ancho">
       <h3>Detalle por categoría</h3>
       <div id="m2-tabla"></div>
       <p class="nota">Los TEU de más representan el espacio que podría liberarse si la categoría alcanzara su meta de permanencia.</p>
