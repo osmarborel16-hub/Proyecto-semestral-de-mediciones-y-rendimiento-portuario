@@ -524,6 +524,39 @@
     #m2-barras .barra-dwell { grid-template-columns: minmax(0, 1fr); gap: 10px; }
     #m2-barras .barra-dwell .valor { text-align: left; }
   }
+  #m4 {
+    background: linear-gradient(145deg, #0b2037, #15435b);
+    color: #fff;
+  }
+  #m4 > h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); }
+  #m4 > .nota { color: #dfedf6; margin-bottom: 18px; }
+  #m4 .m4-salidas { grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr)); gap: 12px; }
+  #m4 .m4-salidas > div {
+    color: var(--texto);
+    border-radius: 14px;
+    padding: 14px 16px;
+  }
+  #m4 .m4-salidas .num { font-size: clamp(1.35rem, 2.6vw, 2rem); }
+  #m4 .m4-salidas .lbl, #m4 .control-slider .ref { font-size: .875rem; line-height: 1.45; }
+  #m4 .m4-cuerpo { gap: 12px; }
+  #m4 .m4-controles, #m4 .m4-panel {
+    min-width: 0;
+    border: 1px solid var(--borde);
+    border-radius: 14px;
+    padding: clamp(12px, 2vw, 20px);
+    background: #fff;
+    color: var(--texto);
+  }
+  #m4 .m4-panel h3 { margin: 0 0 10px; }
+  #m4 .control-slider { padding-block: 8px; border-bottom: 1px solid var(--borde); font-size: .875rem; }
+  #m4 .control-slider input { accent-color: #13546a; }
+  #m4 #m4-restablecer { padding: 9px 12px; background: #13546a; color: #fff; }
+  #m4 #m4-restablecer:hover { background: #0b6880; }
+  #m4 .m4-resultados { margin-top: 12px; }
+  #m4 table { width: 100%; table-layout: fixed; overflow-wrap: anywhere; }
+  @media (max-width: 600px) {
+    #m4 th, #m4 td { padding-inline: 3px; }
+  }
 </style>
 </head>
 <body>
@@ -776,6 +809,8 @@
   <h2>Simulador de escenarios</h2>
   <p class="nota">Proyecta la densidad del patio para los 14 días siguientes a «Día hasta». El escenario base usa los últimos 28 días de operación.</p>
 
+  <div class="m4-salidas" id="m4-salidas"></div>
+
   <div class="m4-cuerpo">
     <div class="m4-controles">
       <h3>Supuestos del escenario</h3>
@@ -783,29 +818,30 @@
       <div id="m4-sliders-dwell"></div>
       <h3 style="margin-top:14px">Llegada de buques</h3>
       <div class="control-slider">
-        <div class="fila"><span>Buques extra por semana</span><strong id="m4-buques-txt"></strong></div>
+        <div class="fila"><label for="m4-buques">Buques extra por semana</label><strong id="m4-buques-txt"></strong></div>
         <input type="range" id="m4-buques" min="-2" max="3" step="0.5" value="0">
         <div class="ref">Hoy llegan 3.5 buques por semana. Valores negativos = menos buques.</div>
       </div>
       <div class="control-slider">
-        <div class="fila"><span>TEU por buque extra (descarga + carga)</span><strong id="m4-teu-txt"></strong></div>
+        <div class="fila"><label for="m4-teu">TEU por buque extra (descarga + carga)</label><strong id="m4-teu-txt"></strong></div>
         <input type="range" id="m4-teu" min="300" max="1500" step="10" value="900">
         <div class="ref" id="m4-teu-ref"></div>
       </div>
       <button type="button" id="m4-restablecer">↺ Restablecer a la situación actual</button>
     </div>
 
-    <div>
-      <div class="m4-salidas" id="m4-salidas"></div>
-      <h3 style="margin:0 0 8px; font-size:1rem" id="m4-titulo-graf">Densidad del patio: real y proyectada</h3>
+    <div class="m4-panel">
+      <h3 id="m4-titulo-graf">Densidad del patio: real y proyectada</h3>
       <div class="lienzo" style="height:320px"><canvas id="m4-grafico" aria-label="Proyección de densidad a 14 días"></canvas></div>
       <details class="tabla-datos"><summary>Ver la proyección en tabla</summary><div class="scroll" id="m4-tabla-proy"></div></details>
     </div>
   </div>
 
-  <h3 style="margin-top:18px">Resultados por categoría</h3>
-  <div id="m4-tabla"></div>
-  <p class="nota">La proyección aplica los cambios de forma gradual y mantiene la tendencia de crecimiento actual. En días de llegada de buques, la ocupación puede alcanzar la alerta roja antes de lo previsto.</p>
+  <div class="m4-panel m4-resultados">
+    <h3>Resultados por categoría</h3>
+    <div id="m4-tabla"></div>
+    <p class="nota">La proyección aplica los cambios de forma gradual y mantiene la tendencia de crecimiento actual. En días de llegada de buques, la ocupación puede alcanzar la alerta roja antes de lo previsto.</p>
+  </div>
 </section>
 
 <!-- ===== MÓDULO 5 · MEJORA (A3) ===== Responsable: Osmar Chiari -->
