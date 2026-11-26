@@ -698,6 +698,46 @@
       box-shadow: 0 10px 22px #09192c55;
     }
   }
+  .m4-dwell-leyenda { color: var(--suave); margin-bottom: 12px; font-size: .875rem; }
+  .m4-dwell-fila {
+    display: grid;
+    grid-template-columns: minmax(8rem, 1fr) minmax(0, 3fr) minmax(7rem, 1fr);
+    align-items: center;
+    gap: 8px 16px;
+    padding: 12px 0;
+    border-top: 1px solid var(--borde);
+  }
+  .m4-dwell-pista {
+    position: relative;
+    display: grid;
+    gap: 5px;
+    padding: 4px 0;
+    background: #f0f5f9;
+    border-radius: 6px;
+  }
+  .m4-dwell-pista .barra { height: 8px; border-radius: 5px; transition: width 300ms ease; }
+  .m4-dwell-pista .actual { background: #8493a3; }
+  .m4-dwell-pista .escenario { background: var(--categoria); }
+  .m4-dwell-pista .meta {
+    position: absolute;
+    inset-block: 0;
+    width: 2px;
+    background: #172e47;
+    box-shadow: 0 0 0 1px #fff;
+    transition: left 300ms ease;
+  }
+  .m4-dwell-valor { text-align: right; }
+  .m4-dwell-valor strong { display: block; font-size: clamp(1.4rem, 2.7vw, 2rem); }
+  .m4-dwell-valor [data-delta], .m4-dwell-fila [data-base] { font-size: .875rem; color: var(--suave); }
+  .m4-dwell-valor [data-delta="sube"] { color: #a32237; }
+  .m4-dwell-valor [data-delta="baja"] { color: #087345; }
+  @media (max-width: 600px) {
+    .m4-dwell-fila { grid-template-columns: minmax(0, 1fr) auto; }
+    .m4-dwell-pista { grid-column: 1 / -1; grid-row: 2; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .m4-dwell-pista :is(.barra, .meta) { transition: none; }
+  }
 </style>
 </head>
 <body>
@@ -986,7 +1026,12 @@
 
   <div class="m4-panel m4-resultados">
     <h3>Resultados por categoría</h3>
-    <div id="m4-tabla"></div>
+    <div class="m4-dwell-leyenda">Permanencia en días · gris: actual · color: escenario · línea vertical: meta</div>
+    <div id="m4-dwell-resultados"></div>
+    <details class="tabla-datos">
+      <summary>Ver detalle de inventario y proyección</summary>
+      <div id="m4-tabla"></div>
+    </details>
     <p class="nota">La proyección aplica los cambios de forma gradual y mantiene la tendencia de crecimiento actual. En días de llegada de buques, la ocupación puede alcanzar la alerta roja antes de lo previsto.</p>
   </div>
 </section>
@@ -2589,6 +2634,37 @@ function renderModulo4() {
         ctx.setLineDash([]); ctx.fillStyle = '#d6e7f9'; ctx.font = '11px Segoe UI, Arial'; ctx.fillText('hoy (día de corte)', x + 4, top + 12); ctx.restore(); } }]
     });
   }
+
+  const resultadosDwell = document.getElementById('m4-dwell-resultados');
+  const categoriasDwell = Object.keys(CATEGORIAS);
+  if (!resultadosDwell.children.length) {
+    resultadosDwell.innerHTML = categoriasDwell.map(c => `
+      <div class="m4-dwell-fila" style="--categoria:${COLOR_CAT[c]}">
+        <div><strong>${CATEGORIAS[c]}</strong><div data-base></div></div>
+        <div class="m4-dwell-pista" aria-hidden="true">
+          <div class="barra actual"></div>
+          <div class="barra escenario"></div>
+          <div class="meta"></div>
+        </div>
+        <div class="m4-dwell-valor"><strong data-escenario></strong><span data-delta></span></div>
+      </div>`).join('');
+  }
+  const escalaDwell = Math.max(20, ...categoriasDwell.flatMap(c => [
+    cal.cat[c].W, escAct.dwell[c], METAS.dwell[c]
+  ])) * 1.05;
+  categoriasDwell.forEach((c, i) => {
+    const fila = resultadosDwell.children[i];
+    const actual = cal.cat[c].W, escenario = escAct.dwell[c], meta = METAS.dwell[c];
+    const delta = Math.round((escenario - actual) * 10) / 10;
+    fila.querySelector('.actual').style.width = (actual / escalaDwell * 100) + '%';
+    fila.querySelector('.escenario').style.width = (escenario / escalaDwell * 100) + '%';
+    fila.querySelector('.meta').style.left = (meta / escalaDwell * 100) + '%';
+    fila.querySelector('[data-base]').textContent = `Actual ${fmt(actual, 2)} · Meta ${fmt(meta, 1)}`;
+    fila.querySelector('[data-escenario]').textContent = fmt(escenario, 2) + ' días';
+    const etiquetaDelta = fila.querySelector('[data-delta]');
+    etiquetaDelta.dataset.delta = delta > 0 ? 'sube' : delta < 0 ? 'baja' : 'igual';
+    etiquetaDelta.textContent = delta ? (delta > 0 ? '+' : '') + fmt(delta, 1) + ' días' : 'Sin cambio';
+  });
 
   /* Tabla por categoría */
   const escAct = escenarioActual(cal);
