@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&amp;display=swap">
-<title>Dashboard KPI · Un patio que se llena</title>
+<title>Patio en Flujo · Dashboard portuario</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
   :root {
@@ -449,6 +449,39 @@
     line-height: 1.04;
   }
   section.modulo > h2, .dialogo-cabecera h2 { font-weight: 400; }
+  .marca-patio {
+    display: flex;
+    align-items: center;
+    gap: clamp(12px, 2vw, 22px);
+    margin-top: 16px;
+  }
+  .marca-patio h1 { margin-top: 0; }
+  .emblema-patio {
+    display: grid;
+    flex: 0 0 auto;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 5px;
+    width: clamp(48px, 8vw, 76px);
+    aspect-ratio: 1;
+    padding: clamp(7px, 1.15vw, 11px);
+    border: 1px solid #82d8d58c;
+    border-radius: 15px;
+    background: #0b2338;
+  }
+  .emblema-patio span {
+    border: 1px solid #98e5ed;
+    border-radius: 3px;
+    background: repeating-linear-gradient(90deg, #80d5e6 0 3px, #b2edf1 3px 4px);
+  }
+  .emblema-patio span:last-child {
+    border: 1px dashed #98e5ed;
+    background: transparent;
+  }
+  @media (max-width: 550px) {
+    .marca-patio { align-items: flex-start; }
+    .emblema-patio { margin-top: 2px; }
+  }
 </style>
 </head>
 <body>
@@ -459,8 +492,15 @@
       <p>UMIP · Medición y Rendimiento de Terminales Portuarias</p>
       <span class="aviso">Datos simulados</span>
     </div>
-    <h1>Un patio que se llena</h1>
-    <p class="cabecera-descripcion">Dashboard de KPI portuarios · 60 días de operación simulada en los bloques A–F.</p>
+    <div class="marca-patio">
+      <span class="emblema-patio" role="img" aria-label="Tres contenedores y un espacio liberado">
+        <span></span><span></span><span></span><span></span>
+      </span>
+      <div>
+        <h1>Patio en Flujo</h1>
+        <p class="cabecera-descripcion">Simulamos cómo evacuar contenedores vacíos y reducir el tiempo libre de almacenaje para liberar espacio y disminuir los remanejos.</p>
+      </div>
+    </div>
   </div>
 </header>
 
