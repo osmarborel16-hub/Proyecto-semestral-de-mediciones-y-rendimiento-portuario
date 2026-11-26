@@ -592,6 +592,30 @@
   }
   #m4 .m4-panel-grafica summary, #m4 .m4-panel-grafica .pendiente { color: #c1dbf4; }
   #m4 .m4-panel-grafica th, #m4 .m4-panel-grafica td { border-color: #42617d; }
+  #m4-sliders-dwell { display: grid; gap: 10px; margin-block: 12px; }
+  #m4 .m4-categoria {
+    margin: 0;
+    padding: 10px;
+    border: 1px solid var(--borde);
+    border-top: 3px solid var(--color-categoria);
+    border-radius: 10px;
+    background: #f8fbfd;
+  }
+  #m4 .m4-categoria .fila { align-items: center; flex-wrap: wrap; }
+  .m4-categoria label { display: inline-flex; align-items: center; gap: 7px; font-weight: 700; }
+  .m4-icono {
+    display: inline-grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    border: 1px solid var(--color-categoria);
+    border-radius: 7px;
+    background: #fff;
+    color: var(--texto);
+    font-size: 1.1rem;
+    line-height: 1;
+  }
+  #m4 .m4-categoria input { accent-color: var(--color-categoria); margin-inline: 0; }
 </style>
 </head>
 <body>
@@ -2380,8 +2404,12 @@ function renderModulo4() {
   /* Controles */
   const cont = document.getElementById('m4-sliders-dwell');
   if (!cont.dataset.listo) {
-    cont.innerHTML = Object.keys(CATEGORIAS).map(c => `<div class="control-slider">
-      <div class="fila"><span>${CATEGORIAS[c]}</span><strong id="m4-w-txt-${c}"></strong></div>
+    const iconos = { IMP: '↓', EXP: '↑', TRB: '⇄', VAC: '□' };
+    cont.innerHTML = Object.keys(CATEGORIAS).map(c => `<div class="control-slider m4-categoria" style="--color-categoria:${COLOR_CAT[c]}">
+      <div class="fila">
+        <label for="m4-w-${c}"><span class="m4-icono" aria-hidden="true">${iconos[c]}</span>${CATEGORIAS[c]}</label>
+        <strong id="m4-w-txt-${c}"></strong>
+      </div>
       <input type="range" id="m4-w-${c}" data-cat="${c}" min="1" max="20" step="0.5">
       <div class="ref" id="m4-w-ref-${c}"></div></div>`).join('');
     cont.querySelectorAll('input').forEach(inp => inp.addEventListener('input', (e) => {
