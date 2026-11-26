@@ -482,6 +482,48 @@
     .marca-patio { align-items: flex-start; }
     .emblema-patio { margin-top: 2px; }
   }
+  #m2 {
+    background: linear-gradient(145deg, #0b2037, #15435b);
+    color: #fff;
+  }
+  .m2-encabezado {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px 24px;
+    margin-bottom: 16px;
+  }
+  .m2-encabezado h2 { margin: 0 0 6px; font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 400; }
+  .m2-encabezado > div:first-child { flex: 1 1 300px; }
+  .m2-encabezado .nota, .m2-encabezado .m2-controles label { color: #dfedf6; }
+  .m2-encabezado .m2-controles { margin: 0; }
+  .m2-indicadores, .m2-paneles { display: grid; gap: 12px; }
+  .m2-indicadores { grid-template-columns: repeat(4, minmax(0, 1fr)); margin-bottom: 12px; }
+  .m2-paneles { grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); }
+  .m2-panel, .m2-indicador {
+    min-width: 0;
+    border-radius: 14px;
+    padding: clamp(12px, 2vw, 20px);
+    color: var(--texto);
+    background: #fff;
+  }
+  .m2-indicador { border-top: 4px solid var(--color-categoria); }
+  .m2-indicador strong { display: block; font-weight: 600; }
+  .m2-indicador .num { display: block; margin: 7px 0 3px; font-size: clamp(1.4rem, 2.8vw, 2.15rem); line-height: 1.15; }
+  .m2-indicador small { color: var(--suave); }
+  .m2-panel h3 { margin: 0 0 10px; }
+  .m2-panel .m2-respuesta { margin: 0; }
+  .m2-panel .m2-global { grid-template-columns: minmax(0, 1fr); }
+  .m2-panel:last-child { grid-column: 1 / -1; }
+  #m2-tabla table { table-layout: fixed; overflow-wrap: anywhere; }
+  @media (max-width: 1000px) { .m2-paneles { grid-template-columns: minmax(0, 1fr); } }
+  @media (max-width: 670px) {
+    .m2-indicadores { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    #m2-tabla th, #m2-tabla td { padding-inline: 3px; }
+    #m2-barras .barra-dwell { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+    #m2-barras .barra-dwell .valor { text-align: left; }
+  }
 </style>
 </head>
 <body>
@@ -616,36 +658,44 @@
 
 <!-- ===== MÓDULO 2 · DWELL TIME ===== Responsable: Leslie West -->
 <section class="modulo" id="m2">
-  <h2>Dwell time</h2>
+  <div class="m2-encabezado">
+    <div>
+      <h2>Dwell time</h2>
   <p class="nota">El tiempo de permanencia se muestra para los contenedores que <strong>salieron</strong> en el periodo filtrado. La antigüedad corresponde al inventario al cierre del día de corte. El filtro de turno no aplica a este módulo.</p>
-
+    </div>
   <div class="m2-controles">
     <label>X días para la antigüedad (aging)
       <input type="number" id="m2-x" min="1" max="60" step="1" value="10">
     </label>
   </div>
+  </div>
 
+  <div class="m2-indicadores" id="m2-indicadores" aria-label="Permanencia por categoría"></div>
+
+  <div class="m2-paneles">
+    <div class="m2-panel">
+      <h3 id="m2-titulo-dwell">Dwell time por categoría vs meta</h3>
+      <div id="m2-barras"></div>
+    </div>
+    <div class="m2-panel">
+      <h3>Presión sobre el patio</h3>
   <div class="m2-respuesta">
     <div class="pregunta">¿Qué categoría presiona más el patio y cuántos TEU ocupa de más?</div>
     <div class="respuesta" id="m2-respuesta"></div>
   </div>
-
-  <div class="m2-cuerpo">
-    <div>
-      <h3 id="m2-titulo-dwell">Dwell time por categoría vs meta</h3>
-      <div id="m2-barras"></div>
       <div class="m2-global" id="m2-global"></div>
     </div>
-    <div>
+    <div class="m2-panel">
       <h3 id="m2-titulo-aging">Antigüedad del inventario</h3>
       <div class="lienzo"><canvas id="m2-grafico" aria-label="Antigüedad del inventario por categoría"></canvas></div>
       <p class="nota" id="m2-aging-txt"></p>
     </div>
+    <div class="m2-panel">
+      <h3>Detalle por categoría</h3>
+      <div id="m2-tabla"></div>
+      <p class="nota">Los TEU de más representan el espacio que podría liberarse si la categoría alcanzara su meta de permanencia.</p>
+    </div>
   </div>
-
-  <h3 style="margin-top:18px">Detalle por categoría</h3>
-  <div id="m2-tabla"></div>
-  <p class="nota">Los TEU de más representan el espacio que podría liberarse si la categoría alcanzara su meta de permanencia.</p>
 </section>
 
 <!-- ===== MÓDULO 3 · REMANEJOS ===== Responsable: Adriana Garibaldi -->
@@ -1933,6 +1983,16 @@ function renderModulo2() {
       ` (${fmt(exceso[critica] / capacidad(f.bloque) * 100)} puntos de densidad).` +
       (segunda && exceso[segunda] > 0 ? ` Le sigue ${CATEGORIAS[segunda]} con unos ${Math.round(exceso[segunda]).toLocaleString('es-PA')} TEU de más.` : '');
   }
+
+  document.getElementById('m2-indicadores').innerHTML = cats.map(c => {
+    const dwell = dw.porCategoria[c].dwell;
+    const valor = dwell === null ? 'Sin salidas' : fmt(dwell, 2) + ' días';
+    return `<div class="m2-indicador" style="--color-categoria:${COLOR_CAT[c]}">
+      <strong>${CATEGORIAS[c]}</strong>
+      <span class="num">${valor}</span>
+      <small>Meta ≤ ${METAS.dwell[c]} días</small>
+    </div>`;
+  }).join('');
 
   /* 2) Barras de dwell vs meta (HTML: valor y meta siempre visibles) */
   const escala = Math.max(14, ...cats.map(c => (dw.porCategoria[c].dwell || 0) * 1.1));
