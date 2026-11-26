@@ -369,17 +369,18 @@
     .boton-remanejos { left: 8px; transform: translateY(50%); }
   }
   .dialogo-remanejos {
-    width: min(1080px, calc(100% - 24px));
-    max-height: 90dvh;
+    width: min(960px, calc(100% - 32px));
+    max-height: 86dvh;
     padding: clamp(14px, 3vw, 28px);
     border: 1px solid var(--borde);
-    border-radius: 14px;
-    background: var(--tarjeta);
-    color: var(--texto);
+    border-radius: 18px;
+    background: #fff;
+    color: #0d2239;
+    box-shadow: 0 24px 72px #06132566;
   }
   .dialogo-remanejos::backdrop {
-    background: #09182b80;
-    backdrop-filter: blur(6px);
+    background: #09182b38;
+    backdrop-filter: blur(14px) saturate(.85);
   }
   @media (prefers-reduced-motion: no-preference) {
     .dialogo-remanejos[open] { animation: entrada-remanejos 320ms cubic-bezier(.2, .75, .3, 1) both; }
@@ -391,10 +392,22 @@
   }
   @keyframes fondo-remanejos {
     from { background: transparent; backdrop-filter: blur(0); }
-    to { background: #09182b80; backdrop-filter: blur(6px); }
+    to { background: #09182b38; backdrop-filter: blur(14px) saturate(.85); }
   }
   .dialogo-cabecera { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
   .dialogo-cabecera h2, .dialogo-cabecera form { margin: 0; }
+  .dialogo-cabecera h2 {
+    font-size: clamp(1.65rem, 4vw, 2.6rem);
+    line-height: 1.1;
+    letter-spacing: -.025em;
+  }
+  .dialogo-remanejos .nota, .dialogo-remanejos .m3-resumen .lbl {
+    color: #354b60;
+    font-size: .875rem;
+    line-height: 1.55;
+  }
+  .dialogo-remanejos .m3-resumen .num { font-size: 1.5rem; }
+
   .filtros-panel { margin-bottom: 12px; }
   .filtros-panel > summary { width: fit-content; cursor: pointer; color: var(--primario); padding: 6px 0; font-weight: 650; }
   .filtros-panel .filtros { margin-top: 6px; }
