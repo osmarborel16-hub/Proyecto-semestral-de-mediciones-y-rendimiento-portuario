@@ -1,0 +1,51 @@
+{
+  "schemaVersion": "1.0",
+  "project": "Patio en Flujo",
+  "period": "60 días · corte día 60",
+  "updatedAt": "2026-11-19",
+  "nature": "Datos académicos simulados y verificados",
+  "source": "https://osmarborel16-hub.github.io/Proyecto-semestral-de-mediciones-y-rendimiento-portuario/",
+  "verification": "https://github.com/osmarborel16-hub/Proyecto-semestral-de-mediciones-y-rendimiento-portuario/blob/main/docs/verificacion_manual.md",
+  "capacidadTeu": 4600,
+  "inventarioTeu": 3690,
+  "densidadPct": 80.22,
+  "dwellGlobalDias": 6.35,
+  "remanejosPct": 39.27,
+  "diasAlertaRoja": 31.6,
+  "metas": {
+    "densidadPct": 70,
+    "dwellGlobalDias": 5,
+    "remanejosPct": 30,
+    "diasAlertaRoja": 30
+  },
+  "categorias": [
+    {
+      "id": "importacion",
+      "nombre": "Importación",
+      "contenedores": 6356,
+      "dwellDias": 7.14,
+      "metaDias": 5
+    },
+    {
+      "id": "exportacion",
+      "nombre": "Exportación",
+      "contenedores": 5806,
+      "dwellDias": 4.16,
+      "metaDias": 4
+    },
+    {
+      "id": "transbordo",
+      "nombre": "Transbordo",
+      "contenedores": 5593,
+      "dwellDias": 4.99,
+      "metaDias": 4
+    },
+    {
+      "id": "vacios",
+      "nombre": "Vacíos",
+      "contenedores": 2242,
+      "dwellDias": 13.17,
+      "metaDias": 7
+    }
+  ]
+}
